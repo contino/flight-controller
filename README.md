@@ -18,8 +18,11 @@ For macOs get graphviz for the diagrams to work
     - brew install graphviz 
 
 
+AWS CDK
+- NVM -> npm and node https://github.com/nvm-sh/nvm#usage 
+- AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-prereqs.html
+- AWS CDK https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
+
+
 
 # Questions
-
-- Do you want to go with Terraform, we can use AWS CDK or even terraform cdktf
-- Do you want to use docker or Lambda or “dockerized lambda”?

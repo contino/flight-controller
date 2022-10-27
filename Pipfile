@@ -4,8 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-google-cloud-pubsub = "*"
-google-cloud-bigquery = "*"
 flask = "*"
 gunicorn = "*"
 structlog = "*"
