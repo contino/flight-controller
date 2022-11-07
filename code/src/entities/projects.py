@@ -16,6 +16,18 @@ class ProjectRequested(BaseEvent):
     eventVersion: int
     eventType: Literal["ProjectRequested"] = "ProjectRequested"
 
+@dataclass
+class ProjectAssignedPayload:
+    project_id: str
+    assigned_time: float
+
+
+@dataclass
+class ProjectAssigned(BaseEvent):
+    payload: ProjectAssignedPayload
+    eventVersion: int
+    eventType: Literal["ProjectAssigned"] = "ProjectAssigned"
+
 
 @dataclass
 class ProjectCreatedPayload:

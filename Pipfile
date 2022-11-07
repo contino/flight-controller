@@ -4,9 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
-gunicorn = "*"
 structlog = "*"
+boto3= "*" 
 
 [dev-packages]
 pytest = "*"

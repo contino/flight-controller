@@ -1,3 +1,5 @@
+from dateutil import parser
+
 from src.entities.projects import (
     ProjectCreated,
     ProjectLeadTime,
@@ -10,5 +12,5 @@ def handle_project_created(
 ) -> ProjectLeadTime:
     return ProjectLeadTime(
         project_requested.payload.project_id,
-        project_created.payload.created_time - project_requested.payload.requested_time,
+        (parser.parse(project_created.payload.created_time) - parser.parse(project_requested.payload.requested_time)).total_seconds(),
     )

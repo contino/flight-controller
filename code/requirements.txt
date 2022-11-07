@@ -1,0 +1,2 @@
+structlog==22.1.0
+python-dateutil==2.8.2

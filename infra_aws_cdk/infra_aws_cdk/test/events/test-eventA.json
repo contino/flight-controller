@@ -1,0 +1,7 @@
+[{
+    "Source": "contino.custom",
+    "DetailType": "Test Event",
+    "Detail": "{\"event_type\": \"ProjectAssigned\",\"project_id\":\"project1\",\"time\":\"2022-12-04 03:13:02.113000000\"}",
+    "EventBusName":"MainEventBus"
+}]
+
