@@ -41,7 +41,7 @@ class DynamoEventSink(EventSink):
                 for event in events:
                     value = {
                         'aggregateId': event.aggregateId,
-                        'eventId':event.eventId,
+                        'eventId':str(event.eventId),
                         'eventType': event.eventType,
                         'aggregateType': event.aggregateType,
                         'aggregateVersion':event.aggregateVersion,

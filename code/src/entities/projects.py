@@ -46,3 +46,9 @@ class ProjectCreated(BaseEvent):
 class ProjectLeadTime:
     project_id: str
     lead_time: float
+
+@dataclass
+class ProjectAssignedLeadTime:
+    project_id: str
+    lead_time: float
+

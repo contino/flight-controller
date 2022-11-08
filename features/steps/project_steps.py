@@ -15,7 +15,7 @@ topic_path = publisher.topic_path(project="contino-squad0-fc", topic="topic")
 
 @given("a project has been requested")
 def request_project(context):
-    context.project_id = "".join(random.choices(string.ascii_letters, k=12))
+    context.correlation_id = "".join(random.choices(string.ascii_letters, k=12))
     context.project_number = str(random.randint(100000000000, 999999999999))
     context.requested_time = datetime.utcnow().timestamp()
     publisher.publish(
@@ -24,7 +24,7 @@ def request_project(context):
             {
                 "event_type": "ProjectRequested",
                 "requested_time": context.requested_time,
-                "project_id": context.project_id,
+                "correlation_id": context.correlation_id,
                 "project_number": context.project_number,
             }
         ).encode("utf-8"),
@@ -41,7 +41,7 @@ def create_project(context):
             {
                 "event_type": "ProjectCreated",
                 "created_time": context.created_time,
-                "project_id": context.project_id,
+                "correlation_id": context.correlation_id,
                 "project_number": context.project_number,
             }
         ).encode("utf-8"),
@@ -54,7 +54,7 @@ def lead_time_stored(context):
     query = f"""
     SELECT lead_time
     FROM `flight_controller.project_lead_times`
-    WHERE project_id = '{context.project_id}'
+    WHERE correlation_id = '{context.correlation_id}'
     """
     print(query)
     got = bigquery_client.query(query).result()
