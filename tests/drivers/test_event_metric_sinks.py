@@ -1,10 +1,6 @@
 from datetime import datetime
-import json
 import random
-import string
-from uuid import uuid4, UUID
-
-from google.cloud import bigquery
+from uuid import UUID
 import pytest
 
 from src.drivers.dynamo_event_sink_source import (
@@ -25,9 +21,7 @@ from src.entities.projects import (
     ProjectAssignedLeadTime
 )
 
-@pytest.mark.integration
-def get_big_query_client():
-    client = bigquery.Client()
+
 
 
 @pytest.mark.integration

@@ -13,6 +13,7 @@ boto3= "*"
 
 [dev-packages]
 pytest = "*"
+pytest-env = "*"
 mypy = "*"
 black = "*"
 pytest-cov = "*"

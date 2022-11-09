@@ -16,7 +16,6 @@ def lambda_handler(event, context):
     full_event = event["detail"]
     events = event_source.get_events_for_aggregate(full_event["correlation_id"])
     logger.msg("Returned aggregate events", events=events)
-    ## TODO convert events before getting aggregate above
     response = handle_event(full_event, events)
     if isinstance(response, Exception):
         logger.msg("Exception handling event", exception=str(response))

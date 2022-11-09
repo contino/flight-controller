@@ -23,8 +23,10 @@ from src.entities.projects import (
 
 
 
-#TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME","InfraAwsCdkStack-eventsourcingtableF21B0323-NEAHWJF9MRL0")
-TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
+TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME","InfraAwsCdkStack-eventsourcingtableF21B0323-NEAHWJF9MRL0")
+#TODO fix the test environment variable 
+# did not work https://github.com/MobileDynasty/pytest-env
+#TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
 
 dynamoDbResource = boto3.resource('dynamodb')
 logger = structlog.get_logger(__name__)
