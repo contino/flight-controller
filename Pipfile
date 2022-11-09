@@ -10,6 +10,7 @@ gunicorn = "*"
 structlog = "*"
 boto3= "*" 
 
+
 [dev-packages]
 pytest = "*"
 mypy = "*"
@@ -17,6 +18,14 @@ black = "*"
 pytest-cov = "*"
 diagrams = "*"
 behave = "*"
+aws-cdk-lib = "==2.47.0"
+constructs = ">=10.0.0,<11.0.0"
+"aws-cdk.aws-apigatewayv2-alpha" = "*"
+"aws-cdk.aws-apigatewayv2-integrations-alpha" = "*"
+"aws-cdk.aws-lambda-python-alpha" = "*"
 
 [requires]
 python_version = "3.10"
+
+[pipenv]
+allow_prereleases = true

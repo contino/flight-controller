@@ -1,7 +1,6 @@
 import random
 import string
 from datetime import datetime
-from dateutil import parser
 from uuid import uuid4
 
 from src.adapters.controller import handle_event
@@ -16,22 +15,22 @@ from src.entities.projects import (
 )
 
 correlation_id = "".join(random.choices(string.ascii_letters, k=12))
-
+event_time = int(round(datetime.utcnow().timestamp()))
 project_requested_payload = {
     "correlation_id": correlation_id,
-    "time": datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S"),
+    "time": event_time,
     "event_type": "ProjectRequested",
 }
 
 project_assigned_payload = {
     "correlation_id": correlation_id,
-    "time": datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S"),
+    "time": event_time,
     "event_type": "ProjectAssigned",
 }
 
 project_created_payload = {
     "correlation_id": correlation_id,
-    "time": datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S"),
+    "time": event_time,
     "event_type": "ProjectCreated",
 }
 
@@ -63,7 +62,7 @@ def test_project_created_returns_correct_event():
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")),
+        ProjectRequestedPayload(correlation_id, event_time),
     )
     assert isinstance(
         handle_event(
@@ -80,7 +79,7 @@ def test_project_assigned_returns_correct_event():
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")),
+        ProjectRequestedPayload(correlation_id, event_time),
     )
     assert isinstance(
         handle_event(
@@ -98,7 +97,7 @@ def test_project_created_returns_lead_time():
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")),
+        ProjectRequestedPayload(correlation_id, event_time),
     )
     assert handle_event(project_created_payload, [requested_event])[1] == [
         ProjectLeadTime(
@@ -114,7 +113,7 @@ def test_project_assigned_returns_lead_time():
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")),
+        ProjectRequestedPayload(correlation_id, event_time),
     )
     assert handle_event(project_assigned_payload, [requested_event])[1] == [
         ProjectAssignedLeadTime(
@@ -130,7 +129,7 @@ def test_project_assigned_returns_lead_time_with_multiple_aggregates():
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")),
+        ProjectRequestedPayload(correlation_id, event_time),
     )
 
     created_event = ProjectCreated(
@@ -139,7 +138,7 @@ def test_project_assigned_returns_lead_time_with_multiple_aggregates():
         2,
         uuid4(),
         1,
-        ProjectCreatedPayload(correlation_id, datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")),
+        ProjectCreatedPayload(correlation_id, event_time),
     )
     assert handle_event(project_assigned_payload, [created_event,requested_event])[1] == [
         ProjectAssignedLeadTime(

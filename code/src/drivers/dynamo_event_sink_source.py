@@ -47,7 +47,7 @@ class DynamoEventSink(EventSink):
                         'aggregateVersion':event.aggregateVersion,
                         'eventVersion': event.eventVersion,
                         'payload': json.dumps(event.payload.__dict__),
-                        'datetime': datetime.utcnow().strftime("%m/%d/%Y, %H:%M:%S")
+                        'datetime': int(round(datetime.utcnow().timestamp()))
                     }
                     batch.put_item(Item=value)
         except Exception as err:

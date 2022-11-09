@@ -1,68 +1,61 @@
 from time import sleep
 from behave import given, when, then
-import random
-import string
 from datetime import datetime
 import json
 
-from google.cloud import pubsub_v1, bigquery
+import boto3
 
-publisher = pubsub_v1.PublisherClient()
-bigquery_client = bigquery.Client()
-
-topic_path = publisher.topic_path(project="contino-squad0-fc", topic="topic")
+publisher = boto3.client("events")
 
 
 @given("a project has been requested")
 def request_project(context):
-    context.correlation_id = "".join(random.choices(string.ascii_letters, k=12))
-    context.project_number = str(random.randint(100000000000, 999999999999))
-    context.requested_time = datetime.utcnow().timestamp()
-    publisher.publish(
-        topic_path,
-        json.dumps(
+    context.correlation_id = "behaveTest"
+    context.requested_time = int(round(datetime.utcnow().timestamp()))
+    publisher.put_events(
+        Entries=[
             {
-                "event_type": "ProjectRequested",
-                "requested_time": context.requested_time,
-                "correlation_id": context.correlation_id,
-                "project_number": context.project_number,
+                "Source": "contino.custom",
+                "DetailType": "Test project request Event",
+                f"Detail": '{"event_type": "ProjectRequested","correlation_id":{context.correlation_id},"time":{context.requested_time}}',
+                "EventBusName": "MainEventBus",
             }
-        ).encode("utf-8"),
-    ).result()
+        ]
+    )
+
+
+@given("a project has been assigned")
+def assing_project(context):
+    context.correlation_id = "behaveTest"
+    publisher.put_events(
+        Entries=[
+            {
+                "Source": "contino.custom",
+                "DetailType": "Test project assign Event",
+                f"Detail": '{"event_type": "ProjectRequested","correlation_id":{context.correlation_id},"time":{context.requested_time}}',
+                "EventBusName": "MainEventBus",
+            }
+        ]
+    )
 
 
 @when("the project has been created")
-def create_project(context):
-    sleep(5)
-    context.created_time = datetime.utcnow().timestamp()
-    publisher.publish(
-        topic_path,
-        json.dumps(
+def assing_project(context):
+    context.correlation_id = "behaveTest"
+    publisher.put_events(
+        Entries=[
             {
-                "event_type": "ProjectCreated",
-                "created_time": context.created_time,
-                "correlation_id": context.correlation_id,
-                "project_number": context.project_number,
+                "Source": "contino.custom",
+                "DetailType": "Test project assign Event",
+                f"Detail": '{"event_type": "ProjectCreated","correlation_id":{context.correlation_id},"time":{context.requested_time}}',
+                "EventBusName": "MainEventBus",
             }
-        ).encode("utf-8"),
-    ).result()
+        ]
+    )
 
 
 @then("the lead time is stored correctly")
 def lead_time_stored(context):
-    sleep(10)
-    query = f"""
-    SELECT lead_time
-    FROM `flight_controller.project_lead_times`
-    WHERE correlation_id = '{context.correlation_id}'
-    """
-    print(query)
-    got = bigquery_client.query(query).result()
-
-    rows = []
-    for row in got:
-        rows.append(row)
-
-    assert len(rows) >= 1
-
-    assert rows[0][0] == context.created_time - context.requested_time
+    sleep(1)
+    # TODO get metric results
+    assert True

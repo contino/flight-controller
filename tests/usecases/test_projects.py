@@ -21,7 +21,7 @@ projectRequested = ProjectRequested(
     eventId=uuid4(),
     eventVersion=1,
     payload=ProjectRequestedPayload(
-        "test-project", datetime(2022, 8, 2, 10, 0, 0).strftime("%m/%d/%Y, %H:%M:%S")
+        "test-project", int(round(datetime(2022, 8, 2, 10, 0, 0).timestamp()))
     ),
 )
 
@@ -32,7 +32,7 @@ projectAssigned = ProjectAssigned(
     eventId=uuid4(),
     eventVersion=1,
     payload=ProjectAssignedPayload(
-        "test-project", datetime(2022, 8, 2, 11, 0, 0).strftime("%m/%d/%Y, %H:%M:%S")
+        "test-project", int(round(datetime(2022, 8, 2, 11, 0, 0).timestamp()))
     ),
 )
 
@@ -43,7 +43,7 @@ projectCreated = ProjectCreated(
     eventId=uuid4(),
     eventVersion=1,
     payload=ProjectCreatedPayload(
-        "test-project", datetime(2022, 8, 2, 12, 0, 0).strftime("%m/%d/%Y, %H:%M:%S")
+        "test-project", int(round(datetime(2022, 8, 2, 12, 0, 0).timestamp()))
     ),
 )
 

@@ -10,5 +10,6 @@
         "./code",
         "-p",
         "*test.py"
-    ]
+    ],
+    "python.formatting.provider": "black"
 }

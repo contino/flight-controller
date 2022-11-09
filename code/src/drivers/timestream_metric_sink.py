@@ -5,7 +5,10 @@ import time
 
 
 from .metric_sink import MetricSink
-from src.entities.metrics import Metric
+from src.entities.projects import (
+    ProjectLeadTime,
+    ProjectAssignedLeadTime
+)
 
 # TODO get this from environment
 TIMESTREAM_DATABASE_NAME = "core_flight_controller_db"
@@ -32,11 +35,15 @@ class TimeStreamMetricSink(MetricSink):
             ]
             project_metric = {
                 'Dimensions': dimensions,
-                'MeasureName': 'project_lead_time',
                 'MeasureValue': str(metric.lead_time),
                 'MeasureValueType': 'DOUBLE',
                 'Time': str(current_time)
             }
+
+            if isinstance(metric, ProjectLeadTime):
+                project_metric["MeasureName"]="project_lead_time"
+            elif isinstance(metric, ProjectAssignedLeadTime):
+                project_metric["MeasureName"]="project_assign_time"
 
             records.append(project_metric)
 

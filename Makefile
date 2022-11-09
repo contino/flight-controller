@@ -13,3 +13,12 @@ integration-test:
 
 test:
 	pytest --cov=src --cov-fail-under=50 --cov-report term-missing tests/
+
+e2e:
+	behave
+
+build-aws-cdk: 
+	cd infra_aws_cdk;cdk synthesize
+
+deploy-aws-cdk: 
+	cd infra_aws_cdk;cdk deploy

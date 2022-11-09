@@ -50,9 +50,11 @@ For macOs get graphviz for the diagrams to work
 Testing is split into four commands:
 
 - `make unittest` runs all the unit tests (i.e. tests that are not [marked as integration](https://docs.pytest.org/en/7.1.x/example/markers.html))
-- `make integration-test` run all the integration tests (TODO)
-- `make test` runs all the tests and reports on coverage (TODO)
-- `make e2e` runs the end to end BDD tests using [behave](https://github.com/behave/behave) (TODO)
+- `make integration-test` run all the integration tests 
+- `make test` runs all the tests and reports on coverage 
+- `make e2e` runs the end to end BDD tests using [behave](https://github.com/behave/behave) 
+- `make build-aws-cdk` builds the infra with AWS CDK
+- `make deploy-aws-cdk` deploys the infra with AWS CDK
 
 ### testing from console
 
