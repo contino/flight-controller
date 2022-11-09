@@ -5,6 +5,7 @@ from typing import List, Optional
 from datetime import datetime
 from uuid import UUID
 import json
+import os
 
 
 
@@ -22,8 +23,8 @@ from src.entities.projects import (
 
 
 
-# TODO get from env variables
-TABLE_NAME = "InfraAwsCdkStack-eventsourcingtableF21B0323-NEAHWJF9MRL0"
+#TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME","InfraAwsCdkStack-eventsourcingtableF21B0323-NEAHWJF9MRL0")
+TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
 
 dynamoDbResource = boto3.resource('dynamodb')
 logger = structlog.get_logger(__name__)
@@ -76,7 +77,7 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         ProjectRequestedPayload(
                             json.loads(item["payload"])["project_id"],
-                            json.loads(item["payload"])["requested_time"]
+                            int(json.loads(item["payload"])["requested_time"])
                         ),
                         item["eventType"]
                     ))
@@ -90,7 +91,7 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         ProjectAssignedPayload(
                             json.loads(item["payload"])["project_id"],
-                            json.loads(item["payload"])["assigned_time"]
+                            int(json.loads(item["payload"])["assigned_time"])
                         ),
                         item["eventType"]
                     )
@@ -105,7 +106,7 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         ProjectCreatedPayload(
                             json.loads(item["payload"])["project_id"],
-                            json.loads(item["payload"])["created_time"]
+                            int(json.loads(item["payload"])["created_time"])
                         ),
                         item["eventType"]
                     )

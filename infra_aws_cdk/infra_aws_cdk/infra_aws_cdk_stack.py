@@ -46,7 +46,7 @@ class InfraAwsCdkStack(Stack):
         #                                       handler="lambda_handler",
         #                                       runtime=aws_lambda.Runtime.PYTHON_3_9)
 
-        producer_lambda.add_environment("TABLE_NAME", demo_table.table_name)
+        producer_lambda.add_environment("DYNAMO_TABLE_NAME", demo_table.table_name)
         # grant permission to lambda to write to demo table
         demo_table.grant_read_write_data(producer_lambda)
 
@@ -88,13 +88,11 @@ class InfraAwsCdkStack(Stack):
         # create event bus for core to consume
         eventBus = aws_events.EventBus(
             scope=self, id="main_lambda_bus", event_bus_name="MainEventBus")
-        # TODO event pattern should be thought
         eventPattern  = aws_events.EventPattern(source=['contino.custom'])
         lambdaTarget1 = aws_events_targets.LambdaFunction(handler=base_lambda)
 
         
 
-        # TODO refactor rules to own class and generate them automatically, we need to use an adapter
         aws_events.Rule(scope=self,
                         id="coreevent",
                         rule_name="routeToLambda",

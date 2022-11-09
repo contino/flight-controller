@@ -28,7 +28,7 @@ def _convert_payload_to_event(
             eventVersion=1,
             payload=ProjectRequestedPayload(
                 payload["correlation_id"],
-                payload["time"]
+                int(payload["time"])
             ),
         )
     elif event_type == "ProjectAssigned":
@@ -40,7 +40,7 @@ def _convert_payload_to_event(
             eventVersion=1,
             payload=ProjectAssignedPayload(
                 payload["correlation_id"],
-                payload["time"]
+                int(payload["time"])
             ),
         )
     elif event_type == "ProjectCreated":
@@ -52,7 +52,7 @@ def _convert_payload_to_event(
             eventVersion=1,
             payload=ProjectCreatedPayload(
                 payload["correlation_id"],
-                payload["time"]
+                int(payload["time"])
             ),
         )
 

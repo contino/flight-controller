@@ -10,7 +10,6 @@ from src.entities.projects import (
     ProjectAssignedLeadTime
 )
 
-# TODO get this from environment
 TIMESTREAM_DATABASE_NAME = "core_flight_controller_db"
 TIMESTREAM_TABLE_NAME = "event_time_series"
 

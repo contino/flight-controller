@@ -5,19 +5,27 @@ import json
 
 import boto3
 
-publisher = boto3.client("events")
+eventBridge = boto3.client("events")
+timeStream = boto3.client('timestream-query')
+correlation_id = "behaveTest"
 
 
 @given("a project has been requested")
 def request_project(context):
-    context.correlation_id = "behaveTest"
-    context.requested_time = int(round(datetime.utcnow().timestamp()))
-    publisher.put_events(
+    requested_time = int(round(datetime.utcnow().timestamp()))
+
+    eventBridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test project request Event",
-                f"Detail": '{"event_type": "ProjectRequested","correlation_id":{context.correlation_id},"time":{context.requested_time}}',
+                "Detail": json.dumps(
+                    {
+                        "event_type": "ProjectRequested",
+                        "correlation_id": f"{correlation_id}",
+                        "time": f"{requested_time}",
+                    }
+                ),
                 "EventBusName": "MainEventBus",
             }
         ]
@@ -26,13 +34,20 @@ def request_project(context):
 
 @given("a project has been assigned")
 def assing_project(context):
-    context.correlation_id = "behaveTest"
-    publisher.put_events(
+    sleep(3)
+    requested_time = int(round(datetime.utcnow().timestamp()))
+    eventBridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test project assign Event",
-                f"Detail": '{"event_type": "ProjectRequested","correlation_id":{context.correlation_id},"time":{context.requested_time}}',
+                "Detail": json.dumps(
+                    {
+                        "event_type": "ProjectAssigned",
+                        "correlation_id": f"{correlation_id}",
+                        "time": f"{requested_time}",
+                    }
+                ),
                 "EventBusName": "MainEventBus",
             }
         ]
@@ -41,13 +56,20 @@ def assing_project(context):
 
 @when("the project has been created")
 def assing_project(context):
-    context.correlation_id = "behaveTest"
-    publisher.put_events(
+    sleep(3)
+    requested_time = int(round(datetime.utcnow().timestamp()))
+    eventBridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
-                "DetailType": "Test project assign Event",
-                f"Detail": '{"event_type": "ProjectCreated","correlation_id":{context.correlation_id},"time":{context.requested_time}}',
+                "DetailType": "Test project create Event",
+                "Detail": json.dumps(
+                    {
+                        "event_type": "ProjectCreated",
+                        "correlation_id": f"{correlation_id}",
+                        "time": f"{requested_time}",
+                    }
+                ),
                 "EventBusName": "MainEventBus",
             }
         ]
@@ -56,6 +78,7 @@ def assing_project(context):
 
 @then("the lead time is stored correctly")
 def lead_time_stored(context):
-    sleep(1)
-    # TODO get metric results
-    assert True
+    sleep(2)
+    result = timeStream.query(QueryString='select * from core_flight_controller_db.event_time_series where time > ago(10s) order by time desc')
+    print(result)
+    assert len(result["Rows"]) == 2
