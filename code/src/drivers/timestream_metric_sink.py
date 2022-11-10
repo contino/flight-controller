@@ -10,8 +10,8 @@ from src.entities.projects import (
     ProjectAssignedLeadTime
 )
 
-TIMESTREAM_DATABASE_NAME = "core_flight_controller_db"
-TIMESTREAM_TABLE_NAME = "event_time_series"
+TIMESTREAM_DATABASE_NAME = "core_timestream_db"
+TIMESTREAM_TABLE_NAME = "metrics_table"
 
 logger = structlog.get_logger(__name__)
 

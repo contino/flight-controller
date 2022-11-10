@@ -79,6 +79,6 @@ def assing_project(context):
 @then("the lead time is stored correctly")
 def lead_time_stored(context):
     sleep(2)
-    result = timeStream.query(QueryString='select * from core_flight_controller_db.event_time_series where time > ago(10s) order by time desc')
+    result = timeStream.query(QueryString='select * from core_timestream_db.metrics_table where time > ago(10s) order by time desc')
     print(result)
     assert len(result["Rows"]) == 2

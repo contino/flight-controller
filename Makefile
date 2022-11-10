@@ -20,5 +20,8 @@ e2e:
 build-aws-cdk: 
 	cd infra_aws_cdk;cdk synthesize
 
+test-aws-cdk:
+	pytest infra_aws_cdk/tests/
+
 deploy-aws-cdk: 
 	cd infra_aws_cdk;cdk deploy

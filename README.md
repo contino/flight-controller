@@ -61,11 +61,11 @@ Testing is split into four commands:
 After you deploy your infrastructure you can interact with the eventbridge on AWS by sending different messages by runnig the following from the 'infra_aws_cdk' folder:
 
 - Send Project requested event
-    - aws events put-events --entries file://./infra_aws_cdk/test/events/test-eventR.json 
+    - aws events put-events --entries file://./tests/events/test-eventR.json 
 - Send Project assigned event
-    - aws events put-events --entries file://./infra_aws_cdk/test/events/test-eventA.json 
+    - aws events put-events --entries file://./tests/events/test-eventA.json 
 - Send Project created event 
-    - aws events put-events --entries file://./infra_aws_cdk/test/events/test-eventC.json 
+    - aws events put-events --entries file://./tests/events/test-eventC.json 
 
 
 ### Code Structure

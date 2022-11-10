@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from typing import List, Optional, Union
+from typing import List, Optional
 from uuid import UUID, uuid4
 
 from google.cloud import bigquery
