@@ -28,6 +28,12 @@ The approach to scaling a landing zone on AWS is [elaborated here](https://aws.a
     - AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-prereqs.html
     - AWS CDK https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
 
+- Terraform CDK
+    - NVM -> npm and node https://github.com/nvm-sh/nvm#usage 
+    - Terraform 
+    - Yarn -> npm install --global yarn
+    - TFCDK -> npm install --global cdktf-cli@latest -- WARNING required NODE 16.13
+
 Optional
 
 For macOs get graphviz for the diagrams to work

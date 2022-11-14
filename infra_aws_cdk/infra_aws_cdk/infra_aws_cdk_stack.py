@@ -1,12 +1,6 @@
 # AWS python CDK https://docs.aws.amazon.com/cdk/api/v2/python/index.html
 
 from aws_cdk import (
-    aws_lambda,
-    aws_events,
-    aws_events_targets,
-    aws_iam,
-    aws_timestream as timestream,
-    CfnTag,
     Stack,
 )
 
