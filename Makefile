@@ -30,7 +30,7 @@ build-tf-cdk:
 	cd infra_tf_cdk;cdktf synth
 
 test-tf-cdk:
-	pytest infra_tf_cdk/tests/
+	cd infra_tf_cdk;pytest main-test.py
 
 deploy-tf-cdk: 
 	cd infra_tf_cdk;cdk deploy

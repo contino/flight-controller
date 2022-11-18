@@ -1,0 +1,7 @@
+[{
+    "Source": "contino.customCDKTF",
+    "DetailType": "Test Event",
+    "Detail": "{\"event_type\": \"ProjectCreated\",\"correlation_id\":\"project1\",\"time\":\"1668124526\"}",
+    "EventBusName":"main_lambda_bus_cdktf"
+}]
+

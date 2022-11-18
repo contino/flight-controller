@@ -21,7 +21,7 @@ class InfraAwsCdkStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         self.dynamotable_name = "event_sourcing_table"
         self.lambda_name = "producer_lambda_function"
-        self.event_bridge_name = "main_lambda_bus"
+        self.event_bridge_name = "MainEventBus"
         self.timestream_db_name = "core_timestream_db"
 
         # create producer lambda function

@@ -15,6 +15,7 @@ class EventBridgeWithLambdaRule(Construct):
         scope: Construct,
         id: str,
         *,
+        name: str,
         send_event_to: aws_lambda.IFunction,
         **kwargs
     ):
@@ -22,7 +23,7 @@ class EventBridgeWithLambdaRule(Construct):
         
         # create event bus for core to consume
         eventBus = aws_events.EventBus(
-            scope=scope, id=id, event_bus_name="MainEventBus"
+            scope=scope, id=id, event_bus_name=name
         )
 
         # Create event pattern and associated rule 
