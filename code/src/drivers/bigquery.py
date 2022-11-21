@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from typing import List, Optional, Union
+from typing import List, Optional
 from uuid import UUID, uuid4
 
 from google.cloud import bigquery
@@ -85,7 +85,7 @@ class BigQueryEventSource(EventSource):
                         UUID(row[3]),
                         row[4],
                         ProjectRequestedPayload(
-                            payload["project_id"],
+                            payload["correlation_id"],
                             payload["requested_time"],
                         ),
                         row[6],
@@ -100,7 +100,7 @@ class BigQueryEventSource(EventSource):
                         UUID(row[3]),
                         row[4],
                         ProjectCreatedPayload(
-                            payload["project_id"],
+                            payload["correlation_id"],
                             payload["created_time"],
                         ),
                         row[6],
