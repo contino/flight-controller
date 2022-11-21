@@ -117,6 +117,7 @@ At the current time there are no branch protections. However, as the build proce
     
     - aggregate_id: this is id to all events that is part of an instantioantion of a process. For example, when one requests, assigns, and creates a project all the events will have the same correlation id.
     - event_type: this is the type of event, this can be any string representing what happened.
+    - event_version: this is the version of teh event.
     - time: time when the event happened
     - (Optional) payload: Any other detail one needs to add to the event for additional needs.
 
