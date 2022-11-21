@@ -26,33 +26,33 @@ from src.entities.projects import (
 
 @pytest.mark.integration
 def test_store_metrics_does_not_return_error():
-    correlation_id = "testMetric"
+    aggregate_id = "testMetric"
     lead_time = random.randint(0, 7200)
     assigned_lead_time = random.randint(0, 7200)
     sink = TimeStreamMetricSink()
-    assert sink.store_metrics([ProjectAssignedLeadTime(correlation_id, assigned_lead_time), ProjectLeadTime(correlation_id, lead_time)]) is None
+    assert sink.store_metrics([ProjectAssignedLeadTime(aggregate_id, assigned_lead_time), ProjectLeadTime(aggregate_id, lead_time)]) is None
 
 
 @pytest.mark.integration
 def test_retrieves_aggregate_events_from_dynamodb():
-    correlation_id = "testEvent"
+    aggregate_id = "testEvent"
     eventId = "73333023-5fbe-4ad5-aaf9-dcd9a245dae3"
     eventId2 = "73333023-5fbe-4ad5-aaf9-dcd9a245dae4"
     projectRequested = ProjectRequested(
-        aggregateId=correlation_id,
+        aggregateId=aggregate_id,
         aggregateType="Project",
         aggregateVersion=1,
         eventId=UUID(eventId),
         eventVersion=1,
-        payload=ProjectRequestedPayload(correlation_id, int(round(datetime.utcnow().timestamp()))),
+        payload=ProjectRequestedPayload(aggregate_id, int(round(datetime.utcnow().timestamp()))),
     )
     projectCreated = ProjectCreated(
-        aggregateId=correlation_id,
+        aggregateId=aggregate_id,
         aggregateType="Project",
         aggregateVersion=2,
         eventId=UUID(eventId2),
         eventVersion=1,
-        payload=ProjectCreatedPayload(correlation_id, int(round(datetime.utcnow().timestamp()))),
+        payload=ProjectCreatedPayload(aggregate_id, int(round(datetime.utcnow().timestamp()))),
     )
     sink = DynamoEventSink()
     sink.store_events([projectRequested, projectCreated])

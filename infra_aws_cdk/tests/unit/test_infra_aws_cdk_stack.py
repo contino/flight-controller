@@ -47,7 +47,7 @@ def test_dynamodb_is_created_with_correct_partition_and_sort_key():
 def test_eventbridge_bus_is_created():
     template.has_resource_properties(
         "AWS::Events::EventBus",
-        {"Name": "MainEventBus"},
+        {"Name": "main_lambda_bus"},
     )
 
 

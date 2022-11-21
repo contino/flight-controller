@@ -7,7 +7,7 @@ import boto3
 
 eventBridge = boto3.client("events")
 timeStream = boto3.client('timestream-query')
-correlation_id = "behaveTest"
+aggregate_id = "behaveTest"
 
 
 @given("a project has been requested")
@@ -22,11 +22,11 @@ def request_project(context):
                 "Detail": json.dumps(
                     {
                         "event_type": "ProjectRequested",
-                        "correlation_id": f"{correlation_id}",
+                        "aggregate_id": f"{aggregate_id}",
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "MainEventBus",
+                "EventBusName": "main_lambda_bus",
             }
         ]
     )
@@ -44,11 +44,11 @@ def assing_project(context):
                 "Detail": json.dumps(
                     {
                         "event_type": "ProjectAssigned",
-                        "correlation_id": f"{correlation_id}",
+                        "aggregate_id": f"{aggregate_id}",
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "MainEventBus",
+                "EventBusName": "main_lambda_bus",
             }
         ]
     )
@@ -66,11 +66,11 @@ def assing_project(context):
                 "Detail": json.dumps(
                     {
                         "event_type": "ProjectCreated",
-                        "correlation_id": f"{correlation_id}",
+                        "aggregate_id": f"{aggregate_id}",
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "MainEventBus",
+                "EventBusName": "main_lambda_bus",
             }
         ]
     )
