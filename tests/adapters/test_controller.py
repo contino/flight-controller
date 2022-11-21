@@ -14,22 +14,22 @@ from src.entities.projects import (
     ProjectAssignedLeadTime
 )
 
-correlation_id = "".join(random.choices(string.ascii_letters, k=12))
+aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
 event_time = int(round(datetime.utcnow().timestamp()))
 project_requested_payload = {
-    "correlation_id": correlation_id,
+    "aggregate_id": aggregate_id,
     "time": event_time,
     "event_type": "ProjectRequested",
 }
 
 project_assigned_payload = {
-    "correlation_id": correlation_id,
+    "aggregate_id": aggregate_id,
     "time": event_time,
     "event_type": "ProjectAssigned",
 }
 
 project_created_payload = {
-    "correlation_id": correlation_id,
+    "aggregate_id": aggregate_id,
     "time": event_time,
     "event_type": "ProjectCreated",
 }
@@ -57,12 +57,12 @@ def test_project_requested_returns_correct_event():
 
 def test_project_created_returns_correct_event():
     requested_event = ProjectRequested(
-        correlation_id,
+        aggregate_id,
         "Project",
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, event_time),
+        ProjectRequestedPayload(aggregate_id, event_time),
     )
     assert isinstance(
         handle_event(
@@ -74,12 +74,12 @@ def test_project_created_returns_correct_event():
 
 def test_project_assigned_returns_correct_event():
     requested_event = ProjectRequested(
-        correlation_id,
+        aggregate_id,
         "Project",
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, event_time),
+        ProjectRequestedPayload(aggregate_id, event_time),
     )
     assert isinstance(
         handle_event(
@@ -92,57 +92,57 @@ def test_project_assigned_returns_correct_event():
 
 def test_project_created_returns_lead_time():
     requested_event = ProjectRequested(
-        correlation_id,
+        aggregate_id,
         "Project",
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, event_time),
+        ProjectRequestedPayload(aggregate_id, event_time),
     )
     assert handle_event(project_created_payload, [requested_event])[1] == [
         ProjectLeadTime(
-            correlation_id,
+            aggregate_id,
             0
         )
     ]
 
 def test_project_assigned_returns_lead_time():
     requested_event = ProjectRequested(
-        correlation_id,
+        aggregate_id,
         "Project",
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, event_time),
+        ProjectRequestedPayload(aggregate_id, event_time),
     )
     assert handle_event(project_assigned_payload, [requested_event])[1] == [
         ProjectAssignedLeadTime(
-            correlation_id,
+            aggregate_id,
             0
         )
     ]
 
 def test_project_assigned_returns_lead_time_with_multiple_aggregates():
     requested_event = ProjectRequested(
-        correlation_id,
+        aggregate_id,
         "Project",
         1,
         uuid4(),
         1,
-        ProjectRequestedPayload(correlation_id, event_time),
+        ProjectRequestedPayload(aggregate_id, event_time),
     )
 
     created_event = ProjectCreated(
-        correlation_id,
+        aggregate_id,
         "Project",
         2,
         uuid4(),
         1,
-        ProjectCreatedPayload(correlation_id, event_time),
+        ProjectCreatedPayload(aggregate_id, event_time),
     )
     assert handle_event(project_assigned_payload, [created_event,requested_event])[1] == [
         ProjectAssignedLeadTime(
-            correlation_id,
+            aggregate_id,
             0
         )
     ]
@@ -169,7 +169,7 @@ def test_project_handles_unknown_event():
         handle_event(
             {
                 "requested_time": 1659656680.789246,
-                "correlation_id": "the-armitagency",
+                "aggregate_id": "the-armitagency",
                 "event_type": "NotAnEvent",
             },
             [],
@@ -183,7 +183,7 @@ def test_project_handles_malformed_event():
         handle_event(
             {
                 "requested_time": 1659656680.789246,
-                "correlation_id": "the-armitagency",
+                "aggregate_id": "the-armitagency",
             },
             [],
         ),

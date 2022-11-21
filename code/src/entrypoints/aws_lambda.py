@@ -14,7 +14,7 @@ metric_sink = TimeStreamMetricSink()
 def lambda_handler(event, context):
     print(f'event is {event}')
     full_event = event["detail"]
-    events = event_source.get_events_for_aggregate(full_event["correlation_id"])
+    events = event_source.get_events_for_aggregate(full_event["aggregate_id"])
     logger.msg("Returned aggregate events", events=events)
     response = handle_event(full_event, events)
     if isinstance(response, Exception):

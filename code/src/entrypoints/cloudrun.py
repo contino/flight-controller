@@ -49,7 +49,7 @@ def receive_event(
         try:
             payload = json.loads(data)
             log.msg("Received payload", payload=payload)
-            events = event_source.get_events_for_aggregate(payload["correlation_id"])
+            events = event_source.get_events_for_aggregate(payload["aggregate_id"])
             log.msg("Returned aggregate events", events=events)
             response = handle_event(payload, events)
             if isinstance(response, Exception):

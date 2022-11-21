@@ -1,7 +1,7 @@
 [{
     "Source": "contino.custom",
     "DetailType": "Test Event",
-    "Detail": "{\"event_type\": \"ProjectRequested\",\"correlation_id\":\"project1\",\"time\":\"1667924526\"}",
-    "EventBusName":"MainEventBus"
+    "Detail": "{\"event_type\": \"ProjectRequested\",\"aggregate_id\":\"project1\",\"time\":\"1667924526\"}",
+    "EventBusName":"main_lambda_bus"
 }]
 

@@ -21,37 +21,37 @@ def _convert_payload_to_event(
 ) -> Event:
     if event_type == "ProjectRequested":
         return ProjectRequested(
-            aggregateId=payload["correlation_id"],
+            aggregateId=payload["aggregate_id"],
             aggregateType="Project",
             aggregateVersion=aggregateVersion + 1,
             eventId=str(uuid4()),
             eventVersion=1,
             payload=ProjectRequestedPayload(
-                payload["correlation_id"],
+                payload["aggregate_id"],
                 int(payload["time"])
             ),
         )
     elif event_type == "ProjectAssigned":
         return ProjectAssigned(
-            aggregateId=payload["correlation_id"],
+            aggregateId=payload["aggregate_id"],
             aggregateType="Project",
             aggregateVersion=aggregateVersion + 1,
             eventId=str(uuid4()),
             eventVersion=1,
             payload=ProjectAssignedPayload(
-                payload["correlation_id"],
+                payload["aggregate_id"],
                 int(payload["time"])
             ),
         )
     elif event_type == "ProjectCreated":
         return ProjectCreated(
-            aggregateId=payload["correlation_id"],
+            aggregateId=payload["aggregate_id"],
             aggregateType="Project",
             aggregateVersion=aggregateVersion + 1,
             eventId=str(uuid4()),
             eventVersion=1,
             payload=ProjectCreatedPayload(
-                payload["correlation_id"],
+                payload["aggregate_id"],
                 int(payload["time"])
             ),
         )

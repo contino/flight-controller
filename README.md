@@ -38,6 +38,10 @@ Optional
 
 For macOs get graphviz for the diagrams to work
     - brew install graphviz 
+Granted https://granted.dev/
+    - brew tap common-fate/granted
+    - brew install granted
+    - granted registry add https://github.com/contino/apac-scaffolding-granted-registry.git/granted.yml
 
 ### start of day
 
@@ -111,7 +115,7 @@ At the current time there are no branch protections. However, as the build proce
 
 2- Next you need to understand the "process" for "creating a project". This includes actors, systems, and automation that contributes to creation of a "project" from start to end. From the process diagram we need to identify the events that are associated each component of the "process". "Event" in the process shold have minimum the following fields
     
-    - correlation_id: this is id to all events that is part of an instantioantion of a process. For example, when one requests, assigns, and creates a project all the events will have the same correlation id.
+    - aggregate_id: this is id to all events that is part of an instantioantion of a process. For example, when one requests, assigns, and creates a project all the events will have the same correlation id.
     - event_type: this is the type of event, this can be any string representing what happened.
     - time: time when the event happened
     - (Optional) payload: Any other detail one needs to add to the event for additional needs.
@@ -141,9 +145,5 @@ At the current time there are no branch protections. However, as the build proce
 - create Dockerized lambda code for product creation metric
 
 # Questions
-- account oyu have created is not working. gives https://portal.aws.amazon.com/billing/signup/incomplete.
-- Also how to use https://granted.dev/ without copying the session keys from browser because this is not SSO :(
-- Driver L1 in the diagram is dictated by the DB choice of the implementation. can we seperate them or is it OK. also how to use the "use case interactor" to allow driver to interact with DB on the same level?
-- we are missing the dependency injection at this point. 
-- what does entrypoint belong to?
+
 - How can I use the timestream with the hosted grafana?
