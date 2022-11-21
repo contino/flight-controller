@@ -25,3 +25,12 @@ test-aws-cdk:
 
 deploy-aws-cdk: 
 	cd infra_aws_cdk;cdk deploy
+
+build-tf-cdk: 
+	cd infra_tf_cdk;cdktf synth
+
+test-tf-cdk:
+	cd infra_tf_cdk;pytest main-test.py
+
+deploy-tf-cdk: 
+	cd infra_tf_cdk;cdk deploy
