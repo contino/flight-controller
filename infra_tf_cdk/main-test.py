@@ -1,5 +1,8 @@
 import pytest 
-from cdktf import Testing, TerraformStack
+from cdktf import ( 
+    Testing, 
+    TerraformStack
+)
 from main import MyStack
 
 # The tests below are example tests, you can find more information at
