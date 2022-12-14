@@ -3,7 +3,8 @@
 from constructs import Construct
 from cdktf import (
     App,
-    TerraformStack
+    TerraformStack,
+    S3Backend
 )
 
 from cdktf_cdktf_provider_aws import (
@@ -19,12 +20,12 @@ from timestream_database_component import TimeStreamDBcomponent
 class MyStack(TerraformStack):
     def __init__(self, scope: Construct, id: str):
         super().__init__(scope, id)
-        provider.AwsProvider(self, "AWS", profile="default")
+        provider.AwsProvider(self, "AWS")
 
-        self.dynamotable_name = "event_sourcing_table_cdktf"
+        self.dynamotable_name = "event_sourcing_table" #changed db from "event_sourcing_table_cdktf"
         self.lambda_name = "producer_lambda_function_cdktf"
         self.event_bridge_name = "main_lambda_bus_cdktf"
-        self.timestream_db_name = "core_timestream_db_cdktf"
+        self.timestream_db_name = "core_timestream_db" 
 
         # create dynamodb
         dynamoDBcomponent = DynamoDBcomponent(
@@ -41,6 +42,12 @@ class MyStack(TerraformStack):
 
 
 app = App()
-MyStack(app, "infra_tf_cdk")
+stack = MyStack(app, "infra_tf_cdk")
+
+S3Backend(stack,
+              bucket='099267815798-apac-flight-controller-aws',
+              key='infra_tf_cdk/terraform.tfstate',
+              dynamodb_table='099267815798-apac-flight-controller-aws',
+              )
 
 app.synth()

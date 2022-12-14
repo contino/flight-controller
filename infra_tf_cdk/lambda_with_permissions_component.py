@@ -96,4 +96,3 @@ class LambdaWithPermissionsStack(Construct):
 
         )
 
-        
