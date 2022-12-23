@@ -1,0 +1,15 @@
+{
+  "specversion": "1.0",
+  "type": "io.contino.identity.accessgranted",
+  "source": "https://github.com/contino/apac-flight-controller-aws",
+  "subject": "josh.armitage@contino.io",
+  "id": "61fbd566-0757-4d12-ac03-5641ddd8c4f9",
+  "time": "2018-04-05T17:31:00Z",
+  "datacontenttype": "application/json",
+  "data": {
+    "event_version": "1",
+    "resource": "arn:aws:organizations::369236305845:account/o-laqmqtdr68/099267815798",
+    "role_id": "arn:aws:sso:::permissionSet/ssoins-825965b550edbdf5/ps-bafce5408957e902",
+    "role_name": "AWSAdministratorAccess"
+  }
+}
