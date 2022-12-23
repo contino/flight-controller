@@ -1,7 +1,0 @@
-[{
-    "Source": "contino.customCDKTF",
-    "DetailType": "Test Event",
-    "Detail": "{\"event_type\": \"ProjectRequested\",\"aggregate_id\":\"project1\",\"time\":\"1667924526\"}",
-    "EventBusName":"main_lambda_bus_cdktf"
-}]
-

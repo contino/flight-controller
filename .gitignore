@@ -254,3 +254,7 @@ lerna-debug.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# CDKTF Specifics
+requirements.txt
+all_files/
