@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import Literal
+from typing_extensions import TypeAlias
 from uuid import UUID
 
-AggregateType: "TypeAlias" = Literal["Project"]
+AggregateType: TypeAlias = Literal["Project"]
 
 
 @dataclass

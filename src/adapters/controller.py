@@ -7,13 +7,10 @@ from src.entities.metrics import Metric
 from src.entities.projects import (
     ProjectCreated,
     ProjectCreatedPayload,
-    ProjectAssigned,
-    ProjectAssignedPayload,
     ProjectRequested,
     ProjectRequestedPayload,
 )
-
-from src.usecases.projects import handle_project_created, handle_project_assigned
+from src.usecases.projects import handle_project_created
 
 
 def _convert_payload_to_event(
@@ -24,23 +21,10 @@ def _convert_payload_to_event(
             aggregateId=payload["aggregate_id"],
             aggregateType="Project",
             aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
+            eventId=uuid4(),
             eventVersion=1,
             payload=ProjectRequestedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
-            ),
-        )
-    elif event_type == "ProjectAssigned":
-        return ProjectAssigned(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Project",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
-            payload=ProjectAssignedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
     elif event_type == "ProjectCreated":
@@ -48,11 +32,10 @@ def _convert_payload_to_event(
             aggregateId=payload["aggregate_id"],
             aggregateType="Project",
             aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
+            eventId=uuid4(),
             eventVersion=1,
             payload=ProjectCreatedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
 
@@ -62,17 +45,17 @@ def handle_event(
 ) -> Union[Exception, Tuple[Event, List[Metric]]]:
     if "event_type" in payload:
         event = _convert_payload_to_event(
-                payload, payload["event_type"], len(aggregate_events)
+            payload, payload["event_type"], len(aggregate_events)
         )
         if isinstance(event, ProjectRequested):
-            return (event,[])
-        elif payload["event_type"] in ["ProjectCreated","ProjectAssigned"]:
+            return (event, [])
+        elif payload["event_type"] in ["ProjectCreated"]:
             metrics = []
             for aggregate_event in aggregate_events:
-                if payload["event_type"] == "ProjectCreated" and isinstance(aggregate_event, ProjectRequested):
+                if payload["event_type"] == "ProjectCreated" and isinstance(
+                    aggregate_event, ProjectRequested
+                ):
                     metrics.append(handle_project_created(aggregate_event, event))
-                elif payload["event_type"] == "ProjectAssigned" and isinstance(aggregate_event, ProjectRequested):
-                    metrics.append(handle_project_assigned(aggregate_event, event))
             return (event, metrics)
         else:
             return Exception(f"Unknown Event type {payload['event_type']}")

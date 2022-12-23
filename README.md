@@ -66,17 +66,6 @@ Testing is split into four commands:
 - `make build-aws-cdk` builds the infra with AWS CDK
 - `make deploy-aws-cdk` deploys the infra with AWS CDK
 
-### testing from console
-
-After you deploy your infrastructure you can interact with the eventbridge on AWS by sending different messages by runnig the following from the 'infra_aws_cdk' folder:
-
-- Send Project requested event
-    - aws events put-events --entries file://./tests/events/test-eventR.json 
-- Send Project assigned event
-    - aws events put-events --entries file://./tests/events/test-eventA.json 
-- Send Project created event 
-    - aws events put-events --entries file://./tests/events/test-eventC.json 
-
 
 ### Code Structure
 
@@ -110,8 +99,7 @@ At the current time there are no branch protections. However, as the build proce
 
 1- First of all, you need to define a SLO. In this example we will work with 2 SLO's. These SLO's are related to creation of a "project" at a client. 
     
-    - "time taken between requesting a project and assigning the request to be executed"
-    - "time taken between requesting a project and finally creating the project"
+    - "time taken between requesting a project and creating the project"
 
 2- Next you need to understand the "process" for "creating a project". This includes actors, systems, and automation that contributes to creation of a "project" from start to end. From the process diagram we need to identify the events that are associated each component of the "process". "Event" in the process shold have minimum the following fields
     

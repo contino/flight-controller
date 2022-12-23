@@ -1,3 +1,4 @@
+from typing import Any
 import structlog
 
 from src.drivers.dynamo_event_sink_source import DynamoEventSink, DynamoEventSource
@@ -11,8 +12,8 @@ event_sink = DynamoEventSink()
 metric_sink = TimeStreamMetricSink()
 
 
-def lambda_handler(event, context):
-    print(f'event is {event}')
+def lambda_handler(event: Any, _: Any) -> None:
+    print(f"event is {event}")
     full_event = event["detail"]
     events = event_source.get_events_for_aggregate(full_event["aggregate_id"])
     logger.msg("Returned aggregate events", events=events)

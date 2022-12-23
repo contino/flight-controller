@@ -4,25 +4,27 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-google-cloud-pubsub = "*"
+boto3-stubs = {extras = ["dynamodb", "timestream-query", "timestream-write"], version = "*"}
+boto3= "*" 
+flask = "*"
 google-cloud-bigquery = "*"
+google-cloud-pubsub = "*"
 gunicorn = "*"
 structlog = "*"
-boto3= "*" 
-
+typing-extensions = "*"
 
 [dev-packages]
-pytest = "*"
-pytest-env = "*"
-mypy = "*"
-black = "*"
-pytest-cov = "*"
-diagrams = "*"
 behave = "*"
-constructs = ">=10.0.0,<11.0.0"
+black = "*"
 cdktf = "~=0.13.3"
-cdktf-cdktf-provider-aws = "~=10.0.2"
 cdktf-cdktf-provider-archive = "*"
+cdktf-cdktf-provider-aws = "~=10.0.2"
+constructs = ">=10.0.0,<11.0.0"
+diagrams = "*"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-env = "*"
 
 [requires]
 python_version = "3.10"

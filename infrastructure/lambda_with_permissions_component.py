@@ -13,12 +13,20 @@ from cdktf_cdktf_provider_aws import (
     iam_role,
     iam_role_policy_attachment,
     lambda_function,
-    dynamodb_table
+    dynamodb_table,
+    timestreamwrite_table,
 )
 
 
 class LambdaWithPermissionsStack(Construct):
-    def __init__(self, scope: Construct, id: str, name: str, dynamoDbTable: dynamodb_table.DynamodbTable):
+    def __init__(
+        self,
+        scope: Construct,
+        id: str,
+        name: str,
+        dynamoDbTable: dynamodb_table.DynamodbTable,
+        timestreamTable: timestreamwrite_table.TimestreamwriteTable,
+    ):
         super().__init__(scope, id)
 
         # create lambda helpers
@@ -37,7 +45,7 @@ class LambdaWithPermissionsStack(Construct):
         lambda_iam_role = iam_role.IamRole(
             self,
             "iam_role_lambda",
-            name="flight-controller-aim-role",
+            name="flight-controller-iam-role",
             assume_role_policy=json.dumps(
                 {
                     "Version": "2012-10-17",
@@ -54,24 +62,51 @@ class LambdaWithPermissionsStack(Construct):
             inline_policy=[
                 iam_role.IamRoleInlinePolicy(
                     name="AllowDynamoDB",
-                    policy=json.dumps({
-                        "Version": "2012-10-17",
-                        "Statement":
+                    policy=json.dumps(
                         {
-                            "Action": [
-                                "dynamodb:Scan",
-                                "dynamodb:Query",
-                                "dynamodb:BatchGetItem",
-                                "dynamodb:BatchWriteItem",
-                                "dynamodb:GetItem",
-                                "dynamodb:PutItem",
-                            ],
-                            "Resource": dynamoDbTable.arn,
-                            "Effect": "Allow",
-                        },
-                    })
-                )
-            ]
+                            "Version": "2012-10-17",
+                            "Statement": {
+                                "Action": [
+                                    "dynamodb:Scan",
+                                    "dynamodb:Query",
+                                    "dynamodb:BatchGetItem",
+                                    "dynamodb:BatchWriteItem",
+                                    "dynamodb:GetItem",
+                                    "dynamodb:PutItem",
+                                ],
+                                "Resource": dynamoDbTable.arn,
+                                "Effect": "Allow",
+                            },
+                        }
+                    ),
+                ),
+                iam_role.IamRoleInlinePolicy(
+                    name="AllowTimestream",
+                    policy=json.dumps(
+                        {
+                            "Version": "2012-10-17",
+                            "Statement": {
+                                "Action": ["timestream:DescribeEndpoints"],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                            },
+                        }
+                    ),
+                ),
+                iam_role.IamRoleInlinePolicy(
+                    name="AllowTimestreamWrite",
+                    policy=json.dumps(
+                        {
+                            "Version": "2012-10-17",
+                            "Statement": {
+                                "Action": ["timestream:WriteRecords"],
+                                "Resource": timestreamTable.arn,
+                                "Effect": "Allow",
+                            },
+                        }
+                    ),
+                ),
+            ],
         )
 
         iam_role_policy_attachment.IamRolePolicyAttachment(
@@ -93,6 +128,4 @@ class LambdaWithPermissionsStack(Construct):
             environment=lambda_function.LambdaFunctionEnvironment(
                 variables={"DYNAMO_TABLE_NAME": dynamoDbTable.name}
             ),
-
         )
-

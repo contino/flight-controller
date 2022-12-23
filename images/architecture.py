@@ -1,7 +1,7 @@
 # see https://diagrams.mingrammer.com/docs/nodes/aws for different nodes
 
 from diagrams import Cluster, Diagram
-from diagrams.aws.integration import Eventbridge 
+from diagrams.aws.integration import Eventbridge
 from diagrams.aws.compute import Lambda
 from diagrams.aws.database import Dynamodb, Timestream
 from diagrams.aws.devtools import Codepipeline, Codebuild
@@ -23,26 +23,25 @@ with Diagram("Flight Controller", show=False):
         configNode >> pubsubNativeNode
         systemsManagerNode >> pubsubNativeNode
         cloudwatchNode >> pubsubNativeNode
-    
+
     with Cluster("Custom Events"):
         pubsubCustomNode = Eventbridge("Ingest")
         transitGatewayNode = TransitGateway()
         lambdaCustomNode = Lambda("Event handler")
         prometheusNode = Custom("Collection", "./icons/AWS_hosted_promotheus_icon.png")
         codebuildNode = Codebuild("Build")
-        
-        #edges
+
+        # edges
         transitGatewayNode >> lambdaCustomNode >> pubsubCustomNode
         prometheusNode >> pubsubCustomNode
         codebuildNode >> pubsubCustomNode
-        
-    
+
     with Cluster("Flight Controller Core"):
         pubsubNode = Eventbridge("Ingest")
         lambdaNode = Lambda("Event handler")
         ##edges
         pubsubNode >> lambdaNode
-        
+
         with Cluster("Storage"):
             dynamoDbNode = Dynamodb("Event Store")
             timestreamNode = Timestream("Time Stream")
@@ -53,7 +52,6 @@ with Diagram("Flight Controller", show=False):
     with Cluster("Visualisations"):
         grafanaNode = Custom("Dashboarding", "./icons/AWS_hosted_grafana_icon.png")
 
-   
     pubsubCustomNode >> pubsubNode
     pubsubNativeNode >> pubsubNode
     timestreamNode << grafanaNode

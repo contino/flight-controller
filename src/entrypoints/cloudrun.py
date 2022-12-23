@@ -19,7 +19,7 @@ log = structlog.get_logger(__name__)
 
 
 @app.route("/", methods=["POST"])
-def index():
+def index() -> Union[Tuple[str, Literal[400]], Tuple[Literal[""], Literal[200]]]:
     return receive_event(request.get_json())  # pragma: no cover
 
 

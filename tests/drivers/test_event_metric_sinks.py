@@ -3,34 +3,32 @@ import random
 from uuid import UUID
 import pytest
 
-from src.drivers.dynamo_event_sink_source import (
-    DynamoEventSink,
-    DynamoEventSource
-)
+from src.drivers.dynamo_event_sink_source import DynamoEventSink, DynamoEventSource
 
-from src.drivers.timestream_metric_sink import (
-    TimeStreamMetricSink
-)
+from src.drivers.timestream_metric_sink import TimeStreamMetricSink
 
 from src.entities.projects import (
     ProjectCreated,
     ProjectCreatedPayload,
     ProjectRequestedPayload,
     ProjectRequested,
-     ProjectLeadTime,
-    ProjectAssignedLeadTime
+    ProjectLeadTime,
 )
-
-
 
 
 @pytest.mark.integration
 def test_store_metrics_does_not_return_error():
     aggregate_id = "testMetric"
     lead_time = random.randint(0, 7200)
-    assigned_lead_time = random.randint(0, 7200)
     sink = TimeStreamMetricSink()
-    assert sink.store_metrics([ProjectAssignedLeadTime(aggregate_id, assigned_lead_time), ProjectLeadTime(aggregate_id, lead_time)]) is None
+    assert (
+        sink.store_metrics(
+            [
+                ProjectLeadTime(aggregate_id, lead_time),
+            ]
+        )
+        is None
+    )
 
 
 @pytest.mark.integration
@@ -44,7 +42,9 @@ def test_retrieves_aggregate_events_from_dynamodb():
         aggregateVersion=1,
         eventId=UUID(eventId),
         eventVersion=1,
-        payload=ProjectRequestedPayload(aggregate_id, int(round(datetime.utcnow().timestamp()))),
+        payload=ProjectRequestedPayload(
+            aggregate_id, int(round(datetime.utcnow().timestamp()))
+        ),
     )
     projectCreated = ProjectCreated(
         aggregateId=aggregate_id,
@@ -52,7 +52,9 @@ def test_retrieves_aggregate_events_from_dynamodb():
         aggregateVersion=2,
         eventId=UUID(eventId2),
         eventVersion=1,
-        payload=ProjectCreatedPayload(aggregate_id, int(round(datetime.utcnow().timestamp()))),
+        payload=ProjectCreatedPayload(
+            aggregate_id, int(round(datetime.utcnow().timestamp()))
+        ),
     )
     sink = DynamoEventSink()
     sink.store_events([projectRequested, projectCreated])

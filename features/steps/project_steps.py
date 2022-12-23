@@ -1,4 +1,6 @@
 from time import sleep
+from typing import Any
+from uuid import uuid4
 from behave import given, when, then
 from datetime import datetime
 import json
@@ -6,12 +8,12 @@ import json
 import boto3
 
 eventBridge = boto3.client("events")
-timeStream = boto3.client('timestream-query')
-aggregate_id = "behaveTest"
+timeStream = boto3.client("timestream-query")
 
 
 @given("a project has been requested")
-def request_project(context):
+def request_project(context: Any) -> None:
+    context.aggregate_id = str(uuid4())
     requested_time = int(round(datetime.utcnow().timestamp()))
 
     eventBridge.put_events(
@@ -22,41 +24,19 @@ def request_project(context):
                 "Detail": json.dumps(
                     {
                         "event_type": "ProjectRequested",
-                        "aggregate_id": f"{aggregate_id}",
+                        "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "main_lambda_bus",
-            }
-        ]
-    )
-
-
-@given("a project has been assigned")
-def assing_project(context):
-    sleep(3)
-    requested_time = int(round(datetime.utcnow().timestamp()))
-    eventBridge.put_events(
-        Entries=[
-            {
-                "Source": "contino.custom",
-                "DetailType": "Test project assign Event",
-                "Detail": json.dumps(
-                    {
-                        "event_type": "ProjectAssigned",
-                        "aggregate_id": f"{aggregate_id}",
-                        "time": f"{requested_time}",
-                    }
-                ),
-                "EventBusName": "main_lambda_bus",
+                "EventBusName": "main_lambda_bus_cdktf",
             }
         ]
     )
 
 
 @when("the project has been created")
-def assing_project(context):
-    sleep(3)
+def create_project(context: Any) -> None:
+    sleep(1)
     requested_time = int(round(datetime.utcnow().timestamp()))
     eventBridge.put_events(
         Entries=[
@@ -66,19 +46,21 @@ def assing_project(context):
                 "Detail": json.dumps(
                     {
                         "event_type": "ProjectCreated",
-                        "aggregate_id": f"{aggregate_id}",
+                        "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "main_lambda_bus",
+                "EventBusName": "main_lambda_bus_cdktf",
             }
         ]
     )
 
 
 @then("the lead time is stored correctly")
-def lead_time_stored(context):
+def lead_time_stored(context: Any) -> None:
     sleep(2)
-    result = timeStream.query(QueryString='select * from core_timestream_db.metrics_table where time > ago(10s) order by time desc')
+    query = f"select * from core_timestream_db.metrics_table where project_id = '{context.aggregate_id}'"
+    result = timeStream.query(QueryString=query)
+    print(query)
     print(result)
-    # assert len(result["Rows"]) == 2
+    assert len(result["Rows"]) == 1
