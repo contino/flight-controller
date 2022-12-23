@@ -9,7 +9,7 @@ google-cloud-bigquery = "*"
 gunicorn = "*"
 structlog = "*"
 boto3= "*" 
-
+boto3-stubs = {extras = ["dynamodb", "timestream-read", "timestream-write"], version = "*"}
 
 [dev-packages]
 pytest = "*"

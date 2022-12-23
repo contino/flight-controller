@@ -5,6 +5,7 @@ install-dependencies:
 	pipenv install --dev
 
 unittest:
+	pipenv run mypy src
 	pipenv run pytest -m 'not integration' tests/
 
 integration-test:
@@ -21,6 +22,7 @@ build-tf-cdk:
 	rsync -avu $(shell pwd)/src $(shell pwd)/infrastructure/all_files
 	pip install -r requirements.txt --target=$(shell pwd)/infrastructure/all_files
 	cd infrastructure;cdktf synth
+	rm requirements.txt
 
 deploy-tf-cdk: 
 	cd infrastructure;cdktf deploy --auto-approve

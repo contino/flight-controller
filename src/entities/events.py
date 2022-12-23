@@ -1,4 +1,4 @@
-from typing import Literal, Union
+from typing import Literal, TypeAlias, Union
 
 from .projects import (
     ProjectCreated,
@@ -7,8 +7,8 @@ from .projects import (
     ProjectRequested,
 )
 
-Event: "TypeAlias" = Union[ProjectCreated, ProjectRequested]
+Event: TypeAlias = Union[ProjectCreated, ProjectRequested]
 
-EventType: "TypeAlias" = Union[Literal["ProjectCreated"], Literal["ProjectRequested"]]
+EventType: TypeAlias = Union[Literal["ProjectCreated"], Literal["ProjectRequested"]]
 
-Payload: "TypeAlias" = Union[ProjectCreatedPayload, ProjectRequestedPayload]
+Payload: TypeAlias = Union[ProjectCreatedPayload, ProjectRequestedPayload]
