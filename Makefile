@@ -19,7 +19,7 @@ e2e:
 
 build-tf-cdk:
 	pipenv requirements | tee requirements.txt
-	rm -r $(shell pwd)/infrastructure/all_files
+	if [ -d "$(shell pwd)/infrastructure/all_files" ]; then rm -Rf $(shell pwd)/infrastructure/all_files; fi
 	rsync -avu $(shell pwd)/src $(shell pwd)/infrastructure/all_files
 	pip install -r requirements.txt --target=$(shell pwd)/infrastructure/all_files
 	cd infrastructure;cdktf synth
