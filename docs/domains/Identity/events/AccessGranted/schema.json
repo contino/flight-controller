@@ -1,0 +1,29 @@
+{
+  "$id": "https://example.com/AccessGranted.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AccessGranted",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "eventVersion": {
+          "type": "string",
+          "description": "The version of the event"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The epoch timestamp of the event"
+        },
+        "identity": {
+          "type": "string",
+          "description": "A unique identifier for the identity"
+        },
+        "access": {
+          "type": "string",
+          "description": "A unique identifier for the access request"
+        }
+      }
+    }
+  }
+}
