@@ -45,7 +45,7 @@ app = App()
 stack = MyStack(app, "infra_tf_cdk")
 
 S3Backend(stack,
-              bucket='099267815798-apac-flight-controller-aws',
+              bucket='103417687554-apac-flight-controller-aws',
               key='infra_tf_cdk/terraform.tfstate',
               dynamodb_table='103417687554-apac-flight-controller-aws',
               )
