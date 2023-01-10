@@ -15,6 +15,7 @@ from dynamo_db_component import DynamoDBcomponent
 from lambda_with_permissions_component import LambdaWithPermissionsStack
 from event_bridge_component import EventBridgeComponent
 from timestream_database_component import TimeStreamDBcomponent
+from managed_grafana_component import
 
 
 class MyStack(TerraformStack):
@@ -22,7 +23,7 @@ class MyStack(TerraformStack):
         super().__init__(scope, id)
         provider.AwsProvider(self, "AWS")
 
-        self.dynamotable_name = "event_sourcing_table" #changed db from "event_sourcing_table_cdktf"
+        self.dynamotable_name = "event_sourcing_table"
         self.lambda_name = "producer_lambda_function_cdktf"
         self.event_bridge_name = "main_lambda_bus_cdktf"
         self.timestream_db_name = "core_timestream_db" 
