@@ -15,7 +15,7 @@ from dynamo_db_component import DynamoDBcomponent
 from lambda_with_permissions_component import LambdaWithPermissionsStack
 from event_bridge_component import EventBridgeComponent
 from timestream_database_component import TimeStreamDBcomponent
-from managed_grafana_component import
+from managed_grafana_component import GrafanaWithPermissionsStack
 
 
 class MyStack(TerraformStack):
@@ -27,6 +27,7 @@ class MyStack(TerraformStack):
         self.lambda_name = "producer_lambda_function_cdktf"
         self.event_bridge_name = "main_lambda_bus_cdktf"
         self.timestream_db_name = "core_timestream_db" 
+        self.grafana_workspace_name = "grafana_dashboard"
 
         # create dynamodb
         dynamoDBcomponent = DynamoDBcomponent(
@@ -40,15 +41,18 @@ class MyStack(TerraformStack):
         # create timestream data base
         timeStreamComponent = TimeStreamDBcomponent(
             self, "time_stream", self.timestream_db_name)
+        # Create Grafana workspace
+        grafanaworkspace = GrafanaWithPermissionsStack(
+            self, "grafana_workspace", self.grafana_workspace_name)
 
 
 app = App()
 stack = MyStack(app, "infra_tf_cdk")
 
 S3Backend(stack,
-              bucket='103417687554-apac-flight-controller-aws',
+              bucket='099267815798-apac-flight-controller-aws',
               key='infra_tf_cdk/terraform.tfstate',
-              dynamodb_table='103417687554-apac-flight-controller-aws',
+              dynamodb_table='099267815798-apac-flight-controller-aws',
               )
 
 app.synth()

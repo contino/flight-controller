@@ -18,18 +18,19 @@
 # app.add_output(output)
 
 import cdktf
-import grafana_workspace
-import grafana_dashboard
-import grafana_panel
-import grafana_row
-import grafana_datasource
+# import grafana_workspace
+# import grafana_dashboard
+# import grafana_panel
+# import grafana_row
+# import grafana_datasource
 import json
 import os
 import os.path as Path
 
 from cdktf_cdktf_provider_aws import (
     iam_role,
-    iam_role_policy_attachment
+    iam_role_policy_attachment,
+    grafana_workspace
 )
 
 from constructs import Construct
@@ -41,7 +42,7 @@ from cdktf import (
 # app = cdktf.App()
 
 class GrafanaWithPermissionsStack(Construct):
-    def __init__(self, scope: Construct, id: str, name: str, grafana_workspace: grafana_workspace.Workspace):
+    def __init__(self, scope: Construct, id: str, name: str):
         super().__init__(scope, id)
 
         # CREATE roles
@@ -63,6 +64,7 @@ class GrafanaWithPermissionsStack(Construct):
                     },
                 }
             ),
+            
             inline_policy=[
                 iam_role.IamRoleInlinePolicy(
                     name="AllowTimestreamDB",
@@ -95,17 +97,21 @@ class GrafanaWithPermissionsStack(Construct):
         iam_role_policy_attachment.IamRolePolicyAttachment(
             self,
             "policy_attachment",
-            policy_arn="arn:aws:iam::099267815798:role/aws-service-role/grafana.amazonaws.com/AWSServiceRoleForAmazonGrafana",
+            policy_arn="arn:aws:iam::aws:policy/AmazonTimestreamReadOnlyAccess",
             role=grafana_iam_role.name,
         )
 
 
         # Create a Grafana workspace
-        self.grafana_workspace = grafana_workspace.Workspace(
+        self.grafana_workspace = grafana_workspace.GrafanaWorkspace(
             self,
             "grafana_flight_control",
             name=name,
-            role=grafana_iam_role
+            account_access_type="CURRENT_ACCOUNT",
+            authentication_providers=["AWS_SSO"],
+            permission_type="SERVICE_MANAGED",
+            role_arn=grafana_iam_role.arn,
+            data_sources=["TIMESTREAM"]
         )
 
 
