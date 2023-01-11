@@ -37,7 +37,7 @@ class LambdaWithPermissionsStack(Construct):
         lambda_iam_role = iam_role.IamRole(
             self,
             "iam_role_lambda",
-            name="flight-controller-aim-role",
+            name="flight-controller-iam-role",
             assume_role_policy=json.dumps(
                 {
                     "Version": "2012-10-17",
