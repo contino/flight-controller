@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "103417687554-apac-flight-controller-aws"
+    bucket         = "099267815798-apac-flight-controller-aws"
     key            = "10_oidc/terraform.tfstate"
     region         = "ap-southeast-2"
-    dynamodb_table = "103417687554-apac-flight-controller-aws"
+    dynamodb_table = "099267815798-apac-flight-controller-aws"
   }
 
   required_providers {
