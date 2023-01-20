@@ -1,22 +1,3 @@
-# # Import the resource
-# from grafana_cdk import grafana_workspace
-
-# # Create the resource
-# workspace = grafana_workspace.Workspace(
-#     "my-workspace",
-#     name="Dashboard",
-# )
-
-# # Output the workspace ID
-# output = tf.Output(
-#     "workspace_id",
-#     value=workspace.id,
-#     description="The ID of the Grafana workspace",
-# )
-
-# # Add the output to the app
-# app.add_output(output)
-
 import cdktf
 # import grafana_workspace
 # import grafana_dashboard
@@ -39,7 +20,7 @@ from cdktf import (
     TerraformAsset,
     AssetType,
 )
-# app = cdktf.App()
+
 
 class GrafanaWithPermissionsStack(Construct):
     def __init__(self, scope: Construct, id: str, name: str):
@@ -115,12 +96,6 @@ class GrafanaWithPermissionsStack(Construct):
         )
 
 
-# # Create a Grafana workspace
-# grafana_workspace = grafana_workspace.Workspace(
-#     app, "my-workspace",
-#     name="My Workspace",
-# )
-
 # # Create a Grafana dashboard
 # dashboard = grafana_dashboard.Dashboard(
 #     "my-dashboard",
@@ -148,19 +123,11 @@ class GrafanaWithPermissionsStack(Construct):
 #     panels=[panel],
 # )
 
-# # Create a Grafana data source
-# datasource = grafana_datasource.DataSource(
-#     "my-datasource",
-#     name="My Data Source",
-#     type="prometheus",
-#     url="http://localhost:9090",
-# )
+
 
 # # Add the dashboard, row, and data source to the workspace
 # grafana_workspace.add_resources([dashboard, row, datasource])
 
-# # Synthesize the CDK app
-# app.synth()
 
 
 
