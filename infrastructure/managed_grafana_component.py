@@ -1,9 +1,4 @@
 import cdktf
-# import grafana_workspace
-# import grafana_dashboard
-# import grafana_panel
-# import grafana_row
-# import grafana_datasource
 import json
 import os
 import os.path as Path
@@ -11,7 +6,8 @@ import os.path as Path
 from cdktf_cdktf_provider_aws import (
     iam_role,
     iam_role_policy_attachment,
-    grafana_workspace
+    grafana_workspace,
+    grafana_workspace_api_key,
 )
 
 from constructs import Construct
@@ -21,6 +17,7 @@ from cdktf import (
     AssetType,
 )
 
+from grafana_api import GrafanaFace
 
 class GrafanaWithPermissionsStack(Construct):
     def __init__(self, scope: Construct, id: str, name: str):
@@ -95,43 +92,33 @@ class GrafanaWithPermissionsStack(Construct):
             data_sources=["TIMESTREAM"]
         )
 
-
-# # Create a Grafana dashboard
-# dashboard = grafana_dashboard.Dashboard(
-#     "my-dashboard",
-#     title="My Dashboard",
-# )
-
-# # Create a Grafana panel
-# panel = grafana_panel.Panel(
-#     "my-panel",
-#     title="My Panel",
-#     type="graph",
-#     data_source="my-datasource",
-#     targets=[
-#         {
-#             "ref_id": "A",
-#             "expr": "sum(rate(request_duration_seconds_count[5m])) by (le)"
-#         }
-#     ],
-# )
-
-# # Create a Grafana row
-# row = grafana_row.Row(
-#     "my-row",
-#     title="My Row",
-#     panels=[panel],
-# )
+        #Output the workspace ID
+        output_grafana_workspace_id=cdktf.TerraformOutput(
+            self,
+            "workspace_id",
+            value=self.grafana_workspace.id
+        )
 
 
+        #Create an API key for the admin role
+        self.grafana_workspace_api_key = grafana_workspace_api_key.GrafanaWorkspaceApiKey(
+            self,
+            "grafana_workspace_api_key",
+            key_name="flight-controller-grafana-api-key",
+            key_role="ADMIN",
+            workspace_id=self.grafana_workspace.id,
+            seconds_to_live=86400
+            )
 
-# # Add the dashboard, row, and data source to the workspace
-# grafana_workspace.add_resources([dashboard, row, datasource])
+        #Output API token for the dashboard role
+        output_api_key=cdktf.TerraformOutput(
+            self,
+            "api_key",
+            value=self.grafana_workspace_api_key.key,
+        )
 
+        # save_file=cdktf.FileProvisioner
 
+        os.environ["GRAFANA_API_KEY"] = output_api_key.value
 
-
-  
-
-
-
+        
