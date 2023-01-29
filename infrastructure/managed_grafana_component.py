@@ -1,23 +1,15 @@
-import cdktf
 import json
 import os
-import os.path as Path
 
+import cdktf
 from cdktf_cdktf_provider_aws import (
-    iam_role,
-    iam_role_policy_attachment,
     grafana_workspace,
     grafana_workspace_api_key,
+    iam_role,
+    iam_role_policy_attachment,
 )
-
 from constructs import Construct
 
-from cdktf import (
-    TerraformAsset,
-    AssetType,
-)
-
-from grafana_api import GrafanaFace
 
 class GrafanaWithPermissionsStack(Construct):
     def __init__(self, scope: Construct, id: str, name: str):
@@ -42,34 +34,34 @@ class GrafanaWithPermissionsStack(Construct):
                     },
                 }
             ),
-            
             inline_policy=[
                 iam_role.IamRoleInlinePolicy(
                     name="AllowTimestreamDB",
-                    policy=json.dumps({
-                        "Version": "2012-10-17",
-                        "Statement":
+                    policy=json.dumps(
                         {
-                            "Action": [
-                                "timestream:CancelQuery",
-                                "timestream:DescribeDatabase",
-                                "timestream:DescribeEndpoints",
-                                "timestream:DescribeTable",
-                                "timestream:ListDatabases",
-                                "timestream:ListMeasures",
-                                "timestream:ListTables",
-                                "timestream:ListTagsForResource",
-                                "timestream:Select",
-                                "timestream:SelectValues",
-                                "timestream:DescribeScheduledQuery",
-                                "timestream:ListScheduledQueries"
-                            ],
-                            "Resource": "*",
-                            "Effect": "Allow",
-                        },
-                    })
+                            "Version": "2012-10-17",
+                            "Statement": {
+                                "Action": [
+                                    "timestream:CancelQuery",
+                                    "timestream:DescribeDatabase",
+                                    "timestream:DescribeEndpoints",
+                                    "timestream:DescribeTable",
+                                    "timestream:ListDatabases",
+                                    "timestream:ListMeasures",
+                                    "timestream:ListTables",
+                                    "timestream:ListTagsForResource",
+                                    "timestream:Select",
+                                    "timestream:SelectValues",
+                                    "timestream:DescribeScheduledQuery",
+                                    "timestream:ListScheduledQueries",
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                            },
+                        }
+                    ),
                 )
-            ]
+            ],
         )
 
         iam_role_policy_attachment.IamRolePolicyAttachment(
@@ -78,7 +70,6 @@ class GrafanaWithPermissionsStack(Construct):
             policy_arn="arn:aws:iam::aws:policy/AmazonTimestreamReadOnlyAccess",
             role=grafana_iam_role.name,
         )
-
 
         # Create a Grafana workspace
         self.grafana_workspace = grafana_workspace.GrafanaWorkspace(
@@ -89,29 +80,28 @@ class GrafanaWithPermissionsStack(Construct):
             authentication_providers=["AWS_SSO"],
             permission_type="SERVICE_MANAGED",
             role_arn=grafana_iam_role.arn,
-            data_sources=["TIMESTREAM"]
+            data_sources=["TIMESTREAM"],
         )
 
-        #Output the workspace ID
-        output_grafana_workspace_id=cdktf.TerraformOutput(
-            self,
-            "workspace_id",
-            value=self.grafana_workspace.id
+        # Output the workspace ID
+        output_grafana_workspace_id = cdktf.TerraformOutput(
+            self, "workspace_id", value=self.grafana_workspace.id
         )
 
-
-        #Create an API key for the admin role
-        self.grafana_workspace_api_key = grafana_workspace_api_key.GrafanaWorkspaceApiKey(
-            self,
-            "grafana_workspace_api_key",
-            key_name="flight-controller-grafana-api-key",
-            key_role="ADMIN",
-            workspace_id=self.grafana_workspace.id,
-            seconds_to_live=86400
+        # Create an API key for the admin role
+        self.grafana_workspace_api_key = (
+            grafana_workspace_api_key.GrafanaWorkspaceApiKey(
+                self,
+                "grafana_workspace_api_key",
+                key_name="flight-controller-grafana-api-key",
+                key_role="ADMIN",
+                workspace_id=self.grafana_workspace.id,
+                seconds_to_live=86400,
             )
+        )
 
-        #Output API token for the dashboard role
-        output_api_key=cdktf.TerraformOutput(
+        # Output API token for the dashboard role
+        output_api_key = cdktf.TerraformOutput(
             self,
             "api_key",
             value=self.grafana_workspace_api_key.key,
@@ -120,5 +110,3 @@ class GrafanaWithPermissionsStack(Construct):
         # save_file=cdktf.FileProvisioner
 
         os.environ["GRAFANA_API_KEY"] = output_api_key.value
-
-        

@@ -25,28 +25,29 @@
 #     print("Dashboard created successfully")
 
 
-
 # Import the necessary modules
+from constructs import Construct
+from cdktf import TerraformStack
 
-import * as cdktf from 'cdktf';
+from imports.grafana.dashboard import Dashboard
+from imports.grafana.provider import GrafanaProvider
 
-import grafana from cdktf-provider-grafana
-
-import * as grafana from "imports/grafana/"
-
-import grafana_provider from 
-
- 
 
 # Create a new stack
 
-class MyStack extends cdktf.Stack {
-  constructor(scope: cdktf.App, id: string, props?: cdktf.StackProps) {
-    super(scope, id, props);
 
-    # Create a new Grafana dashboard
+class GrafanaStack(TerraformStack):
+    def __init__(self, scope: Construct, id: str):
+        super().__init__(scope, id)
 
-    new grafana.Dashboard(this, 'my-dashboard', {
+        GrafanaProvider(self, "Grafana")
+
+        # Create a new Grafana dashboard
+
+        self.dashboard = Dashboard(
+            self,
+            "my-dashboard",
+            config_json="""{
       title: 'My Dashboard',
       panels: [
         {
@@ -71,11 +72,5 @@ class MyStack extends cdktf.Stack {
           ]
         }
       ]
-    });
-  }
-}
-# Create a new CDKTF app
-
-const app = new cdktf.App();
-new MyStack(app, 'my-stack');
-app.synth();
+    }""",
+        )
