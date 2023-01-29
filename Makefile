@@ -22,6 +22,9 @@ build-tf-cdk:
 	pip install -r requirements.txt --target=$(shell pwd)/infrastructure/all_files
 	cd infrastructure;cdktf synth
 
+plan-tf-cdk: 
+	cd infrastructure;cdktf plan
+
 deploy-tf-cdk: 
 	cd infrastructure;cdktf deploy --auto-approve
 
