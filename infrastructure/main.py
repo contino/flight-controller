@@ -7,7 +7,7 @@ from cdktf_cdktf_provider_aws import provider
 
 from dynamo_db_component import DynamoDBcomponent
 from grafana_dashboard_component import GrafanaStack
-from lambda_with_permissions_component import LambdaWithPermissionsStack
+from lambda_with_permissions_component import LambdaWithPermissionsComponent
 from event_bridge_component import EventBridgeComponent
 from timestream_database_component import TimeStreamDBcomponent
 from managed_grafana_component import GrafanaWithPermissionsStack
@@ -29,7 +29,7 @@ class MyStack(TerraformStack):
             self, "event_table", self.dynamotable_name
         )
         # create lambda function
-        lambdaComponent = LambdaWithPermissionsStack(
+        lambdaComponent = LambdaWithPermissionsComponent(
             self, "lambda_function", self.lambda_name, dynamoDBcomponent.table
         )
         # create event bridge
