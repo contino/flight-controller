@@ -13,12 +13,18 @@ from cdktf_cdktf_provider_aws import (
     iam_role,
     iam_role_policy_attachment,
     lambda_function,
-    dynamodb_table
+    dynamodb_table,
 )
 
 
-class LambdaWithPermissionsStack(Construct):
-    def __init__(self, scope: Construct, id: str, name: str, dynamoDbTable: dynamodb_table.DynamodbTable):
+class LambdaWithPermissionsComponent(Construct):
+    def __init__(
+        self,
+        scope: Construct,
+        id: str,
+        name: str,
+        dynamoDbTable: dynamodb_table.DynamodbTable,
+    ):
         super().__init__(scope, id)
 
         # create lambda helpers
@@ -54,24 +60,25 @@ class LambdaWithPermissionsStack(Construct):
             inline_policy=[
                 iam_role.IamRoleInlinePolicy(
                     name="AllowDynamoDB",
-                    policy=json.dumps({
-                        "Version": "2012-10-17",
-                        "Statement":
+                    policy=json.dumps(
                         {
-                            "Action": [
-                                "dynamodb:Scan",
-                                "dynamodb:Query",
-                                "dynamodb:BatchGetItem",
-                                "dynamodb:BatchWriteItem",
-                                "dynamodb:GetItem",
-                                "dynamodb:PutItem",
-                            ],
-                            "Resource": dynamoDbTable.arn,
-                            "Effect": "Allow",
-                        },
-                    })
+                            "Version": "2012-10-17",
+                            "Statement": {
+                                "Action": [
+                                    "dynamodb:Scan",
+                                    "dynamodb:Query",
+                                    "dynamodb:BatchGetItem",
+                                    "dynamodb:BatchWriteItem",
+                                    "dynamodb:GetItem",
+                                    "dynamodb:PutItem",
+                                ],
+                                "Resource": dynamoDbTable.arn,
+                                "Effect": "Allow",
+                            },
+                        }
+                    ),
                 )
-            ]
+            ],
         )
 
         iam_role_policy_attachment.IamRolePolicyAttachment(
@@ -93,6 +100,4 @@ class LambdaWithPermissionsStack(Construct):
             environment=lambda_function.LambdaFunctionEnvironment(
                 variables={"DYNAMO_TABLE_NAME": dynamoDbTable.name}
             ),
-
         )
-
