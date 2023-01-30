@@ -48,7 +48,9 @@ class MyStack(TerraformStack):
 
 app = App()
 stack = MyStack(app, "infra_tf_cdk")
-grafana_stack = GrafanaStack(app, "grafana_cdk")
+grafana_stack = GrafanaStack(
+    app, "grafana_cdk", dynamo_table_name=stack.dynamotable_name
+)
 
 S3Backend(
     stack,
