@@ -37,7 +37,7 @@ from imports.grafana.provider import GrafanaProvider
 
 
 class GrafanaStack(TerraformStack):
-    def __init__(self, scope: Construct, id: str):
+    def __init__(self, scope: Construct, id: str, dynamo_table_name: str):
         super().__init__(scope, id)
 
         GrafanaProvider(self, "Grafana")
