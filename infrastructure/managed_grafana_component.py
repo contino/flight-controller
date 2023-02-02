@@ -11,7 +11,7 @@ from cdktf_cdktf_provider_aws import (
 from constructs import Construct
 
 
-class GrafanaWithPermissionsStack(Construct):
+class GrafanaWithPermissionsComponent(Construct):
     def __init__(self, scope: Construct, id: str, name: str):
         super().__init__(scope, id)
 
@@ -85,7 +85,9 @@ class GrafanaWithPermissionsStack(Construct):
 
         # Output the workspace ID
         output_grafana_workspace_id = cdktf.TerraformOutput(
-            self, "workspace_id", value=self.grafana_workspace.id
+            self, 
+            "workspace_id", 
+            value=self.grafana_workspace.id
         )
 
         # Create an API key for the admin role
@@ -96,7 +98,7 @@ class GrafanaWithPermissionsStack(Construct):
                 key_name="flight-controller-grafana-api-key",
                 key_role="ADMIN",
                 workspace_id=self.grafana_workspace.id,
-                seconds_to_live=86400,
+                seconds_to_live=186400,
             )
         )
 
@@ -107,6 +109,6 @@ class GrafanaWithPermissionsStack(Construct):
             value=self.grafana_workspace_api_key.key,
         )
 
-        # save_file=cdktf.FileProvisioner
+        # # save_file=cdktf.FileProvisioner
 
-        os.environ["GRAFANA_API_KEY"] = output_api_key.value
+        # os.environ["GRAFANA_API_KEY"] = output_api_key.value

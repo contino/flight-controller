@@ -9,7 +9,8 @@ google-cloud-bigquery = "*"
 gunicorn = "*"
 structlog = "*"
 boto3= "*" 
-
+cdktf = "*"
+constructs = "*"
 
 [dev-packages]
 pytest = "*"
