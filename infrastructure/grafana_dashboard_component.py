@@ -1,4 +1,4 @@
-# import json
+import json
 # import requests
 
 # # Set up the API URL and authentication credentials
@@ -6,7 +6,7 @@
 # headers = {
 #     # "Content-Type": "application/json",
 #     # "Accept": "application/json",
-#     "Authorization": "Bearer eyJrIjoiZnhrMXVCb3c5ajZSUlFDQU1hMXdRUzZEVTFzREJPOGIiLCJuIjoiZmxpZ2h0LWNvbnRyb2xsZXItZ3JhZmFuYS1hcGkta2V5IiwiaWQiOjF9"
+#     "Authorization": "Bearer eyJrIjoiekNIV2hqbzdtUVMzcmhGZVNaYXJXNmNBZ2w0ZDhDcnMiLCJuIjoiYWRtaW4iLCJpZCI6MX0="
 # }
 
 
@@ -24,53 +24,47 @@
 # else:
 #     print("Dashboard created successfully")
 
-
 # Import the necessary modules
 from constructs import Construct
-from cdktf import TerraformStack
-
+# from cdktf import TerraformStack
 from imports.grafana.dashboard import Dashboard
 from imports.grafana.provider import GrafanaProvider
 
+from cdktf_cdktf_provider_aws import (
+  grafana_workspace
+)
 
-# Create a new stack
+from managed_grafana_component import GrafanaWithPermissionsComponent
+from managed_grafana_component import grafana_workspace_api_key
 
+# Load the dashboard configuration from a JSON file
+with open("dashboard.json", "r") as f:
+    data = json.load(f)
 
-class GrafanaStack(TerraformStack):
-    def __init__(self, scope: Construct, id: str, dynamo_table_name: str):
+# Convert the data to a JSON string
+data = json.dumps(data)
+
+# Create a new component
+class GrafanaDashboardComponent(Construct):
+    def __init__(self, scope: Construct, id: str, grafana_workspace_api_key: grafana_workspace_api_key.GrafanaWorkspaceApiKey,
+    ):
         super().__init__(scope, id)
 
-        GrafanaProvider(self, "Grafana")
+        # self.grafana = GrafanaProvider(self, 
+        # "Grafana",
+        # alias="grafana",
+        # auth="cloud_api_key",
+        # cloud_api_key=grafana_workspace_api_key.key,
+        # cloud_api_url="https://g-2e637a6ddc.grafana-workspace.ap-southeast-2.amazonaws.com/api/dashboards/db"
+        # cloud_api_key="eyJrIjoiekNIV2hqbzdtUVMzcmhGZVNaYXJXNmNBZ2w0ZDhDcnMiLCJuIjoiYWRtaW4iLCJpZCI6MX0="
+        # )
 
         # Create a new Grafana dashboard
-
         self.dashboard = Dashboard(
             self,
             "my-dashboard",
-            config_json="""{
-      title: 'My Dashboard',
-      panels: [
-        {
-          type: 'graph',
-          title: 'My Graph',
-          dataselect: {
-            time: {
-              from: 'now-6h',
-              to: 'now'
-            }
-          },
-          targets: [
-            {
-              expr: 'SELECT value FROM my-existing-database.my-existing-table WHERE time >= now() - 6h AND time <= now()',
-              timestream: {
-                query: {
-                  database: 'my-existing-database',
-                  table: 'my-existing-table'
-                }
-              }
-            }
-          ]
-        }
-      ]
-    }""",
+            config_json=data,
+            provider=None
         )
+
+        

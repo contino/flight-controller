@@ -4,19 +4,31 @@ from constructs import Construct
 from cdktf import App, TerraformStack, S3Backend
 
 from cdktf_cdktf_provider_aws import provider
+from imports.grafana.provider import GrafanaProvider
 
 from dynamo_db_component import DynamoDBcomponent
-from grafana_dashboard_component import GrafanaStack
 from lambda_with_permissions_component import LambdaWithPermissionsComponent
 from event_bridge_component import EventBridgeComponent
 from timestream_database_component import TimeStreamDBcomponent
-from managed_grafana_component import GrafanaWithPermissionsStack
+from managed_grafana_component import GrafanaWithPermissionsComponent
+from grafana_dashboard_component import GrafanaDashboardComponent
+from managed_grafana_component import grafana_workspace_api_key
 
 
 class MyStack(TerraformStack):
-    def __init__(self, scope: Construct, id: str):
+    def __init__(self, scope: Construct, id: str,
+    ):
         super().__init__(scope, id)
         provider.AwsProvider(self, "AWS")
+        GrafanaProvider(
+            self, 
+            "Grafana",
+            auth="cloud_api_key",
+            alias="grafana",
+            # cloud_api_key=grafana_workspace_api_key.key,
+            cloud_api_url="https://g-2e637a6ddc.grafana-workspace.ap-southeast-2.amazonaws.com/api/dashboards/db",
+            cloud_api_key="eyJrIjoiekNIV2hqbzdtUVMzcmhGZVNaYXJXNmNBZ2w0ZDhDcnMiLCJuIjoiYWRtaW4iLCJpZCI6MX0="
+            )
 
         self.dynamotable_name = "event_sourcing_table"
         self.lambda_name = "producer_lambda_function_cdktf"
@@ -41,16 +53,20 @@ class MyStack(TerraformStack):
             self, "time_stream", self.timestream_db_name
         )
         # Create Grafana workspace
-        grafanaworkspace = GrafanaWithPermissionsStack(
+        grafanaworkspace = GrafanaWithPermissionsComponent(
             self, "grafana_workspace", self.grafana_workspace_name
         )
 
+        #Create Grafana dashboard
+        grafanadashboard = GrafanaDashboardComponent(
+            self, "grafana_dashboard", grafanaworkspace.grafana_workspace_api_key
+        )
 
 app = App()
 stack = MyStack(app, "infra_tf_cdk")
-grafana_stack = GrafanaStack(
-    app, "grafana_cdk", dynamo_table_name=stack.dynamotable_name
-)
+# grafana_stack = GrafanaStack(
+#     app, "grafana_cdk", dynamo_table_name=stack.dynamotable_name
+# )
 
 S3Backend(
     stack,
@@ -59,11 +75,11 @@ S3Backend(
     dynamodb_table="099267815798-apac-flight-controller-aws",
 )
 
-S3Backend(
-    grafana_stack,
-    bucket="099267815798-apac-flight-controller-aws",
-    key="grafana_cdk/terraform.tfstate",
-    dynamodb_table="099267815798-apac-flight-controller-aws",
-)
+# S3Backend(
+#     grafana_stack,
+#     bucket="099267815798-apac-flight-controller-aws",
+#     key="grafana_cdk/terraform.tfstate",
+#     dynamodb_table="099267815798-apac-flight-controller-aws",
+# )
 
 app.synth()
