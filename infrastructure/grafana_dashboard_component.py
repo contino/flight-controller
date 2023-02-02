@@ -50,21 +50,21 @@ class GrafanaDashboardComponent(Construct):
     ):
         super().__init__(scope, id)
 
-        # self.grafana = GrafanaProvider(self, 
-        # "Grafana",
+        self.grafana = GrafanaProvider(self, 
+        "Grafana",
         # alias="grafana",
-        # auth="cloud_api_key",
+        auth="cloud_api_key",
         # cloud_api_key=grafana_workspace_api_key.key,
         # cloud_api_url="https://g-2e637a6ddc.grafana-workspace.ap-southeast-2.amazonaws.com/api/dashboards/db"
         # cloud_api_key="eyJrIjoiekNIV2hqbzdtUVMzcmhGZVNaYXJXNmNBZ2w0ZDhDcnMiLCJuIjoiYWRtaW4iLCJpZCI6MX0="
-        # )
+        )
 
         # Create a new Grafana dashboard
         self.dashboard = Dashboard(
             self,
             "my-dashboard",
             config_json=data,
-            provider=None
+            provider=None,
         )
 
         
