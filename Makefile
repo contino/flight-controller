@@ -16,11 +16,15 @@ test:
 e2e:
 	pipenv run behave
 
-build-tf-cdk:
+build-python:
 	pipenv requirements | tee requirements.txt
 	rsync -avu $(shell pwd)/src $(shell pwd)/infrastructure/all_files
 	pip install -r requirements.txt --target=$(shell pwd)/infrastructure/all_files
+
+synth:
 	cd infrastructure;cdktf synth
+
+build-tf-cdk: build-python synth
 
 plan-tf-cdk: 
 	cd infrastructure;cdktf plan
