@@ -5,12 +5,13 @@ from cdktf_cdktf_provider_aws import (
     grafana_workspace_api_key,
     iam_role,
     iam_role_policy_attachment,
+    data_aws_ssm_parameter
 )
 from constructs import Construct
 
 
 class GrafanaWithPermissionsComponent(Construct):
-    def __init__(self, scope: Construct, id: str, name: str):
+    def __init__(self, scope: Construct, id: str, name: str,):
         super().__init__(scope, id)
 
         # CREATE roles
@@ -81,19 +82,21 @@ class GrafanaWithPermissionsComponent(Construct):
             data_sources=["TIMESTREAM"],
         )
 
-        # # Output the workspace ID
-        output_grafana_workspace_id = cdktf.TerraformOutput(
-            self, "workspace_id", value=self.grafana_workspace.id
-        )
+        # # Create an API key for the admin role
+        # self.grafana_workspace_api_key = (
+        #     grafana_workspace_api_key.GrafanaWorkspaceApiKey(
+        #         self,
+        #         "grafana_workspace_api_key",
+        #         key_name=key_name,
+        #         key_role="ADMIN",
+        #         workspace_id=self.grafana_workspace.id,
+        #         seconds_to_live=2525000,
+        #     )
+        # )
 
-        # Create an API key for the admin role
-        self.grafana_workspace_api_key = (
-            grafana_workspace_api_key.GrafanaWorkspaceApiKey(
-                self,
-                "grafana_workspace_api_key",
-                key_name="flight-controller-grafana-api-key",
-                key_role="ADMIN",
-                workspace_id=self.grafana_workspace.id,
-                seconds_to_live=2592000,
-            )
+        # Import API Key from parameter store
+        self.api_key = data_aws_ssm_parameter.DataAwsSsmParameter(
+          self,
+          "api_key",
+          name="flight_controller_api_key"
         )
