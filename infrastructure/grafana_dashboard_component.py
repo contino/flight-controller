@@ -19,7 +19,6 @@ class GrafanaDashboardComponent(Construct):
         self,
         scope: Construct,
         id: str,
-        # grafana_workspace_api_key: grafana_workspace_api_key.GrafanaWorkspaceApiKey,
     ):
         super().__init__(scope, id)
 
