@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from constructs import Construct
-from cdktf import App, TerraformStack, S3Backend
+from cdktf import App, TerraformStack, S3Backend, TerraformOutput
 
 from cdktf_cdktf_provider_aws.provider import AwsProvider
 from imports.grafana.provider import GrafanaProvider
@@ -19,16 +19,12 @@ class MyStack(TerraformStack):
     def __init__(
         self,
         scope: Construct,
-        id: str,
+        id: str, 
     ):
         super().__init__(scope, id)
+
         AwsProvider(self, "AWS")
-        GrafanaProvider(
-            self,
-            "Grafana",
-            auth="eyJrIjoiekNIV2hqbzdtUVMzcmhGZVNaYXJXNmNBZ2w0ZDhDcnMiLCJuIjoiYWRtaW4iLCJpZCI6MX0=",
-            url="https://g-2e637a6ddc.grafana-workspace.ap-southeast-2.amazonaws.com/",
-        )
+       
 
         self.dynamotable_name = "event_sourcing_table"
         self.lambda_name = "producer_lambda_function_cdktf"
@@ -57,14 +53,22 @@ class MyStack(TerraformStack):
             self, "grafana_workspace", self.grafana_workspace_name
         )
 
+        GrafanaProvider(
+            self,
+            "Grafana",
+            auth=grafanaWorkspace.api_key,
+            # auth="eyJrIjoiU3oxcThrMGJaWktRWTBpeGVtcjc4NlRGOGJidnA1Tk8iLCJuIjoiZmxpZ2h0LWNvbnRyb2xsZXItZ3JhZmFuYS1hcGkta2V5IiwiaWQiOjF9",
+            url="https://g-2e637a6ddc.grafana-workspace.ap-southeast-2.amazonaws.com/",
+        )
+
         # Create Grafana dashboard
         grafanaDashboard = GrafanaDashboardComponent(
-            self, "grafana_dashboard", grafanaWorkspace.grafana_workspace_api_key
+            self, "grafana_dashboard", 
         )
 
 
 app = App()
-stack = MyStack(app, "infra_tf_cdk")
+stack = MyStack(app, "infra_tf_cdk",)
 
 S3Backend(
     stack,

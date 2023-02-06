@@ -24,13 +24,13 @@ build-python:
 synth:
 	cd infrastructure;cdktf synth
 
-build-tf-cdk: build-python synth
+build: build-python synth
 
-plan-tf-cdk: 
+plan: 
 	cd infrastructure;cdktf plan
 
-deploy-tf-cdk: 
+deploy: 
 	cd infrastructure;cdktf deploy --auto-approve
 
-destroy-tf-cdk:
+destroy:
 	cd infrastructure;cdktf destroy --auto-approve

@@ -51,10 +51,13 @@ jobs:
         run: make unittest
 
       - name: Synthesize terraform configuration template
-        run: make build-tf-cdk
+        run: make build
+
+      - name: Run Terraform plan
+        run: make plan
 
       - name: Deploy terraform cdk
-        run: make deploy-tf-cdk
+        run: make deploy
 
       - name: Perform full test and check coverage
         run: make test
