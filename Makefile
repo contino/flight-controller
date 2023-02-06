@@ -27,10 +27,10 @@ synth:
 build: build-python synth
 
 plan: 
-	cd infrastructure;cdktf plan
+	cd infrastructure;cdktf plan --var key_name=$(shell git rev-parse --short HEAD)
 
 deploy: 
-	cd infrastructure;cdktf deploy --auto-approve
+	cd infrastructure;cdktf deploy --auto-approve --var key_name=$(shell git rev-parse --short HEAD)
 
 destroy:
 	cd infrastructure;cdktf destroy --auto-approve

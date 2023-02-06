@@ -1,13 +1,9 @@
-
-
 # Import the necessary modules
 from constructs import Construct
 import json
 
 from imports.grafana.folder import Folder
 from imports.grafana.dashboard import Dashboard
-from imports.grafana.provider import GrafanaProvider
-from managed_grafana_component import grafana_workspace_api_key
 
 # Load the dashboard configuration from a JSON file
 with open("dashboard.json", "r") as f:
@@ -28,7 +24,7 @@ class GrafanaDashboardComponent(Construct):
         super().__init__(scope, id)
 
         self.folder = Folder(self, "folder", title="Terraform Test Folder")
-
+        
         # Create a new Grafana dashboard
         self.dashboard = Dashboard(
             self,

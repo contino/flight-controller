@@ -12,7 +12,6 @@ from event_bridge_component import EventBridgeComponent
 from timestream_database_component import TimeStreamDBcomponent
 from managed_grafana_component import GrafanaWithPermissionsComponent
 from grafana_dashboard_component import GrafanaDashboardComponent
-from managed_grafana_component import grafana_workspace_api_key
 
 
 class MyStack(TerraformStack):
@@ -31,6 +30,7 @@ class MyStack(TerraformStack):
         self.timestream_db_name = "core_timestream_db"
         self.grafana_workspace_name = "grafana_dashboard"
 
+       
         # create dynamodb
         dynamoDBcomponent = DynamoDBcomponent(
             self, "event_table", self.dynamotable_name
@@ -49,15 +49,14 @@ class MyStack(TerraformStack):
         )
         # Create Grafana workspace
         grafanaWorkspace = GrafanaWithPermissionsComponent(
-            self, "grafana_workspace", self.grafana_workspace_name
+            self, "grafana_workspace", self.grafana_workspace_name,
         )
 
         GrafanaProvider(
             self,
             "Grafana",
-            auth=grafanaWorkspace.grafana_workspace_api_key.key,
-            # auth="eyJrIjoiekNIV2hqbzdtUVMzcmhGZVNaYXJXNmNBZ2w0ZDhDcnMiLCJuIjoiYWRtaW4iLCJpZCI6MX0=",
-            url="https://g-2e637a6ddc.grafana-workspace.ap-southeast-2.amazonaws.com/",
+            auth=grafanaWorkspace.api_key.value,
+            url="https://"+grafanaWorkspace.grafana_workspace.id+".grafana-workspace.ap-southeast-2.amazonaws.com/",
         )
 
         # Create Grafana dashboard
@@ -65,7 +64,6 @@ class MyStack(TerraformStack):
             self,
             "grafana_dashboard",
         )
-
 
 app = App()
 stack = MyStack(
