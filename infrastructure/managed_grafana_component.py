@@ -15,7 +15,6 @@ class GrafanaWithPermissionsComponent(Construct):
         super().__init__(scope, id)
 
         # CREATE roles
-
         grafana_iam_role = iam_role.IamRole(
             self,
             "iam_role_grafana",
