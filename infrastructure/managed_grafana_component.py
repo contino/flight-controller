@@ -1,7 +1,5 @@
 import json
-import os
 import cdktf
-from cdktf import TerraformOutput
 from cdktf_cdktf_provider_aws import (
     grafana_workspace,
     grafana_workspace_api_key,
@@ -85,31 +83,17 @@ class GrafanaWithPermissionsComponent(Construct):
 
         # # Output the workspace ID
         output_grafana_workspace_id = cdktf.TerraformOutput(
-            self, 
-            "workspace_id", 
-            value=self.grafana_workspace.id
+            self, "workspace_id", value=self.grafana_workspace.id
         )
 
         # Create an API key for the admin role
         self.grafana_workspace_api_key = (
             grafana_workspace_api_key.GrafanaWorkspaceApiKey(
                 self,
-                "grafana_workspace_api_key_2",
+                "grafana_workspace_api_key",
                 key_name="flight-controller-grafana-api-key",
                 key_role="ADMIN",
                 workspace_id=self.grafana_workspace.id,
-                seconds_to_live=186400,
+                seconds_to_live=2592000,
             )
         )
-
-        # Output API token for the dashboard role
-        # output_api_key = cdktf.TerraformOutput(
-        #     self,
-        #     "api_key",
-        #     value=self.grafana_workspace_api_key.key,
-        #     sensitive=True
-        # )
-
-        self.api_key = self.grafana_workspace_api_key.key
-
-

@@ -8,9 +8,7 @@ google-cloud-pubsub = "*"
 google-cloud-bigquery = "*"
 gunicorn = "*"
 structlog = "*"
-boto3= "*" 
-cdktf = "*"
-constructs = "*"
+boto3= "*"
 
 [dev-packages]
 pytest = "*"
@@ -20,9 +18,9 @@ black = "*"
 pytest-cov = "*"
 diagrams = "*"
 behave = "*"
-constructs = ">=10.0.0,<11.0.0"
-cdktf = "~=0.13.3"
-cdktf-cdktf-provider-aws = "~=10.0.2"
+constructs = "*"
+cdktf = "*"
+cdktf-cdktf-provider-aws = "*"
 cdktf-cdktf-provider-archive = "*"
 
 [requires]
