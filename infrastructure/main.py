@@ -2,6 +2,7 @@
 
 from constructs import Construct
 from cdktf import App, TerraformStack, S3Backend
+import os
 
 from cdktf_cdktf_provider_aws.provider import AwsProvider
 from imports.grafana.provider import GrafanaProvider
@@ -55,7 +56,7 @@ class MyStack(TerraformStack):
         GrafanaProvider(
             self,
             "Grafana",
-            auth="${{ secrets.GRAFANA_API_KEY }}",
+            auth=os.environ['GRAFANA_API_KEY'],
             # auth=grafanaWorkspace.api_key.value,
             url="https://"+grafanaWorkspace.grafana_workspace.id+".grafana-workspace.ap-southeast-2.amazonaws.com/",
         )
