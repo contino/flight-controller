@@ -13,6 +13,9 @@ integration-test:
 test:
 	pipenv run pytest --cov=src --cov-fail-under=50 --cov-report term-missing tests/
 
+watch:
+	ptw -- -m 'not integration' tests/
+
 e2e:
 	pipenv run behave
 

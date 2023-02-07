@@ -16,9 +16,9 @@ resource "aws_iam_role" "github_oidc" {
           Federated = aws_iam_openid_connect_provider.github.arn
         }
         Condition = {
-          StringLike = {
+          StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "token.actions.githubusercontent.com:sub" = "repo:contino/apac-flight-controller-aws:main"
+            "token.actions.githubusercontent.com:sub" = "repo:contino/apac-flight-controller-aws:ref:refs/heads/main"
           }
         }
       },

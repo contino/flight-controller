@@ -16,6 +16,7 @@ class ProjectRequested(BaseEvent):
     eventVersion: int
     eventType: Literal["ProjectRequested"] = "ProjectRequested"
 
+
 @dataclass
 class ProjectAssignedPayload:
     project_id: str
@@ -44,11 +45,11 @@ class ProjectCreated(BaseEvent):
 
 @dataclass
 class ProjectLeadTime:
-    project_id: str
+    aggregate_id: str
     lead_time: float
+
 
 @dataclass
 class ProjectAssignedLeadTime:
-    project_id: str
+    aggregate_id: str
     lead_time: float
-

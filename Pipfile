@@ -22,6 +22,8 @@ constructs = "*"
 cdktf = "*"
 cdktf-cdktf-provider-aws = "*"
 cdktf-cdktf-provider-archive = "*"
+pytest-watch = "*"
+dirhash = "*"
 
 [requires]
 python_version = "3.10"
