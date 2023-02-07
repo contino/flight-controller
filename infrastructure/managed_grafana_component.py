@@ -86,7 +86,7 @@ class GrafanaWithPermissionsComponent(Construct):
         #     grafana_workspace_api_key.GrafanaWorkspaceApiKey(
         #         self,
         #         "grafana_workspace_api_key",
-        #         key_name=key_name,
+        #         key_name="flight_controller_api_key",
         #         key_role="ADMIN",
         #         workspace_id=self.grafana_workspace.id,
         #         seconds_to_live=2525000,
