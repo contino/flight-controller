@@ -52,12 +52,18 @@ jobs:
 
       - name: Synthesize terraform configuration template
         run: make build
+        with:
+          githubToken: ${{ secrets.GRAFANA_API_KEY}}
 
       - name: Run Terraform plan
         run: make plan
+        with:
+          githubToken: ${{ secrets.GRAFANA_API_KEY}}
 
       - name: Deploy terraform cdk
         run: make deploy
+        with:
+          githubToken: ${{ secrets.GRAFANA_API_KEY}}
 
       - name: Perform full test and check coverage
         run: make test
