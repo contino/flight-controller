@@ -57,7 +57,6 @@ class MyStack(TerraformStack):
             self,
             "Grafana",
             auth=os.environ['GRAFANA_API_KEY'],
-            # auth=grafanaWorkspace.api_key.value,
             url="https://"+grafanaWorkspace.grafana_workspace.id+".grafana-workspace.ap-southeast-2.amazonaws.com/",
         )
 

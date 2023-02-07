@@ -1,11 +1,9 @@
 import json
-import cdktf
 from cdktf_cdktf_provider_aws import (
     grafana_workspace,
     grafana_workspace_api_key,
     iam_role,
     iam_role_policy_attachment,
-    data_aws_ssm_parameter
 )
 from constructs import Construct
 
@@ -92,10 +90,3 @@ class GrafanaWithPermissionsComponent(Construct):
         #         seconds_to_live=2525000,
         #     )
         # )
-
-        # Import API Key from parameter store
-        self.api_key = data_aws_ssm_parameter.DataAwsSsmParameter(
-          self,
-          "api_key",
-          name="flight_controller_api_key"
-        )
