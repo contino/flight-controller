@@ -1,5 +1,11 @@
 from typing import Any, Dict, List, Tuple, Union
 from uuid import uuid4
+from src.entities.compliance import (
+    ResourceFoundCompliant,
+    ResourceFoundCompliantPayload,
+    ResourceFoundNonCompliant,
+    ResourceFoundNonCompliantPayload,
+)
 
 
 from src.entities.events import Event, EventType
@@ -12,6 +18,7 @@ from src.entities.projects import (
     ProjectRequested,
     ProjectRequestedPayload,
 )
+from src.usecases.compliance import handle_resource_found_compliant
 
 from src.usecases.projects import handle_project_created, handle_project_assigned
 
@@ -27,8 +34,7 @@ def _convert_payload_to_event(
             eventId=str(uuid4()),
             eventVersion=1,
             payload=ProjectRequestedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
     elif event_type == "ProjectAssigned":
@@ -39,8 +45,7 @@ def _convert_payload_to_event(
             eventId=str(uuid4()),
             eventVersion=1,
             payload=ProjectAssignedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
     elif event_type == "ProjectCreated":
@@ -51,8 +56,29 @@ def _convert_payload_to_event(
             eventId=str(uuid4()),
             eventVersion=1,
             payload=ProjectCreatedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
+            ),
+        )
+    elif event_type == "ResourceFoundNonCompliant":
+        return ResourceFoundNonCompliant(
+            aggregateId=payload["aggregate_id"],
+            aggregateType="Resource",
+            aggregateVersion=aggregateVersion + 1,
+            eventId=str(uuid4()),
+            eventVersion=1,
+            payload=ResourceFoundNonCompliantPayload(
+                payload["container_id"], int(payload["time"])
+            ),
+        )
+    elif event_type == "ResourceFoundCompliant":
+        return ResourceFoundCompliant(
+            aggregateId=payload["aggregate_id"],
+            aggregateType="Resource",
+            aggregateVersion=aggregateVersion + 1,
+            eventId=str(uuid4()),
+            eventVersion=1,
+            payload=ResourceFoundCompliantPayload(
+                payload["container_id"], int(payload["time"])
             ),
         )
 
@@ -62,18 +88,28 @@ def handle_event(
 ) -> Union[Exception, Tuple[Event, List[Metric]]]:
     if "event_type" in payload:
         event = _convert_payload_to_event(
-                payload, payload["event_type"], len(aggregate_events)
+            payload, payload["event_type"], len(aggregate_events)
         )
         if isinstance(event, ProjectRequested):
-            return (event,[])
-        elif payload["event_type"] in ["ProjectCreated","ProjectAssigned"]:
+            return (event, [])
+        elif payload["event_type"] in [
+            "ProjectCreated",
+            "ProjectAssigned",
+            "ResourceFoundNonCompliant",
+        ]:
             metrics = []
             for aggregate_event in aggregate_events:
-                if payload["event_type"] == "ProjectCreated" and isinstance(aggregate_event, ProjectRequested):
+                if payload["event_type"] == "ProjectCreated" and isinstance(
+                    aggregate_event, ProjectRequested
+                ):
                     metrics.append(handle_project_created(aggregate_event, event))
-                elif payload["event_type"] == "ProjectAssigned" and isinstance(aggregate_event, ProjectRequested):
+                elif payload["event_type"] == "ProjectAssigned" and isinstance(
+                    aggregate_event, ProjectRequested
+                ):
                     metrics.append(handle_project_assigned(aggregate_event, event))
             return (event, metrics)
+        elif payload["event_type"] in ["ResourceFoundCompliant"]:
+            return (event, [handle_resource_found_compliant(event, aggregate_events)])
         else:
             return Exception(f"Unknown Event type {payload['event_type']}")
     return Exception("Malformed event with no event_type")

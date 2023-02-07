@@ -7,6 +7,12 @@ from uuid import UUID
 import json
 import os
 
+from src.entities.compliance import (
+    ResourceFoundCompliant,
+    ResourceFoundCompliantPayload,
+    ResourceFoundNonCompliant,
+    ResourceFoundNonCompliantPayload,
+)
 
 
 from .event_sink import EventSink
@@ -22,13 +28,12 @@ from src.entities.projects import (
 )
 
 
-
-TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME","event_sourcing_table")
-# TODO fix the test environment variable 
+TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME", "event_sourcing_table")
+# TODO fix the test environment variable
 # did not work https://github.com/MobileDynasty/pytest-env
-#TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
+# TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
 
-dynamoDbResource = boto3.resource('dynamodb')
+dynamoDbResource = boto3.resource("dynamodb")
 logger = structlog.get_logger(__name__)
 
 
@@ -36,39 +41,46 @@ class DynamoEventSink(EventSink):
     def __init__(self) -> None:
         self.dynamoDbTable = dynamoDbResource.Table(TABLE_NAME)
 
-    
     def store_events(self, events: List[Event]) -> Optional[Exception]:
         try:
-        # do deduplication before batch save
-            with self.dynamoDbTable.batch_writer(overwrite_by_pkeys=['aggregateId', 'eventId']) as batch:
+            # do deduplication before batch save
+            with self.dynamoDbTable.batch_writer(
+                overwrite_by_pkeys=["aggregateId", "eventId"]
+            ) as batch:
                 for event in events:
                     value = {
-                        'aggregateId': event.aggregateId,
-                        'eventId':str(event.eventId),
-                        'eventType': event.eventType,
-                        'aggregateType': event.aggregateType,
-                        'aggregateVersion':event.aggregateVersion,
-                        'eventVersion': event.eventVersion,
-                        'payload': json.dumps(event.payload.__dict__),
-                        'datetime': int(round(datetime.utcnow().timestamp()))
+                        "aggregateId": event.aggregateId,
+                        "eventId": str(event.eventId),
+                        "eventType": event.eventType,
+                        "aggregateType": event.aggregateType,
+                        "aggregateVersion": event.aggregateVersion,
+                        "eventVersion": event.eventVersion,
+                        "payload": json.dumps(event.payload.__dict__),
+                        "datetime": int(round(datetime.utcnow().timestamp())),
                     }
                     batch.put_item(Item=value)
         except Exception as err:
-            logger.error(f"Couldn't add to table type of error is {type(err)} AND reason is {err} ")
+            logger.error(
+                f"Couldn't add to table type of error is {type(err)} AND reason is {err} "
+            )
             return err
+
 
 class DynamoEventSource(EventSource):
     def __init__(self) -> None:
         self.dynamoDbTable = dynamoDbResource.Table(TABLE_NAME)
 
+    def _sort_events(self, event: Event) -> int:
+        return event.aggregateVersion
+
     def get_events_for_aggregate(self, aggregate_id: str) -> List[Event]:
         response = self.dynamoDbTable.query(
-            KeyConditionExpression=Key('aggregateId').eq(aggregate_id)
+            KeyConditionExpression=Key("aggregateId").eq(aggregate_id)
         )
         logger.msg(f"responses {response}")
 
         events: List[Event] = []
-        for item in response['Items']:
+        for item in response["Items"]:
             if item["eventType"] == "ProjectRequested":
                 events.append(
                     ProjectRequested(
@@ -79,10 +91,11 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         ProjectRequestedPayload(
                             json.loads(item["payload"])["project_id"],
-                            int(json.loads(item["payload"])["requested_time"])
+                            int(json.loads(item["payload"])["requested_time"]),
                         ),
-                        item["eventType"]
-                    ))
+                        item["eventType"],
+                    )
+                )
             elif item["eventType"] == "ProjectAssigned":
                 events.append(
                     ProjectAssigned(
@@ -93,9 +106,9 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         ProjectAssignedPayload(
                             json.loads(item["payload"])["project_id"],
-                            int(json.loads(item["payload"])["assigned_time"])
+                            int(json.loads(item["payload"])["assigned_time"]),
                         ),
-                        item["eventType"]
+                        item["eventType"],
                     )
                 )
             elif item["eventType"] == "ProjectCreated":
@@ -108,9 +121,43 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         ProjectCreatedPayload(
                             json.loads(item["payload"])["project_id"],
-                            int(json.loads(item["payload"])["created_time"])
+                            int(json.loads(item["payload"])["created_time"]),
                         ),
-                        item["eventType"]
+                        item["eventType"],
                     )
                 )
+            elif item["eventType"] == "ResourceFoundCompliant":
+                events.append(
+                    ResourceFoundCompliant(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        ResourceFoundCompliantPayload(
+                            timestamp=int(json.loads(item["payload"])["timestamp"]),
+                            container_id=json.loads(item["payload"])["container_id"],
+                        ),
+                        item["eventType"],
+                    )
+                )
+
+            elif item["eventType"] == "ResourceFoundNonCompliant":
+                events.append(
+                    ResourceFoundNonCompliant(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        ResourceFoundNonCompliantPayload(
+                            timestamp=int(json.loads(item["payload"])["timestamp"]),
+                            container_id=json.loads(item["payload"])["container_id"],
+                        ),
+                        item["eventType"],
+                    )
+                )
+
+        events.sort(key=self._sort_events)
+
         return events

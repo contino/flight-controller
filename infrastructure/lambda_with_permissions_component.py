@@ -16,6 +16,8 @@ from cdktf_cdktf_provider_aws import (
     dynamodb_table,
 )
 
+from dirhash import dirhash
+
 
 class LambdaWithPermissionsComponent(Construct):
     def __init__(
@@ -36,6 +38,7 @@ class LambdaWithPermissionsComponent(Construct):
             "lambda-asset",
             path=Path.join(os.getcwd(), "all_files"),
             type=AssetType.ARCHIVE,
+            asset_hash=dirhash(Path.join(os.getcwd(), "all_files"), "md5"),
         )
 
         # CREATE roles
@@ -77,7 +80,23 @@ class LambdaWithPermissionsComponent(Construct):
                             },
                         }
                     ),
-                )
+                ),
+                iam_role.IamRoleInlinePolicy(
+                    name="AllowTimeStream",
+                    policy=json.dumps(
+                        {
+                            "Version": "2012-10-17",
+                            "Statement": {
+                                "Action": [
+                                    "timestream:DescribeEndpoints",
+                                    "timestream:WriteRecords",
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                            },
+                        }
+                    ),
+                ),
             ],
         )
 

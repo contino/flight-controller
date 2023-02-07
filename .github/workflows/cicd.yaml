@@ -55,7 +55,7 @@ jobs:
       - name: Synthesize terraform configuration template
         run: make build
         
-      - name: Deploy deployment
+      - name: Dev deployment
         run: make deploy
 
       - name: Perform full test and check coverage
@@ -70,6 +70,12 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::103417687554:role/github_oidc
           aws-region: ap-southeast-2
+
+      - name: Prepare for production deployment
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: make clean
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY_PROD }}
         
       - name: Production deployment
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
