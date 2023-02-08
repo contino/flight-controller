@@ -12,14 +12,26 @@ from .projects import (
     ProjectRequested,
 )
 
-Event: "TypeAlias" = Union[ProjectCreated, ProjectRequested, ResourceFoundNonCompliant]
+from src.entities.accounts import (
+    AccountCreated,
+    AccountCreatedPayload,
+    AccountRequested,
+    AccountRequestedPayload
+)
+
+Event: "TypeAlias" = Union[ProjectCreated, ProjectRequested, AccountCreated, AccountRequested, ResourceFoundNonCompliant]
 
 EventType: "TypeAlias" = Union[
+    
     Literal["ProjectCreated"],
+   
     Literal["ProjectRequested"],
+    Literal["AccountCreated"],
+    Literal["AccountRequested"]
+    ,
     Literal["ResourceFoundNonCompliant"],
 ]
 
 Payload: "TypeAlias" = Union[
-    ProjectCreatedPayload, ProjectRequestedPayload, ResourceFoundNonCompliantPayload
+    ProjectCreatedPayload, ProjectRequestedPayload, AccountCreatedPayload, AccountRequestedPayload, ResourceFoundNonCompliantPayload
 ]
