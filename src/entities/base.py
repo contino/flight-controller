@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Literal, Union
 from uuid import UUID
 
-AggregateType: "TypeAlias" = Union[Literal["Project"], Literal["Resource"]]
+AggregateType: "TypeAlias" = Union[Literal["Project"], Literal["Resource"], Literal["Account"]]
 
 
 @dataclass

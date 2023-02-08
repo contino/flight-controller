@@ -13,7 +13,10 @@ from src.entities.compliance import (
     ResourceFoundNonCompliant,
     ResourceFoundNonCompliantPayload,
 )
-
+from src.entities.patch import (
+    PatchRunSummary,
+    PatchRunSummaryPayload
+)
 
 from .event_sink import EventSink
 from .event_source import EventSource
@@ -141,7 +144,6 @@ class DynamoEventSource(EventSource):
                         item["eventType"],
                     )
                 )
-
             elif item["eventType"] == "ResourceFoundNonCompliant":
                 events.append(
                     ResourceFoundNonCompliant(
@@ -157,6 +159,22 @@ class DynamoEventSource(EventSource):
                         item["eventType"],
                     )
                 )
+            elif item["eventType"] == "PatchRunSummary":
+                events.append(
+                    PatchRunSummary(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        PatchRunSummaryPayload(
+                            failed_instances=json.loads(item["payload"])["failed_instances"],
+                            successful_instances=json.loads(item["payload"])["successful_instances"],
+                        ),
+                        item["eventType"],
+                    )
+                )
+
 
         events.sort(key=self._sort_events)
 
