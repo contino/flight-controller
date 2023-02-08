@@ -27,6 +27,24 @@ from src.entities.projects import (
     ProjectRequestedPayload,
 )
 
+from src.entities.accounts import (
+    AccountCreated,
+    AccountCreatedPayload,
+    AccountAssigned,
+    AccountAssignedPayload,
+    AccountRequested,
+    AccountRequestedPayload,
+)
+
+from src.entities.accounts import (
+    AccountCreated,
+    AccountCreatedPayload,
+    AccountAssigned,
+    AccountAssignedPayload,
+    AccountRequested,
+    AccountRequestedPayload,
+)
+
 
 TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME", "event_sourcing_table")
 # TODO fix the test environment variable
@@ -155,6 +173,51 @@ class DynamoEventSource(EventSource):
                             container_id=json.loads(item["payload"])["container_id"],
                         ),
                         item["eventType"],
+                    )
+                )
+            elif item["eventType"] == "AccountRequested":
+                events.append(
+                    AccountRequested(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        AccountRequestedPayload(
+                            json.loads(item["payload"])["account_id"],
+                            int(json.loads(item["payload"])["requested_time"])
+                        ),
+                        item["eventType"]
+                    )
+                )
+            elif item["eventType"] == "AccountAssigned":
+                events.append(
+                    AccountAssigned(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        AccountAssignedPayload(
+                            json.loads(item["payload"])["account_id"],
+                            int(json.loads(item["payload"])["assigned_time"])
+                        ),
+                        item["eventType"]
+                    )
+                )
+            elif item["eventType"] == "AccountCreated":
+                events.append(
+                    AccountCreated(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        AccountCreatedPayload(
+                            json.loads(item["payload"])["account_id"],
+                            int(json.loads(item["payload"])["created_time"])
+                        ),
+                        item["eventType"]
                     )
                 )
 

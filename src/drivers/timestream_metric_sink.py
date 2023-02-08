@@ -7,8 +7,15 @@ from src.entities.compliance import ResourceComplianceLeadTime
 
 
 from .metric_sink import MetricSink
-from src.entities.projects import ProjectLeadTime, ProjectAssignedLeadTime
-from src.entities.metrics import Metric
+from src.entities.projects import (
+    ProjectLeadTime,
+    ProjectAssignedLeadTime
+)
+
+from src.entities.accounts import (
+    AccountLeadTime,
+    AccountAssignedLeadTime,
+)
 
 TIMESTREAM_DATABASE_NAME = "core_timestream_db"
 TIMESTREAM_TABLE_NAME = "metrics_table"
@@ -41,6 +48,10 @@ class TimeStreamMetricSink(MetricSink):
                 record["MeasureName"] = "project_assign_time"
             elif isinstance(metric, ResourceComplianceLeadTime):
                 record["MeasureName"] = "resource_compliance_lead_time"
+            elif isinstance(metric, AccountLeadTime):
+                project_metric['MeasureName']="account_lead_time"
+            elif isinstance(metric, AccountAssignedLeadTime):
+                project_metric['MeasureName']="account_assign_time"
 
             records.append(record)
 
