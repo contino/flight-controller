@@ -19,6 +19,11 @@ from src.entities.projects import (
     ProjectLeadTime,
     ProjectAssignedLeadTime,
 )
+from src.entities.patch import (
+    PatchRunSummary,
+    PatchRunSummaryPayload,
+    PatchCompliancePercentage
+)
 
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
 event_time = int(round(datetime.utcnow().timestamp()))
@@ -155,7 +160,6 @@ def test_project_created_handles_no_project_requested():
 def test_project_assigned_handles_no_project_requested():
     assert isinstance(handle_event(project_assigned_payload, [])[0], ProjectAssigned)
 
-
 def test_project_created_returns_no_metric_with_no_project_requested():
     assert handle_event(project_created_payload, [])[1] == []
 
@@ -163,6 +167,35 @@ def test_project_created_returns_no_metric_with_no_project_requested():
 def test_project_assigned_returns_no_metric_with_no_project_requested():
     assert handle_event(project_assigned_payload, [])[1] == []
 
+def test_patch_summary_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
+                "successful_instances": "i-peoritdsfl",
+                "event_type": "PatchRunSummary",
+            },
+            [],
+        )[0],
+        PatchRunSummary,
+    )
+
+def test_patch_summary_returns_metric():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
+                "successful_instances": "i-peoritdsfl",
+                "event_type": "PatchRunSummary",
+            },
+            [],
+        )[1][0],
+        PatchCompliancePercentage,
+    )
 
 def test_project_assigned_returns_no_metric_with_no_project_requested():
     assert handle_event(project_assigned_payload, [])[1] == []
