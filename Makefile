@@ -21,16 +21,34 @@ build-python:
 	rsync -avu $(shell pwd)/src $(shell pwd)/infrastructure/all_files
 	pip install -r requirements.txt --target=$(shell pwd)/infrastructure/all_files
 
-synth:
-	cd infrastructure;cdktf synth
+clean:
+	cd infrastructure; rm -rf cdktf.out
+
+synth-core:
+	cd infrastructure;cdktf synth infra_tf_cdk
+
+synth-grafana:
+	cd infrastructure;cdktf synth grafana
+
+synth: synth-core synth-grafana
 
 build: build-python synth
 
-plan: 
-	cd infrastructure;cdktf plan
+plan-core:
+	cd infrastructure;cdktf plan infra_tf_cdk
 
-deploy: 
-	cd infrastructure;cdktf deploy --auto-approve
+plan-grafana:
+	cd infrastructure;cdktf plan grafana
 
-destroy:
-	cd infrastructure;cdktf destroy --auto-approve
+plan: build-python plan-core plan-grafana
+
+deploy: build-python
+	cd infrastructure;cdktf deploy infra_tf_cdk grafana --auto-approve
+
+destroy-core:
+	cd infrastructure;cdktf destroy infra_tf_cdk
+
+destroy-grafana:
+	cd infrastructure;cdktf destroy grafana
+
+destroy: destroy-core destroy-grafana
