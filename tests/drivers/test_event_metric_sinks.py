@@ -17,7 +17,7 @@ from src.entities.projects import (
     ProjectCreatedPayload,
     ProjectRequestedPayload,
     ProjectRequested,
-     ProjectLeadTime,
+    ProjectLeadTime,
     ProjectAssignedLeadTime
 )
 
