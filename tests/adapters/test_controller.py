@@ -200,7 +200,7 @@ def test_account_requested_returns_no_metrics():
     )
 
 
-def test_project_requested_returns_correct_event():
+def test_account_requested_returns_correct_event():
     assert isinstance(
         handle_event(
             account_requested_payload,
