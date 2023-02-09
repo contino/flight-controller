@@ -17,7 +17,17 @@ from src.entities.projects import (
     ProjectRequested,
     ProjectRequestedPayload,
     ProjectLeadTime,
-    ProjectAssignedLeadTime,
+    ProjectAssignedLeadTime
+)
+from src.entities.accounts import (
+    AccountCreated,
+    AccountAssigned,
+    AccountRequested,
+    AccountCreatedPayload,
+    AccountAssignedPayload,
+    AccountRequestedPayload,
+    AccountLeadTime,
+    AccountAssignedLeadTime,
 )
 
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -40,6 +50,23 @@ project_created_payload = {
     "event_type": "ProjectCreated",
 }
 
+account_requested_payload = {
+    "aggregate_id": aggregate_id,
+    "time": event_time,
+    "event_type": "AccountRequested",
+}
+
+account_assigned_payload = {
+    "aggregate_id": aggregate_id,
+    "time": event_time,
+    "event_type": "AccountAssigned",
+}
+
+account_created_payload = {
+    "aggregate_id": aggregate_id,
+    "time": event_time,
+    "event_type": "AccountCreated",
+}
 
 def test_project_requested_returns_no_metrics():
     assert (
@@ -155,7 +182,6 @@ def test_project_created_handles_no_project_requested():
 def test_project_assigned_handles_no_project_requested():
     assert isinstance(handle_event(project_assigned_payload, [])[0], ProjectAssigned)
 
-
 def test_project_created_returns_no_metric_with_no_project_requested():
     assert handle_event(project_created_payload, [])[1] == []
 
@@ -168,78 +194,137 @@ def test_project_assigned_returns_no_metric_with_no_project_requested():
     assert handle_event(project_assigned_payload, [])[1] == []
 
 
-def test_resource_non_compliant_returns_correct_type():
-    assert isinstance(
-        handle_event(
-            {
-                "aggregate_id": aggregate_id,
-                "container_id": "123456789012",
-                "time": event_time,
-                "event_type": "ResourceFoundNonCompliant",
-            },
-            [],
-        )[0],
-        ResourceFoundNonCompliant,
-    )
-
-
-def test_resource_non_compliant_returns_no_metric():
+# Test events for account metrics
+def test_account_requested_returns_no_metrics():
     assert (
         handle_event(
-            {
-                "aggregate_id": aggregate_id,
-                "container_id": "123456789012",
-                "time": event_time,
-                "event_type": "ResourceFoundNonCompliant",
-            },
+            account_requested_payload,
             [],
         )[1]
         == []
     )
 
 
-def test_resource_compliant_returns_correct_type():
+def test_project_requested_returns_correct_event():
     assert isinstance(
         handle_event(
-            {
-                "aggregate_id": aggregate_id,
-                "container_id": "123456789012",
-                "time": event_time,
-                "event_type": "ResourceFoundCompliant",
-            },
+            account_requested_payload,
             [],
         )[0],
-        ResourceFoundCompliant,
+        AccountRequested,
     )
 
 
-def test_resource_compliant_returns_metric():
+def test_account_created_returns_correct_event():
+    requested_event = AccountRequested(
+        aggregate_id,
+        "Account",
+        1,
+        uuid4(),
+        1,
+        AccountRequestedPayload(aggregate_id, event_time),
+    )
     assert isinstance(
         handle_event(
-            {
-                "aggregate_id": aggregate_id,
-                "container_id": "123456789012",
-                "time": event_time,
-                "event_type": "ResourceFoundCompliant",
-            },
-            [
-                ResourceFoundNonCompliant(
-                    aggregate_id,
-                    "Resource",
-                    1,
-                    uuid4(),
-                    1,
-                    ResourceFoundNonCompliantPayload(
-                        container_id="123456789012", timestamp=event_time
-                    ),
-                )
-            ],
-        )[1][0],
-        ResourceComplianceLeadTime,
+            account_created_payload,
+            [requested_event],
+        )[0],
+        AccountCreated,
+    )
+
+def test_account_assigned_returns_correct_event():
+    requested_event = AccountRequested(
+        aggregate_id,
+        "Project",
+        1,
+        uuid4(),
+        1,
+        AccountRequestedPayload(aggregate_id, event_time),
+    )
+    assert isinstance(
+        handle_event(
+            account_assigned_payload,
+            [requested_event],
+        )[0],
+        AccountAssigned,
     )
 
 
-def test_handles_unknown_event():
+def test_account_created_returns_lead_time():
+    requested_event = AccountRequested(
+        aggregate_id,
+        "Account",
+        1,
+        uuid4(),
+        1,
+        AccountRequestedPayload(aggregate_id, event_time),
+    )
+    assert handle_event(account_created_payload, [requested_event])[1] == [
+        AccountLeadTime(
+            aggregate_id,
+            0
+        )
+    ]
+
+
+def test_account_assigned_returns_lead_time():
+    requested_event = AccountRequested(
+        aggregate_id,
+        "Account",
+        1,
+        uuid4(),
+        1,
+        AccountRequestedPayload(aggregate_id, event_time),
+    )
+    assert handle_event(account_assigned_payload, [requested_event])[1] == [
+        AccountAssignedLeadTime(
+            aggregate_id,
+            0
+        )
+    ]
+
+
+def test_account_assigned_returns_lead_time_with_multiple_aggregates():
+    requested_event = AccountRequested(
+        aggregate_id,
+        "Account",
+        1,
+        uuid4(),
+        1,
+        AccountRequestedPayload(aggregate_id, event_time),
+    )
+
+    created_event = AccountCreated(
+        aggregate_id,
+        "Account",
+        2,
+        uuid4(),
+        1,
+        AccountCreatedPayload(aggregate_id, event_time),
+    )
+    assert handle_event(account_assigned_payload, [created_event,requested_event])[1] == [
+        AccountAssignedLeadTime(
+            aggregate_id,
+            0
+        )
+    ]
+
+def test_account_created_handles_no_project_requested():
+    assert isinstance(handle_event(account_created_payload, [])[0], AccountCreated)
+
+def test_account_assigned_handles_no_project_requested():
+    assert isinstance(handle_event(account_assigned_payload, [])[0], AccountAssigned)
+
+def test_account_created_returns_no_metric_with_no_project_requested():
+    assert handle_event(account_created_payload, [])[1] == []
+
+def test_account_assigned_returns_no_metric_with_no_project_requested():
+    assert handle_event(account_created_payload, [])[1] == []
+
+def test_account_assigned_returns_no_metric_with_no_project_requested():
+    assert handle_event(account_assigned_payload, [])[1] == []
+
+def test_project_handles_unknown_event():
     assert isinstance(
         handle_event(
             {
