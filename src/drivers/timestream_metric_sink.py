@@ -4,6 +4,7 @@ from typing import List, Optional
 import time
 
 from src.entities.compliance import ResourceComplianceLeadTime
+from src.entities.metrics import Metric
 
 
 from .metric_sink import MetricSink
@@ -49,9 +50,9 @@ class TimeStreamMetricSink(MetricSink):
             elif isinstance(metric, ResourceComplianceLeadTime):
                 record["MeasureName"] = "resource_compliance_lead_time"
             elif isinstance(metric, AccountLeadTime):
-                project_metric['MeasureName']="account_lead_time"
+                record['MeasureName']="account_lead_time"
             elif isinstance(metric, AccountAssignedLeadTime):
-                project_metric['MeasureName']="account_assign_time"
+                record['MeasureName']="account_assign_time"
 
             records.append(record)
 
