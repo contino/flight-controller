@@ -209,7 +209,6 @@ def test_account_requested_returns_correct_event():
         AccountRequested,
     )
 
-
 def test_account_created_returns_correct_event():
     requested_event = AccountRequested(
         aggregate_id,

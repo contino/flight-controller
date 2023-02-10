@@ -141,7 +141,7 @@ def handle_event(
             "ProjectCreated",
             "ProjectAssigned",
             "AccountCreated",
-            "AccountAssigned",
+            "AccountRequested",
             "ResourceFoundNonCompliant",
         ]:
             metrics = []
