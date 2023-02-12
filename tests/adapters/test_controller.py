@@ -31,6 +31,7 @@ from src.entities.accounts import (
 )
 
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+account_id = aggregate_id
 event_time = int(round(datetime.utcnow().timestamp()))
 project_requested_payload = {
     "aggregate_id": aggregate_id,

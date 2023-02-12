@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from .base import BaseEvent
+from .base import BaseMetric
 
 
 @dataclass
@@ -43,12 +44,12 @@ class AccountCreated(BaseEvent):
 
 
 @dataclass
-class AccountLeadTime:
+class AccountLeadTime(BaseMetric):
     account_id: str
     lead_time: float
 
 @dataclass
-class AccountAssignedLeadTime:
+class AccountAssignedLeadTime(BaseMetric):
     account_id: str
     lead_time: float
 

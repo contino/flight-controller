@@ -154,9 +154,13 @@ def handle_event(
                     aggregate_event, ProjectRequested
                 ):
                     metrics.append(handle_project_assigned(aggregate_event, event))
-                elif payload["event_type"] == "AccountCreated" and isinstance(aggregate_event, AccountRequested):
-                    metrics.append(handle_account_created(aggregate_event, event))
-                elif payload["event_type"] == "AccountAssigned" and isinstance(aggregate_event, AccountRequested):
+                elif payload["event_type"] == "AccountCreated" and isinstance(
+                    aggregate_event, AccountRequested
+                ):
+                    metrics.append(handle_account_created(event, aggregate_events))
+                elif payload["event_type"] == "AccountAssigned" and isinstance(
+                    aggregate_event, AccountRequested
+                ):
                     metrics.append(handle_account_assigned(aggregate_event, event))
             return (event, metrics)
         elif payload["event_type"] in ["ResourceFoundCompliant"]:
