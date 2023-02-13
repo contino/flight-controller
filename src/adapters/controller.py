@@ -6,7 +6,10 @@ from src.entities.compliance import (
     ResourceFoundNonCompliant,
     ResourceFoundNonCompliantPayload,
 )
-
+from src.entities.patch import(
+    PatchRunSummary,
+    PatchRunSummaryPayload
+)
 
 from src.entities.events import Event, EventType
 from src.entities.metrics import Metric
@@ -26,7 +29,7 @@ from src.entities.accounts import (
     AccountRequestedPayload,
 )
 from src.usecases.compliance import handle_resource_found_compliant
-
+from src.usecases.patch import handle_patch_summary
 from src.usecases.projects import handle_project_created, handle_project_assigned
 from src.usecases.accounts import handle_account_created
 
@@ -89,6 +92,17 @@ def _convert_payload_to_event(
                 payload["container_id"], int(payload["time"])
             ),
         )
+    elif event_type == "PatchRunSummary":
+        return PatchRunSummary(
+            aggregateId=payload["aggregate_id"],
+            aggregateType="Account",
+            aggregateVersion=aggregateVersion + 1,
+            eventId=str(uuid4()),
+            eventVersion=1,
+            payload=PatchRunSummaryPayload(
+                payload["failed_instances"], payload["successful_instances"]
+            ),
+        )
     elif event_type == "AccountRequested":
         return AccountRequested(
             aggregateId=payload["aggregate_id"],
@@ -148,6 +162,8 @@ def handle_event(
             return (event, [handle_account_created(event, aggregate_events)])
         elif payload["event_type"] in ["ResourceFoundCompliant"]:
             return (event, [handle_resource_found_compliant(event, aggregate_events)])
+        elif payload["event_type"] in ["PatchRunSummary"]:
+            return (event, [handle_patch_summary(event)])
         else:
             return Exception(f"Unknown Event type {payload['event_type']}")
     return Exception("Malformed event with no event_type")

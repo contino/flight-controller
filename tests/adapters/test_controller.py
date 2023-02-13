@@ -19,6 +19,11 @@ from src.entities.projects import (
     ProjectLeadTime,
     ProjectAssignedLeadTime,
 )
+from src.entities.patch import (
+    PatchRunSummary,
+    PatchRunSummaryPayload,
+    PatchCompliancePercentage
+)
 from src.entities.accounts import (
     AccountCreated,
     AccountRequested,
@@ -183,9 +188,110 @@ def test_project_created_returns_no_metric_with_no_project_requested():
 def test_project_assigned_returns_no_metric_with_no_project_requested():
     assert handle_event(project_assigned_payload, [])[1] == []
 
-
 def test_project_assigned_returns_no_metric_with_no_project_requested():
     assert handle_event(project_assigned_payload, [])[1] == []
+
+
+def test_patch_summary_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
+                "successful_instances": "i-peoritdsfl",
+                "event_type": "PatchRunSummary",
+            },
+            [],
+        )[0],
+        PatchRunSummary,
+    )
+
+def test_patch_summary_returns_metric():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
+                "successful_instances": "i-peoritdsfl",
+                "event_type": "PatchRunSummary",
+            },
+            [],
+        )[1][0],
+        PatchCompliancePercentage,
+    )
+
+
+def test_resource_non_compliant_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "container_id": "123456789012",
+                "time": event_time,
+                "event_type": "ResourceFoundNonCompliant",
+            },
+            [],
+        )[0],
+        ResourceFoundNonCompliant,
+    )
+
+
+def test_resource_non_compliant_returns_no_metric():
+    assert (
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "container_id": "123456789012",
+                "time": event_time,
+                "event_type": "ResourceFoundNonCompliant",
+            },
+            [],
+        )[1]
+        == []
+    )
+
+
+def test_resource_compliant_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "container_id": "123456789012",
+                "time": event_time,
+                "event_type": "ResourceFoundCompliant",
+            },
+            [],
+        )[0],
+        ResourceFoundCompliant,
+    )
+
+
+def test_resource_compliant_returns_metric():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "container_id": "123456789012",
+                "time": event_time,
+                "event_type": "ResourceFoundCompliant",
+            },
+            [
+                ResourceFoundNonCompliant(
+                    aggregate_id,
+                    "Resource",
+                    1,
+                    uuid4(),
+                    1,
+                    ResourceFoundNonCompliantPayload(
+                        container_id="123456789012", timestamp=event_time
+                    ),
+                )
+            ],
+        )[1][0],
+        ResourceComplianceLeadTime,
+    )
 
 
 # Test events for account metrics
@@ -249,7 +355,8 @@ def test_account_created_returns_no_metric_with_no_project_requested():
     assert handle_event(account_created_payload, [])[1] == []
 
 
-def test_project_handles_unknown_event():
+
+def test_handles_unknown_event():
     assert isinstance(
         handle_event(
             {
@@ -274,3 +381,4 @@ def test_handles_malformed_event():
         ),
         Exception,
     )
+

@@ -28,6 +28,11 @@ from src.entities.accounts import (
     AccountRequestedPayload,
 )
 
+from src.entities.patch import (
+    PatchRunSummary,
+    PatchRunSummaryPayload,
+)
+
 
 @pytest.mark.integration
 def test_retrieves_project_events_from_dynamodb():
@@ -96,6 +101,27 @@ def test_retrieves_compliance_events_from_dynamodb():
 
     assert got == [event, event_2]
 
+@pytest.mark.integration
+def test_retrieves_patch_events_from_dynamodb():
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    event = PatchRunSummary(
+        aggregateId=aggregate_id,
+        aggregateType="Account",
+        aggregateVersion=1,
+        eventId=uuid4(),
+        eventVersion=1,
+        payload=PatchRunSummaryPayload(
+            "i-adslkjfds,i-89dsfkjdkfj", "i-peoritdsfl"
+        ),
+    )
+    sink = DynamoEventSink()
+    sink.store_events([event])
+
+    source = DynamoEventSource()
+
+    got = source.get_events_for_aggregate(aggregate_id)
+
+    assert got == [event]
 
 
 @pytest.mark.integration

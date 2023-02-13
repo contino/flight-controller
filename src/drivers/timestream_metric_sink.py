@@ -4,6 +4,7 @@ from typing import List, Optional
 import time
 
 from src.entities.compliance import ResourceComplianceLeadTime
+from src.entities.patch import PatchCompliancePercentage
 from src.entities.metrics import Metric
 
 
@@ -34,19 +35,24 @@ class TimeStreamMetricSink(MetricSink):
             ]
             record = {
                 "Dimensions": dimensions,
-                "MeasureValue": str(metric.lead_time),
                 "MeasureValueType": "DOUBLE",
                 "Time": str(current_time),
             }
-
             if isinstance(metric, ProjectLeadTime):
                 record["MeasureName"] = "project_lead_time"
+                record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, ProjectAssignedLeadTime):
                 record["MeasureName"] = "project_assign_time"
+                record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, ResourceComplianceLeadTime):
                 record["MeasureName"] = "resource_compliance_lead_time"
+                record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, AccountLeadTime):
                 record["MeasureName"] = "account_lead_time"
+                record["MeasureValue"] = str(metric.lead_time)
+            elif isinstance(metric, PatchCompliancePercentage):
+                record["MeasureName"] = "patch_compliance_percentage"
+                record["MeasureValue"] = str(metric.percentage)
 
             records.append(record)
 

@@ -4,7 +4,10 @@ from src.entities.compliance import (
     ResourceFoundNonCompliant,
     ResourceFoundNonCompliantPayload,
 )
-
+from src.entities.patch import (
+    PatchRunSummary,
+    PatchRunSummaryPayload
+)
 from .projects import (
     ProjectCreated,
     ProjectCreatedPayload,
@@ -19,7 +22,7 @@ from src.entities.accounts import (
     AccountRequestedPayload
 )
 
-Event: "TypeAlias" = Union[ProjectCreated, ProjectRequested, AccountCreated, AccountRequested, ResourceFoundNonCompliant]
+Event: "TypeAlias" = Union[ProjectCreated, ProjectRequested, AccountCreated, AccountRequested, ResourceFoundNonCompliant, PatchRunSummary]
 
 EventType: "TypeAlias" = Union[
     
@@ -30,8 +33,9 @@ EventType: "TypeAlias" = Union[
     Literal["AccountRequested"]
     ,
     Literal["ResourceFoundNonCompliant"],
+    Literal["PatchRunSummary"]
 ]
 
 Payload: "TypeAlias" = Union[
-    ProjectCreatedPayload, ProjectRequestedPayload, AccountCreatedPayload, AccountRequestedPayload, ResourceFoundNonCompliantPayload
+    ProjectCreatedPayload, ProjectRequestedPayload, AccountCreatedPayload, AccountRequestedPayload, ResourceFoundNonCompliantPayload, PatchRunSummaryPayload
 ]
