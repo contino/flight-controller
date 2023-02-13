@@ -44,7 +44,7 @@ def test_store_resource_account_lead_time_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                AccountLeadTime(aggregate_id, lead_time),
+                AccountLeadTime(aggregate_id, lead_time=lead_time, account_id=aggregate_id),
             ]
         )
         is None

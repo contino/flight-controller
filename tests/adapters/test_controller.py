@@ -228,21 +228,48 @@ def test_account_created_returns_correct_event():
     )
 
 
+# def test_account_created_returns_lead_time():
+#     requested_event = AccountRequested(
+#         aggregate_id,
+#         "Account",
+#         1,
+#         uuid4(),
+#         1,
+#         AccountRequestedPayload(aggregate_id, event_time),
+#     )
+#     assert handle_event(account_created_payload, [requested_event])[1] == [
+#         AccountLeadTime(
+#             aggregate_id,
+#             0
+#         )
+#     ]
+
+
 def test_account_created_returns_lead_time():
-    requested_event = AccountRequested(
-        aggregate_id,
-        "Account",
-        1,
-        uuid4(),
-        1,
-        AccountRequestedPayload(aggregate_id, event_time),
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "container_id": "123456789012",
+                "time": event_time,
+                "event_type": "AccountCreated",
+            },
+            [
+                AccountRequested(
+                    aggregate_id,
+                    "Resource",
+                    1,
+                    uuid4(),
+                    1,
+                    AccountRequestedPayload(
+                        account_id=aggregate_id,
+                        requested_time=event_time
+                    ),
+                )
+            ],
+        )[1],
+        AccountLeadTime,
     )
-    assert handle_event(account_created_payload, [requested_event])[1] == [
-        AccountLeadTime(
-            aggregate_id,
-            0
-        )
-    ]
 
 
 
