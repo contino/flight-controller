@@ -17,17 +17,13 @@ from src.entities.projects import (
     ProjectRequested,
     ProjectRequestedPayload,
     ProjectLeadTime,
-    ProjectAssignedLeadTime
+    ProjectAssignedLeadTime,
 )
 from src.entities.accounts import (
     AccountCreated,
-    AccountAssigned,
     AccountRequested,
-    AccountCreatedPayload,
-    AccountAssignedPayload,
     AccountRequestedPayload,
     AccountLeadTime,
-    AccountAssignedLeadTime,
 )
 
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -63,6 +59,7 @@ account_created_payload = {
     "time": event_time,
     "event_type": "AccountCreated",
 }
+
 
 def test_project_requested_returns_no_metrics():
     assert (
@@ -178,6 +175,7 @@ def test_project_created_handles_no_project_requested():
 def test_project_assigned_handles_no_project_requested():
     assert isinstance(handle_event(project_assigned_payload, [])[0], ProjectAssigned)
 
+
 def test_project_created_returns_no_metric_with_no_project_requested():
     assert handle_event(project_created_payload, [])[1] == []
 
@@ -209,6 +207,7 @@ def test_account_requested_returns_correct_event():
         )[0],
         AccountRequested,
     )
+
 
 def test_account_created_returns_correct_event():
     requested_event = AccountRequested(
@@ -242,39 +241,13 @@ def test_account_created_returns_lead_time():
     ]
 
 
-# def test_account_created_returns_lead_time():
-#     assert isinstance(
-#         handle_event(
-#             {
-#                 "aggregate_id": aggregate_id,
-#                 "container_id": "123456789012",
-#                 "time": event_time,
-#                 "event_type": "AccountCreated",
-#             },
-#             [
-#                 AccountRequested(
-#                     aggregate_id,
-#                     "Resource",
-#                     1,
-#                     uuid4(),
-#                     1,
-#                     AccountRequestedPayload(
-#                         account_id=aggregate_id,
-#                         requested_time=event_time
-#                     ),
-#                 )
-#             ],
-#         )[1],
-#         AccountLeadTime,
-#     )
-
-
-
 def test_account_created_handles_no_project_requested():
     assert isinstance(handle_event(account_created_payload, [])[0], AccountCreated)
 
+
 def test_account_created_returns_no_metric_with_no_project_requested():
     assert handle_event(account_created_payload, [])[1] == []
+
 
 def test_project_handles_unknown_event():
     assert isinstance(

@@ -22,15 +22,13 @@ from src.entities.projects import (
 from src.entities.accounts import (
     AccountCreated,
     AccountCreatedPayload,
-    AccountAssigned,
-    AccountAssignedPayload,
     AccountRequested,
     AccountRequestedPayload,
 )
 from src.usecases.compliance import handle_resource_found_compliant
 
 from src.usecases.projects import handle_project_created, handle_project_assigned
-from src.usecases.accounts import handle_account_created, handle_account_assigned
+from src.usecases.accounts import handle_account_created
 
 
 def _convert_payload_to_event(
@@ -102,17 +100,6 @@ def _convert_payload_to_event(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
-    elif event_type == "AccountAssigned":
-        return AccountAssigned(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Account",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
-            payload=AccountAssignedPayload(
-                payload["aggregate_id"], int(payload["time"])
-            ),
-        )
     elif event_type == "AccountCreated":
         return AccountCreated(
             aggregateId=payload["aggregate_id"],
@@ -124,6 +111,7 @@ def _convert_payload_to_event(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
+
 
 def handle_event(
     payload: Any, aggregate_events: List[Event]
@@ -154,14 +142,10 @@ def handle_event(
                 elif payload["event_type"] == "AccountCreated" and isinstance(
                     aggregate_event, AccountRequested
                 ):
-                    metrics.append(handle_account_created(aggregate_events, event))
-                elif payload["event_type"] == "AccountAssigned" and isinstance(
-                    aggregate_event, AccountRequested
-                ):
-                    metrics.append(handle_account_assigned(aggregate_event, event))
+                    metrics.append(handle_account_created(aggregate_event, event))
             return (event, metrics)
-        # elif payload["event_type"] in ["AccountCreated"]:
-        #     return (event, [handle_account_created(event, aggregate_events)])
+        elif payload["event_type"] in ["AccountCreated"]:
+            return (event, [handle_account_created(event, aggregate_events)])
         elif payload["event_type"] in ["ResourceFoundCompliant"]:
             return (event, [handle_resource_found_compliant(event, aggregate_events)])
         else:

@@ -30,8 +30,6 @@ from src.entities.projects import (
 from src.entities.accounts import (
     AccountCreated,
     AccountCreatedPayload,
-    AccountAssigned,
-    AccountAssignedPayload,
     AccountRequested,
     AccountRequestedPayload,
 )
@@ -39,8 +37,6 @@ from src.entities.accounts import (
 from src.entities.accounts import (
     AccountCreated,
     AccountCreatedPayload,
-    AccountAssigned,
-    AccountAssignedPayload,
     AccountRequested,
     AccountRequestedPayload,
 )
@@ -185,24 +181,9 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         AccountRequestedPayload(
                             json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["requested_time"])
+                            int(json.loads(item["payload"])["requested_time"]),
                         ),
-                        item["eventType"]
-                    )
-                )
-            elif item["eventType"] == "AccountAssigned":
-                events.append(
-                    AccountAssigned(
-                        item["aggregateId"],
-                        item["aggregateType"],
-                        item["aggregateVersion"],
-                        UUID(item["eventId"]),
-                        item["eventVersion"],
-                        AccountAssignedPayload(
-                            json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["assigned_time"])
-                        ),
-                        item["eventType"]
+                        item["eventType"],
                     )
                 )
             elif item["eventType"] == "AccountCreated":
@@ -215,9 +196,9 @@ class DynamoEventSource(EventSource):
                         item["eventVersion"],
                         AccountCreatedPayload(
                             json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["created_time"])
+                            int(json.loads(item["payload"])["created_time"]),
                         ),
-                        item["eventType"]
+                        item["eventType"],
                     )
                 )
 

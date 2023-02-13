@@ -17,18 +17,6 @@ class AccountRequested(BaseEvent):
     eventVersion: int
     eventType: Literal["AccountRequested"] = "AccountRequested"
 
-@dataclass
-class AccountAssignedPayload:
-    account_id: str
-    assigned_time: float
-
-
-@dataclass
-class AccountAssigned(BaseEvent):
-    payload: AccountAssignedPayload
-    eventVersion: int
-    eventType: Literal["AccountAssigned"] = "AccountAssigned"
-
 
 @dataclass
 class AccountCreatedPayload:
@@ -45,11 +33,4 @@ class AccountCreated(BaseEvent):
 
 @dataclass
 class AccountLeadTime(BaseMetric):
-    account_id: str
     lead_time: float
-
-@dataclass
-class AccountAssignedLeadTime(BaseMetric):
-    account_id: str
-    lead_time: float
-
