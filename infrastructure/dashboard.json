@@ -15,38 +15,54 @@
           "type": "dashboard"
         },
         "type": "dashboard"
+      },
+      {
+        "builtIn": "1",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "Dashboard"
+        },
+        "type": "Dashboard"
       }
     ]
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "grafana",
-        "uid": "grafana"
-      },
+      "description": "This metric is the percentage of patch compliant instances.\nBased on: https://legendary-spoon-f82c1640.pages.github.io/domains/Patching/events/PatchRunSummary/",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds",
+            "seriesBy": "last"
           },
           "custom": {
-            "axisLabel": "",
+            "axisLabel": "Patch Compliance Percentage",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 0,
-            "gradientMode": "none",
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
+            "lineStyle": {
+              "fill": "solid"
+            },
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -59,36 +75,76 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "area"
             }
           },
+          "displayName": "Patch Compliance Percentage",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "#EAB839",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "measure_value::double"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
               }
             ]
           }
-        },
-        "overrides": []
+        ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 8,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Event Docs Link",
+          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Patching/events/PatchRunSummary/"
+        }
+      ],
       "options": {
         "legend": {
-          "calcs": [],
+          "calcs": [
+            "mean"
+          ],
           "displayMode": "list",
           "placement": "bottom"
         },
@@ -99,14 +155,19 @@
       },
       "targets": [
         {
+          "database": "\"core_timestream_db\"",
           "datasource": {
-            "type": "datasource",
-            "uid": "grafana"
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
           },
-          "refId": "A"
+          "measure": "project_lead_time",
+          "rawQuery": "select * from core_timestream_db.metrics_table where aggregate_id = 'testMetric' and measure_name = 'patch_compliance_percentage'",
+          "refId": "A",
+          "table": "\"metrics_table\""
         }
       ],
-      "title": "Panel Title",
+      "title": "Patch Run Compliance Percentage",
+      "transparent": true,
       "type": "timeseries"
     }
   ],
@@ -117,12 +178,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "New dashboard",
-  "version": 0,
+  "title": "Flight Controller dashboard",
+  "uid": "test",
+  "version": 3,
   "weekStart": ""
 }
