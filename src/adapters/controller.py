@@ -99,8 +99,7 @@ def _convert_payload_to_event(
             eventId=str(uuid4()),
             eventVersion=1,
             payload=AccountRequestedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
     elif event_type == "AccountAssigned":
@@ -111,8 +110,7 @@ def _convert_payload_to_event(
             eventId=str(uuid4()),
             eventVersion=1,
             payload=AccountAssignedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
     elif event_type == "AccountCreated":
@@ -123,8 +121,7 @@ def _convert_payload_to_event(
             eventId=str(uuid4()),
             eventVersion=1,
             payload=AccountCreatedPayload(
-                payload["aggregate_id"],
-                int(payload["time"])
+                payload["aggregate_id"], int(payload["time"])
             ),
         )
 
@@ -154,17 +151,17 @@ def handle_event(
                     aggregate_event, ProjectRequested
                 ):
                     metrics.append(handle_project_assigned(aggregate_event, event))
-                # elif payload["event_type"] == "AccountCreated" and isinstance(
-                #     aggregate_event, AccountRequested
-                # ):
-                #     metrics.append(handle_account_created(event, aggregate_events))
+                elif payload["event_type"] == "AccountCreated" and isinstance(
+                    aggregate_event, AccountRequested
+                ):
+                    metrics.append(handle_account_created(aggregate_events, event))
                 elif payload["event_type"] == "AccountAssigned" and isinstance(
                     aggregate_event, AccountRequested
                 ):
                     metrics.append(handle_account_assigned(aggregate_event, event))
             return (event, metrics)
-        elif payload["event_type"] in ["AccountCreated"]:
-            return (event, [handle_account_created(event, aggregate_events)])
+        # elif payload["event_type"] in ["AccountCreated"]:
+        #     return (event, [handle_account_created(event, aggregate_events)])
         elif payload["event_type"] in ["ResourceFoundCompliant"]:
             return (event, [handle_resource_found_compliant(event, aggregate_events)])
         else:
