@@ -15,52 +15,218 @@
           "type": "dashboard"
         },
         "type": "dashboard"
+      },
+      {
+        "builtIn": "1",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "Dashboard"
+        },
+        "type": "Dashboard"
       }
     ]
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "grafana",
-        "uid": "grafana"
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": []
       },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "select measure_value::double from \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'account_lead_time'",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Account Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "select measure_value::double from \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'resource_compliance_lead_time'",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Resource Compliance Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "SELECT * FROM $__database.$__table ",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Project Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -75,39 +241,46 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 0
+        "x": 12,
+        "y": 8
       },
-      "id": 2,
+      "id": 12,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
       },
+      "pluginVersion": "8.4.7",
       "targets": [
         {
+          "database": "\"core_timestream_db\"",
           "datasource": {
-            "type": "datasource",
-            "uid": "grafana"
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
           },
-          "refId": "A"
+          "measure": "project_lead_time",
+          "rawQuery": "select measure_value::double from \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'patch_compliance_percentage'",
+          "refId": "A",
+          "table": "\"metrics_table\""
         }
       ],
-      "title": "Panel Title",
-      "type": "timeseries"
+      "title": "Patch Compliance %",
+      "type": "gauge"
     }
   ],
   "schemaVersion": 35,
@@ -117,12 +290,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-5y",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "New dashboard",
-  "version": 0,
+  "title": "Flight Controller dashboard",
+  "uid": "test",
+  "version": 6,
   "weekStart": ""
 }
