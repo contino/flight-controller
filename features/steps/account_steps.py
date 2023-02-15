@@ -9,7 +9,6 @@ import boto3
 
 eventBridge = boto3.client("events")
 timeStream = boto3.client('timestream-query')
-# aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
 
 
 @given("an account has been requested")
@@ -17,7 +16,7 @@ def request_account(context):
     context.aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     requested_time = int(round(datetime.utcnow().timestamp()))
 
-    eventBridge.put_events(
+    response = eventBridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
@@ -29,10 +28,12 @@ def request_account(context):
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "main_lambda_bus",
+                "EventBusName": "main_lambda_bus_cdktf",
             }
         ]
     )
+
+    assert response["FailedEntryCount"] == 0
 
 
 
@@ -52,7 +53,7 @@ def assing_account(context):
                         "time": f"{requested_time}",
                     }
                 ),
-                "EventBusName": "main_lambda_bus",
+                "EventBusName": "main_lambda_bus_cdktf",
             }
         ]
     )
@@ -62,6 +63,6 @@ def assing_account(context):
 def lead_time_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = 'testMetric' and measure_name = 'account_lead_time' LIMIT 1"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'account_lead_time'"
     )
     assert len(result["Rows"]) == 1

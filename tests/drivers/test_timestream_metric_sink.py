@@ -1,5 +1,6 @@
 import pytest
 import random
+import string
 
 from src.drivers.timestream_metric_sink import TimeStreamMetricSink
 
@@ -10,7 +11,7 @@ from src.entities.patch import PatchCompliancePercentage
 
 @pytest.mark.integration
 def test_store_metrics_does_not_return_error():
-    aggregate_id = "testMetric"
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     lead_time = random.randint(0, 7200)
     sink = TimeStreamMetricSink()
     assert (
@@ -25,7 +26,7 @@ def test_store_metrics_does_not_return_error():
 
 @pytest.mark.integration
 def test_store_resource_compliance_lead_time_does_not_return_error():
-    aggregate_id = "testMetric"
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     lead_time = random.randint(0, 7200)
     sink = TimeStreamMetricSink()
     assert (
@@ -39,7 +40,7 @@ def test_store_resource_compliance_lead_time_does_not_return_error():
 
 @pytest.mark.integration
 def test_store_patch_compliance_percentage_does_not_return_error():
-    aggregate_id = "testMetric"
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     patch_compliance_percentage = random.randint(0, 100)
     sink = TimeStreamMetricSink()
     assert (
@@ -54,7 +55,7 @@ def test_store_patch_compliance_percentage_does_not_return_error():
 
 @pytest.mark.integration
 def test_store_resource_account_lead_time_does_not_return_error():
-    aggregate_id = "testMetric"
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     lead_time = random.randint(0, 7200)
     sink = TimeStreamMetricSink()
     assert (
