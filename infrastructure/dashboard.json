@@ -35,199 +35,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 28,
   "links": [],
   "liveNow": false,
   "panels": [
     {
+      "description": "",
       "fieldConfig": {
         "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
-      "id": 8,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "database": "\"core_timestream_db\"",
-          "datasource": {
-            "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
-          },
-          "measure": "project_lead_time",
-          "rawQuery": "select measure_value::double from \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'account_lead_time'",
-          "refId": "A",
-          "table": "\"metrics_table\""
-        }
-      ],
-      "title": "Account Lead Time (Average)",
-      "type": "gauge"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 10,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "database": "\"core_timestream_db\"",
-          "datasource": {
-            "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
-          },
-          "measure": "project_lead_time",
-          "rawQuery": "select measure_value::double from \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'resource_compliance_lead_time'",
-          "refId": "A",
-          "table": "\"metrics_table\""
-        }
-      ],
-      "title": "Resource Compliance Lead Time (Average)",
-      "type": "gauge"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 6,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "database": "\"core_timestream_db\"",
-          "datasource": {
-            "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
-          },
-          "measure": "project_lead_time",
-          "rawQuery": "SELECT * FROM $__database.$__table ",
-          "refId": "A",
-          "table": "\"metrics_table\""
-        }
-      ],
-      "title": "Project Lead Time (Average)",
-      "type": "gauge"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -238,21 +53,28 @@
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 3600
               }
             ]
           },
-          "unit": "percent"
+          "unit": "s"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 8
+        "x": 0,
+        "y": 0
       },
-      "id": 12,
+      "id": 8,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Account Documentation",
+          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Account/"
+        }
+      ],
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -274,7 +96,207 @@
             "uid": "bmr1Db24z"
           },
           "measure": "project_lead_time",
-          "rawQuery": "select measure_value::double from \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'patch_compliance_percentage'",
+          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'account_lead_time' ORDER BY time asc",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Account Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 10,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Resource Compliance Documentation",
+          "url": ""
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'resource_compliance_lead_time' ORDER BY time asc",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Resource Compliance Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Project Documentation",
+          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Account/"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'project_lead_time' ORDER BY time asc",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Project Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "description": "Percentage based on the number of patch compliant instances.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 12,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Patch Compliance Documentation",
+          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Patching/events/PatchRunSummary/"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'patch_compliance_percentage' ORDER BY time asc",
           "refId": "A",
           "table": "\"metrics_table\""
         }
@@ -297,6 +319,6 @@
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 6,
+  "version": 2,
   "weekStart": ""
 }
