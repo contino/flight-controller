@@ -43,6 +43,38 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "axisLabel": "Activation Count",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "Guardrail Max Activations",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -53,11 +85,11 @@
               },
               {
                 "color": "red",
-                "value": 3600
+                "value": 80
               }
             ]
           },
-          "unit": "s"
+          "unit": "none"
         },
         "overrides": []
       },
@@ -67,25 +99,19 @@
         "x": 0,
         "y": 0
       },
-      "id": 8,
-      "links": [
-        {
-          "targetBlank": true,
-          "title": "Account Documentation",
-          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Account/"
-        }
-      ],
+      "id": 18,
       "options": {
-        "orientation": "auto",
-        "reduceOptions": {
+        "legend": {
           "calcs": [
             "mean"
           ],
-          "fields": "/^measure_value::double$/",
-          "values": false
+          "displayMode": "list",
+          "placement": "bottom"
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "pluginVersion": "8.4.7",
       "targets": [
@@ -95,17 +121,77 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "project_lead_time",
-          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'account_lead_time' ORDER BY time asc",
+          "measure": "guardrail_max_activation",
+          "rawQuery": "SELECT \"time\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\""
         }
       ],
-      "title": "Account Lead Time (Average)",
-      "type": "gauge"
+      "title": "Guardrail Max Activations Average",
+      "type": "timeseries"
     },
     {
-      "description": "",
+      "description": "Total Guardrail Activation Count",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Activations"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 14,
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": true
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "guardrail_activation_count",
+          "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Guardrail Activation Count",
+      "type": "bargauge"
+    },
+    {
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -132,81 +218,10 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 10,
-      "links": [
-        {
-          "targetBlank": true,
-          "title": "Resource Compliance Documentation",
-          "url": ""
-        }
-      ],
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "/^measure_value::double$/",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "8.4.7",
-      "targets": [
-        {
-          "database": "\"core_timestream_db\"",
-          "datasource": {
-            "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
-          },
-          "measure": "project_lead_time",
-          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'resource_compliance_lead_time' ORDER BY time asc",
-          "refId": "A",
-          "table": "\"metrics_table\""
-        }
-      ],
-      "title": "Resource Compliance Lead Time (Average)",
-      "type": "gauge"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 3600
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
         "y": 8
       },
-      "id": 6,
-      "links": [
-        {
-          "targetBlank": true,
-          "title": "Project Documentation",
-          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Account/"
-        }
-      ],
+      "id": 16,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -227,13 +242,13 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "project_lead_time",
-          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'project_lead_time' ORDER BY time asc",
+          "measure": "account_lead_time",
+          "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\""
         }
       ],
-      "title": "Project Lead Time (Average)",
+      "title": "Guardrail Lead Time Average",
       "type": "gauge"
     },
     {
@@ -295,13 +310,214 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "project_lead_time",
-          "rawQuery": "SELECT measure_value::double FROM \"core_timestream_db\".\"metrics_table\" \nWHERE measure_name = 'patch_compliance_percentage' ORDER BY time asc",
+          "measure": "patch_compliance_percentage",
+          "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
-          "table": "\"metrics_table\""
+          "table": "\"metrics_table\"",
+          "waitForResult": false
         }
       ],
       "title": "Patch Compliance %",
+      "type": "gauge"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 10,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Resource Compliance Documentation",
+          "url": ""
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "resource_compliance_lead_time",
+          "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "refId": "A",
+          "table": "\"metrics_table\"",
+          "waitForResult": true
+        }
+      ],
+      "title": "Resource Compliance Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 6,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Project Documentation",
+          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Account/"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "project_lead_time",
+          "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "refId": "A",
+          "table": "\"metrics_table\"",
+          "waitForResult": true
+        }
+      ],
+      "title": "Project Lead Time (Average)",
+      "type": "gauge"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 8,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Account Documentation",
+          "url": "https://legendary-spoon-f82c1640.pages.github.io/domains/Account/"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^measure_value::double$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "bmr1Db24z"
+          },
+          "measure": "account_lead_time",
+          "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "refId": "A",
+          "table": "\"metrics_table\"",
+          "waitForResult": true
+        }
+      ],
+      "title": "Account Lead Time (Average)",
       "type": "gauge"
     }
   ],
@@ -312,13 +528,13 @@
     "list": []
   },
   "time": {
-    "from": "now-5y",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

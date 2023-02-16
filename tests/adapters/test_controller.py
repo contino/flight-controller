@@ -30,8 +30,18 @@ from src.entities.accounts import (
     AccountRequestedPayload,
     AccountLeadTime,
 )
+from src.entities.guardrail import (
+    GuardrailActivated,
+    GuardrailActivatedPayload,
+    GuardrailPassed,
+    GuardrailPassedPayload,
+    GuardrailActivationCount,
+    GuardrailMaxActivation,
+    GuardrailLeadTime
+)
 
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
 account_id = aggregate_id
 event_time = int(round(datetime.utcnow().timestamp()))
 project_requested_payload = {
@@ -188,10 +198,8 @@ def test_project_created_returns_no_metric_with_no_project_requested():
 def test_project_assigned_returns_no_metric_with_no_project_requested():
     assert handle_event(project_assigned_payload, [])[1] == []
 
-def test_project_assigned_returns_no_metric_with_no_project_requested():
-    assert handle_event(project_assigned_payload, [])[1] == []
 
-
+# Patch Summary Events
 def test_patch_summary_returns_correct_type():
     assert isinstance(
         handle_event(
@@ -206,6 +214,7 @@ def test_patch_summary_returns_correct_type():
         )[0],
         PatchRunSummary,
     )
+
 
 def test_patch_summary_returns_metric():
     assert isinstance(
@@ -223,6 +232,7 @@ def test_patch_summary_returns_metric():
     )
 
 
+# Compliance Events
 def test_resource_non_compliant_returns_correct_type():
     assert isinstance(
         handle_event(
@@ -294,7 +304,7 @@ def test_resource_compliant_returns_metric():
     )
 
 
-# Test events for account metrics
+# Account Events
 def test_account_requested_returns_no_metrics():
     assert (
         handle_event(
@@ -355,7 +365,114 @@ def test_account_created_returns_no_metric_with_no_project_requested():
     assert handle_event(account_created_payload, [])[1] == []
 
 
+# Guardrail Events
+def test_guardrail_activated_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "guardrail_id": guardrail_id,
+                "time": event_time,
+                "event_type": "GuardrailActivated",
+            },
+            []
+        )[0],
+        GuardrailActivated,
+    )
 
+
+def test_guardrail_activated_returns_metric():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "guardrail_id": guardrail_id,
+                "time": event_time,
+                "event_type": "GuardrailActivated",
+            },
+            [
+                GuardrailActivated(
+                    aggregate_id,
+                    "Resource",
+                    1,
+                    uuid4(),
+                    1,
+                    GuardrailActivatedPayload(
+                        guardrail_id=guardrail_id, timestamp=event_time
+                    ),
+                )
+            ]
+        )[1][0],
+        GuardrailActivationCount
+    )
+
+def test_guardrail_passed_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "guardrail_id": guardrail_id,
+                "time": event_time,
+                "event_type": "GuardrailPassed",
+            },
+            []
+        )[0],
+        GuardrailPassed,
+    )
+
+
+def test_guardrail_passed_returns_metric_lead_time():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "guardrail_id": guardrail_id,
+                "time": event_time,
+                "event_type": "GuardrailPassed",
+            },
+            [
+                GuardrailActivated(
+                    aggregate_id,
+                    "Resource",
+                    1,
+                    uuid4(),
+                    1,
+                    GuardrailActivatedPayload(
+                        guardrail_id=guardrail_id, timestamp=event_time
+                    ),
+                )
+            ],
+        )[1][0],
+        GuardrailLeadTime
+    )
+
+def test_guardrail_passed_returns_metric_max_activation():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "guardrail_id": guardrail_id,
+                "time": event_time,
+                "event_type": "GuardrailPassed",
+            },
+            [
+                GuardrailActivated(
+                    aggregate_id,
+                    "Resource",
+                    1,
+                    uuid4(),
+                    1,
+                    GuardrailActivatedPayload(
+                        guardrail_id=guardrail_id, timestamp=event_time
+                    ),
+                )
+            ],
+        )[1][1],
+        GuardrailMaxActivation
+    )
+
+
+# Unknown Events
 def test_handles_unknown_event():
     assert isinstance(
         handle_event(
@@ -370,6 +487,7 @@ def test_handles_unknown_event():
     )
 
 
+# Malformed Events
 def test_handles_malformed_event():
     assert isinstance(
         handle_event(
@@ -381,4 +499,6 @@ def test_handles_malformed_event():
         ),
         Exception,
     )
+
+
 

@@ -1,8 +1,8 @@
 ---
-name: GuardrailLeadTime[Metric]
+name: GuardrailActivationCount[Metric]
 version: 1
 summary: |
-  Leadtime from guardrail activation to pass.
+  Amount of guardrail activations.
 producers:
     - Flight Controller
 owners:
@@ -11,7 +11,7 @@ owners:
 
 ### Details
 
-Flight Controller looks at a previous guardrail activation and calculates time till it is resolved.
+Flight Controller looks at all guardrail activations and gives you the total amount.
 
 
 <NodeGraph title="Consumer / Producer Diagram" />

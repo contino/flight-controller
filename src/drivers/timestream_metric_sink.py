@@ -3,17 +3,18 @@ import structlog
 from typing import List, Optional
 import time
 
+from .metric_sink import MetricSink
+from src.entities.metrics import Metric
 from src.entities.compliance import ResourceComplianceLeadTime
 from src.entities.patch import PatchCompliancePercentage
-from src.entities.metrics import Metric
-
-
-from .metric_sink import MetricSink
 from src.entities.projects import ProjectLeadTime, ProjectAssignedLeadTime
-
-from src.entities.accounts import (
-    AccountLeadTime,
+from src.entities.accounts import AccountLeadTime
+from src.entities.guardrail import (
+    GuardrailActivationCount,
+    GuardrailMaxActivation,
+    GuardrailLeadTime
 )
+
 
 TIMESTREAM_DATABASE_NAME = "core_timestream_db"
 TIMESTREAM_TABLE_NAME = "metrics_table"
@@ -53,6 +54,18 @@ class TimeStreamMetricSink(MetricSink):
             elif isinstance(metric, PatchCompliancePercentage):
                 record["MeasureName"] = "patch_compliance_percentage"
                 record["MeasureValue"] = str(metric.percentage)
+            elif isinstance(metric, GuardrailActivationCount):
+                record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
+                record["MeasureName"] = "guardrail_activation_count"
+                record["MeasureValue"] = str(metric.count)
+            elif isinstance(metric, GuardrailMaxActivation):
+                record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
+                record["MeasureName"] = "guardrail_max_activation"
+                record["MeasureValue"] = str(metric.count)
+            elif isinstance(metric, GuardrailLeadTime):
+                record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
+                record["MeasureName"] = "guardrail_lead_time"
+                record["MeasureValue"] = str(metric.lead_time)
 
             records.append(record)
 
