@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Tuple, Union
 from uuid import uuid4
+from src.entities.events import Event, EventType
+from src.entities.metrics import Metric
 from src.entities.compliance import (
     ResourceFoundCompliant,
     ResourceFoundCompliantPayload,
@@ -10,9 +12,6 @@ from src.entities.patch import(
     PatchRunSummary,
     PatchRunSummaryPayload
 )
-
-from src.entities.events import Event, EventType
-from src.entities.metrics import Metric
 from src.entities.projects import (
     ProjectCreated,
     ProjectCreatedPayload,
@@ -28,10 +27,17 @@ from src.entities.accounts import (
     AccountRequested,
     AccountRequestedPayload,
 )
+from src.entities.guardrail import (
+    GuardrailPassed,
+    GuardrailPassedPayload,
+    GuardrailActivated,
+    GuardrailActivatedPayload
+)
 from src.usecases.compliance import handle_resource_found_compliant
 from src.usecases.patch import handle_patch_summary
 from src.usecases.projects import handle_project_created, handle_project_assigned
 from src.usecases.accounts import handle_account_created
+from src.usecases.guardrail import handle_guardrail_passed, handle_guardrail_activated
 
 
 def _convert_payload_to_event(
@@ -125,6 +131,28 @@ def _convert_payload_to_event(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
+    elif event_type == "GuardrailPassed":
+        return GuardrailPassed(
+            aggregateId=payload["aggregate_id"],
+            aggregateType="Resource",
+            aggregateVersion=aggregateVersion + 1,
+            eventId=str(uuid4()),
+            eventVersion=1,
+            payload=GuardrailPassedPayload(
+                payload["guardrail_id"], int(payload["time"])
+            ),
+        )
+    elif event_type == "GuardrailActivated":
+        return GuardrailActivated(
+            aggregateId=payload["aggregate_id"],
+            aggregateType="Resource",
+            aggregateVersion=aggregateVersion + 1,
+            eventId=str(uuid4()),
+            eventVersion=1,
+            payload=GuardrailActivatedPayload(
+                payload["guardrail_id"], int(payload["time"])
+            ),
+        )
 
 
 def handle_event(
@@ -164,6 +192,10 @@ def handle_event(
             return (event, [handle_resource_found_compliant(event, aggregate_events)])
         elif payload["event_type"] in ["PatchRunSummary"]:
             return (event, [handle_patch_summary(event)])
+        elif payload["event_type"] in ["GuardrailPassed"]:
+            return (event, handle_guardrail_passed(event, aggregate_events))
+        elif payload["event_type"] in ["GuardrailActivated"]:
+            return (event, [handle_guardrail_activated(event, aggregate_events)])
         else:
             return Exception(f"Unknown Event type {payload['event_type']}")
     return Exception("Malformed event with no event_type")

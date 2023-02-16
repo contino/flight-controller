@@ -1,8 +1,8 @@
 ---
-name: GuardrailViolation
+name: GuardrailActivated
 version: 1
 summary: |
-    Dispatched when a guardrail compliance status changes.
+  Dispatched when a guardrail activated
 consumers:
     - Flight Controller
 owners:

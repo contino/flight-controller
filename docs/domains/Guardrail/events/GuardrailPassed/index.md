@@ -1,12 +1,17 @@
 ---
-name: GuardrailViolationCount[Metric]
+name: GuardrailPassed
 version: 1
 summary: |
-    Current amount of guardrail violations.
-producers:
+  Dispatched when a guardrail passes
+consumers:
     - Flight Controller
 owners:
     - josharmi
 ---
 
+
 <NodeGraph title="Consumer / Producer Diagram" />
+
+<Schema />
+
+<EventExamples />

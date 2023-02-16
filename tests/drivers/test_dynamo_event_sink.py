@@ -1,36 +1,37 @@
 import random
 import string
+import pytest
 from datetime import datetime
 from uuid import UUID, uuid4
 
-import pytest
-
 from src.drivers.dynamo_event_sink_source import DynamoEventSink, DynamoEventSource
-
 from src.entities.projects import (
     ProjectCreated,
     ProjectCreatedPayload,
     ProjectRequested,
     ProjectRequestedPayload,
 )
-
 from src.entities.compliance import (
     ResourceFoundCompliant,
     ResourceFoundCompliantPayload,
     ResourceFoundNonCompliant,
     ResourceFoundNonCompliantPayload,
 )
-
 from src.entities.accounts import (
     AccountCreated,
     AccountCreatedPayload,
     AccountRequested,
     AccountRequestedPayload,
 )
-
 from src.entities.patch import (
     PatchRunSummary,
     PatchRunSummaryPayload,
+)
+from src.entities.guardrail import (
+    GuardrailActivated,
+    GuardrailActivatedPayload,
+    GuardrailPassed,
+    GuardrailPassedPayload
 )
 
 
@@ -65,7 +66,6 @@ def test_retrieves_project_events_from_dynamodb():
     got = source.get_events_for_aggregate(projectRequested.aggregateId)
 
     assert got == [projectRequested, projectCreated]
-
 
 
 @pytest.mark.integration
@@ -127,7 +127,7 @@ def test_retrieves_patch_events_from_dynamodb():
 @pytest.mark.integration
 def test_retrieves_account_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
-    accountRequested = AccountRequested(
+    event = AccountRequested(
         aggregateId=aggregate_id,
         aggregateType="Account",
         aggregateVersion=1,
@@ -137,7 +137,7 @@ def test_retrieves_account_events_from_dynamodb():
             aggregate_id, int(round(datetime.utcnow().timestamp()))
         ),
     )
-    accountCreated = AccountCreated(
+    event_2 = AccountCreated(
         aggregateId=aggregate_id,
         aggregateType="Account",
         aggregateVersion=2,
@@ -148,11 +148,46 @@ def test_retrieves_account_events_from_dynamodb():
         ),
     )
     sink = DynamoEventSink()
-    sink.store_events([accountRequested, accountCreated])
+    sink.store_events([event, event_2])
 
     source = DynamoEventSource()
 
-    got = source.get_events_for_aggregate(accountRequested.aggregateId)
+    got = source.get_events_for_aggregate(aggregate_id)
 
-    assert got == [accountRequested, accountCreated]
+    assert got == [event, event_2]
+
+
+@pytest.mark.integration
+def test_retrieves_guardrail_events_from_dynamodb():
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
+    event = GuardrailPassed(
+        aggregateId=aggregate_id,
+        aggregateType="Resource",
+        aggregateVersion=1,
+        eventId=uuid4(),
+        eventVersion=1,
+        payload=GuardrailPassedPayload(
+            guardrail_id, int(round(datetime.utcnow().timestamp()))
+        ),
+    )
+    event_2 = GuardrailActivated(
+        aggregateId=aggregate_id,
+        aggregateType="Resource",
+        aggregateVersion=2,
+        eventId=uuid4(),
+        eventVersion=1,
+        payload=GuardrailActivatedPayload(
+            guardrail_id, int(round(datetime.utcnow().timestamp()))
+        ),
+    )
+    sink = DynamoEventSink()
+    sink.store_events([event, event_2])
+
+    source = DynamoEventSource()
+
+    got = source.get_events_for_aggregate(aggregate_id)
+
+    assert got == [event, event_2]
+
 

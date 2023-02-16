@@ -7,6 +7,9 @@ from uuid import UUID
 import json
 import os
 
+from .event_sink import EventSink
+from .event_source import EventSource
+from src.entities.events import Event
 from src.entities.compliance import (
     ResourceFoundCompliant,
     ResourceFoundCompliantPayload,
@@ -17,10 +20,6 @@ from src.entities.patch import (
     PatchRunSummary,
     PatchRunSummaryPayload
 )
-
-from .event_sink import EventSink
-from .event_source import EventSource
-from src.entities.events import Event
 from src.entities.projects import (
     ProjectCreated,
     ProjectCreatedPayload,
@@ -29,21 +28,24 @@ from src.entities.projects import (
     ProjectRequested,
     ProjectRequestedPayload,
 )
-
 from src.entities.accounts import (
     AccountCreated,
     AccountCreatedPayload,
     AccountRequested,
     AccountRequestedPayload,
 )
-
 from src.entities.accounts import (
     AccountCreated,
     AccountCreatedPayload,
     AccountRequested,
     AccountRequestedPayload,
 )
-
+from src.entities.guardrail import (
+    GuardrailPassed,
+    GuardrailPassedPayload,
+    GuardrailActivated,
+    GuardrailActivatedPayload,
+)
 
 TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME", "event_sourcing_table")
 # TODO fix the test environment variable
@@ -215,6 +217,36 @@ class DynamoEventSource(EventSource):
                         AccountCreatedPayload(
                             json.loads(item["payload"])["account_id"],
                             int(json.loads(item["payload"])["created_time"]),
+                        ),
+                        item["eventType"],
+                    )
+                )
+            elif item["eventType"] == "GuardrailPassed":
+                events.append(
+                    GuardrailPassed(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        GuardrailPassedPayload(
+                            guardrail_id=json.loads(item["payload"])["guardrail_id"],
+                            timestamp=int(json.loads(item["payload"])["timestamp"]),
+                        ),
+                        item["eventType"],
+                    )
+                )
+            elif item["eventType"] == "GuardrailActivated":
+                events.append(
+                    GuardrailActivated(
+                        item["aggregateId"],
+                        item["aggregateType"],
+                        item["aggregateVersion"],
+                        UUID(item["eventId"]),
+                        item["eventVersion"],
+                        GuardrailActivatedPayload(
+                            guardrail_id=json.loads(item["payload"])["guardrail_id"],
+                            timestamp=int(json.loads(item["payload"])["timestamp"]),
                         ),
                         item["eventType"],
                     )

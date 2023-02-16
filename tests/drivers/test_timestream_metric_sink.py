@@ -8,6 +8,12 @@ from src.entities.projects import ProjectLeadTime
 from src.entities.compliance import ResourceComplianceLeadTime
 from src.entities.accounts import AccountLeadTime
 from src.entities.patch import PatchCompliancePercentage
+from src.entities.guardrail import (
+    GuardrailActivationCount,
+    GuardrailMaxActivation,
+    GuardrailLeadTime
+)
+
 
 @pytest.mark.integration
 def test_store_metrics_does_not_return_error():
@@ -38,6 +44,7 @@ def test_store_resource_compliance_lead_time_does_not_return_error():
         is None
     )
 
+
 @pytest.mark.integration
 def test_store_patch_compliance_percentage_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -62,6 +69,54 @@ def test_store_resource_account_lead_time_does_not_return_error():
         sink.store_metrics(
             [
                 AccountLeadTime(aggregate_id, lead_time=lead_time),
+            ]
+        )
+        is None
+    )
+
+
+@pytest.mark.integration
+def test_store_gaurdrail_activation_count_does_not_return_error():
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
+    count = random.randint(0, 100)
+    sink = TimeStreamMetricSink()
+    assert (
+        sink.store_metrics(
+            [
+                GuardrailActivationCount(aggregate_id, guardrail_id, count),
+            ]
+        )
+        is None
+    )
+
+
+@pytest.mark.integration
+def test_store_gaurdrail_max_activation_does_not_return_error():
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
+    count = random.randint(0, 100)
+    sink = TimeStreamMetricSink()
+    assert (
+        sink.store_metrics(
+            [
+                GuardrailMaxActivation(aggregate_id, guardrail_id, count),
+            ]
+        )
+        is None
+    )
+
+
+@pytest.mark.integration
+def test_store_gaurdrail_lead_time_does_not_return_error():
+    aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
+    lead_time = random.randint(0, 7200)
+    sink = TimeStreamMetricSink()
+    assert (
+        sink.store_metrics(
+            [
+                GuardrailLeadTime(aggregate_id, guardrail_id, lead_time),
             ]
         )
         is None

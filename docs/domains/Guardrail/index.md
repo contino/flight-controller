@@ -1,7 +1,7 @@
 ---
 name: Guardrail
 summary: |
-  Domain for everything Guardrail
+  Domain for everything guardrail
 owners:
     - josharmi
 ---
