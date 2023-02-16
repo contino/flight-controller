@@ -48,10 +48,10 @@ Optional
 ### Make Commands
 
 - `make local` setup local environment and install dependencies.
-- `make install-dependencies` prerequsite for make local. Installs all the dependencies.
-- `make build-tf-cdk` builds the infra with TF CDK.
-- `make deploy-tf-cdk` deploys the infra with TF CDK.
-- `make destroy-tf-cdk` destroys the infra with TF CDK.
+- `make build` builds the stacks for infra & Grafana with TF CDK.
+- `make plan` plans the 2 stacks created in build step
+- `make deploy` deploys the both infra & Grafana stacks with TF CDK.
+- `make destroy` destroys the both infra & Grafana with TF CDK.
 
 Testing is split into four commands:
 - `make unittest` runs all the unit tests (i.e. tests that are not [marked as integration](https://docs.pytest.org/en/7.1.x/example/markers.html)).
@@ -93,9 +93,30 @@ When developing, it is simplest to start at the first layer and work down ending
 ### Deploying a change
 
 - Assume the correct AWS account/refresh credentials
-- Synth and deploy infra.
-    - `make build-tf-cdk `
-    - `make deploy-tf-cdk`
+- Synth, plan and deploy both infra & Grafana Dashboard.
+    - `make build`
+    - `make plan`
+    - `make deploy`
+
+### Managing Grafana API Keys
+
+While writing this, Grafana API Keys are valid for maximum 30 days only. In case pipeline fails due to expired API keys, follow the below steps:
+
+- Login into Grafana instance 
+- Click on the `configuration` icon on left side bar and select `API keys`
+- Add the new API keys with maximum allowable duration (e.g. 30 days)
+- For key role, select either `Editor` or `Admin`. Recommended role is `Admin`
+- Copy the API Key value 
+![Grafana](images/grafanaAPIKeys.png)
+
+
+- Navigate to Github repo and click on the `Settings` icon
+    NOTE: You will need right level of access to see the `Settings` option
+- Locate the `Secrets & Variables` in the left column and select `Actions` option. 
+- Click the pencil icon to update the secret. Finally paste the API Key value and click `Update Secret`
+![Github](images/githubSecret.png)
+
+Prod and Dev environment have their respective Grafana API keys stored within Github secrets. So, update the right key accordingly. 
 
 ### Merging changes
 
@@ -133,11 +154,15 @@ At the current time there are no branch protections. However, as the build proce
 
 ![See diagram](images/UMLdiagram.png)
 
+
+### Manage Grafana Dashboards
+
+TF CDK is used to build and modify Grafana dashboard and the panels that goes inside dashboard. Dashboard configuration is  magnaged via `dashboard.json` located within the `infrastructure` folder.
+
+
 # Roadmap
 
-- [ ] Create dashboard integration
 - [ ] Update integration and automation tests
-- [ ] Create tfcdk build
 - [ ] Create Dockerized lambda code for product creation metric
 
 # Questions
