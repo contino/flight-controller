@@ -48,6 +48,7 @@ Optional
 ### Make Commands
 
 - `make local` setup local environment and install dependencies.
+- `make docs-run` install, build and run a dev version of the docs.
 - `make build` builds the stacks for infra & Grafana with TF CDK.
 - `make plan` plans the 2 stacks created in build step
 - `make deploy` deploys the both infra & Grafana stacks with TF CDK.
