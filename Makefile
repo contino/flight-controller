@@ -1,9 +1,20 @@
+# Local Commands
 local: install-dependencies
 	pipenv shell
 
 install-dependencies:
 	pipenv install --dev
 
+docs-install:
+	cd docs;npm install
+
+docs-build: docs-install
+	cd docs;npm run build
+
+docs-run: docs-build
+	cd docs;npm run dev
+
+# Test Commands
 unittest:
 	pipenv run pytest -m 'not integration' tests/
 
@@ -19,6 +30,7 @@ watch:
 e2e:
 	pipenv run behave
 
+# Infrastructure Commands
 build-python:
 	pipenv requirements | tee requirements.txt
 	rsync -avu $(shell pwd)/src $(shell pwd)/infrastructure/all_files
