@@ -22,7 +22,7 @@ class GrafanaDashboardComponent(Construct):
     ):
         super().__init__(scope, id)
 
-        self.folder = Folder(self, "folder", title="Terraform Test Folder")
+        self.folder = Folder(self, "folder", title="AWS Flight Controller")
         
         # Create a new Grafana dashboard
         self.dashboard = Dashboard(

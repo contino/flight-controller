@@ -14,6 +14,7 @@ from cdktf_cdktf_provider_aws import (
     iam_role_policy_attachment,
     lambda_function,
     dynamodb_table,
+    timestreamwrite_table,
 )
 
 from dirhash import dirhash
@@ -26,6 +27,7 @@ class LambdaWithPermissionsComponent(Construct):
         id: str,
         name: str,
         dynamoDbTable: dynamodb_table.DynamodbTable,
+        timestream_table: timestreamwrite_table,
     ):
         super().__init__(scope, id)
 
@@ -117,6 +119,10 @@ class LambdaWithPermissionsComponent(Construct):
             role=lambda_iam_role.arn,
             filename=asset.path,
             environment=lambda_function.LambdaFunctionEnvironment(
-                variables={"DYNAMO_TABLE_NAME": dynamoDbTable.name}
+                variables={
+                    "DYNAMO_TABLE_NAME": dynamoDbTable.name,
+                    "TIMESTREAM_DATABASE_NAME": timestream_table.database_name,
+                    "TIMESTREAM_TABLE_NAME": timestream_table.table_name,
+                }
             ),
         )

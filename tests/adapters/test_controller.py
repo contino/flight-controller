@@ -1,6 +1,6 @@
-from datetime import datetime
 import random
 import string
+from datetime import datetime
 from uuid import uuid4
 
 from src.adapters.controller import handle_event
@@ -24,13 +24,17 @@ from src.entities.guardrail import (
     GuardrailMaxActivation,
     GuardrailPassed,
 )
+from src.entities.identity import (
+    IdentityCreated,
+    IdentityLeadTime,
+    IdentityRequested,
+    IdentityRequestedPayload,
+)
 from src.entities.patch import (
     PatchCompliancePercentage,
     PatchRunSummary,
 )
 from src.entities.projects import (
-    ProjectAssigned,
-    ProjectAssignedLeadTime,
     ProjectCreated,
     ProjectCreatedPayload,
     ProjectLeadTime,
@@ -38,11 +42,12 @@ from src.entities.projects import (
     ProjectRequestedPayload,
 )
 
-
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
 guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
 account_id = aggregate_id
+identity_id = "".join(random.choices(string.ascii_letters, k=12))
 event_time = int(round(datetime.utcnow().timestamp()))
+
 
 def test_project_requested_returns_no_metrics():
     assert (
@@ -94,28 +99,6 @@ def test_project_created_returns_correct_type():
     )
 
 
-def test_project_assigned_returns_correct_type ():
-    requested_event = ProjectRequested(
-        aggregate_id,
-        "Project",
-        1,
-        uuid4(),
-        1,
-        ProjectRequestedPayload(aggregate_id, event_time),
-    )
-    assert isinstance(
-        handle_event(
-            {
-                "aggregate_id": aggregate_id,
-                "time": event_time,
-                "event_type": "project_assigned",
-            },
-            [requested_event],
-        )[0],
-        ProjectAssigned,
-    )
-
-
 def test_project_created_returns_lead_time():
     requested_event = ProjectRequested(
         aggregate_id,
@@ -130,100 +113,51 @@ def test_project_created_returns_lead_time():
             "aggregate_id": aggregate_id,
             "time": event_time,
             "event_type": "project_created",
-        }, 
-        [requested_event]
-    )[1] == [ ProjectLeadTime(aggregate_id, 0)]
-
-
-def test_project_assigned_returns_lead_time():
-    requested_event = ProjectRequested(
-        aggregate_id,
-        "Project",
-        1,
-        uuid4(),
-        1,
-        ProjectRequestedPayload(aggregate_id, event_time),
-    )
-    assert handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "project_assigned",
-        }, 
-        [requested_event]
-    )[1] == [ProjectAssignedLeadTime(aggregate_id, 0)]
-
-
-def test_project_assigned_returns_lead_time_with_multiple_aggregates():
-    requested_event = ProjectRequested(
-        aggregate_id,
-        "Project",
-        1,
-        uuid4(),
-        1,
-        ProjectRequestedPayload(aggregate_id, event_time),
-    )
-
-    created_event = ProjectCreated(
-        aggregate_id,
-        "Project",
-        2,
-        uuid4(),
-        1,
-        ProjectCreatedPayload(aggregate_id, event_time),
-    )
-    assert handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "project_assigned",
         },
-        [created_event, requested_event]
-    )[1] == [ProjectAssignedLeadTime(aggregate_id, 0)]
+        [requested_event],
+    )[1] == [ProjectLeadTime(aggregate_id, 0)]
 
 
 def test_project_created_handles_no_project_requested():
-    assert isinstance(handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "project_created",
-        },
-        []
-    )[0], ProjectCreated)
-
-
-def test_project_assigned_handles_no_project_requested():
-    assert isinstance(handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "project_assigned",
-        },
-        []
-    )[0], ProjectAssigned)
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_created",
+            },
+            [],
+        )[0],
+        ProjectCreated,
+    )
 
 
 def test_project_created_returns_no_metric_with_no_project_requested():
-    assert handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "project_created",
-        },
-        []
-    )[1] == []
+    assert (
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_created",
+            },
+            [],
+        )[1]
+        == []
+    )
 
 
 def test_project_assigned_returns_no_metric_with_no_project_requested():
-    assert handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "project_assigned",
-        },
-        []
-    )[1] == []
+    assert (
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_assigned",
+            },
+            [],
+        )[1]
+        == []
+    )
 
 
 # Patch Summary Events
@@ -397,30 +331,36 @@ def test_account_created_returns_lead_time():
             "time": event_time,
             "event_type": "account_created",
         },
-        [requested_event]
+        [requested_event],
     )[1] == [AccountLeadTime(aggregate_id, 0)]
 
 
 def test_account_created_handles_no_project_requested():
-    assert isinstance(handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "account_created",
-        },
-        []
-    )[0], AccountCreated)
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "account_created",
+            },
+            [],
+        )[0],
+        AccountCreated,
+    )
 
 
 def test_account_created_returns_no_metric_with_no_project_requested():
-    assert handle_event(
-        {
-            "aggregate_id": aggregate_id,
-            "time": event_time,
-            "event_type": "account_created",
-        },
-        []
-    )[1] == []
+    assert (
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "account_created",
+            },
+            [],
+        )[1]
+        == []
+    )
 
 
 # Guardrail Events
@@ -433,7 +373,7 @@ def test_guardrail_activated_returns_correct_type():
                 "time": event_time,
                 "event_type": "guardrail_activated",
             },
-            []
+            [],
         )[0],
         GuardrailActivated,
     )
@@ -459,10 +399,11 @@ def test_guardrail_activated_returns_metric():
                         guardrail_id=guardrail_id, timestamp=event_time
                     ),
                 )
-            ]
+            ],
         )[1][0],
-        GuardrailActivationCount
+        GuardrailActivationCount,
     )
+
 
 def test_guardrail_passed_returns_correct_type():
     assert isinstance(
@@ -473,7 +414,7 @@ def test_guardrail_passed_returns_correct_type():
                 "time": event_time,
                 "event_type": "guardrail_passed",
             },
-            []
+            [],
         )[0],
         GuardrailPassed,
     )
@@ -501,8 +442,9 @@ def test_guardrail_passed_returns_metric_lead_time():
                 )
             ],
         )[1][0],
-        GuardrailLeadTime
+        GuardrailLeadTime,
     )
+
 
 def test_guardrail_passed_returns_metric_max_activation():
     assert isinstance(
@@ -526,7 +468,100 @@ def test_guardrail_passed_returns_metric_max_activation():
                 )
             ],
         )[1][1],
-        GuardrailMaxActivation
+        GuardrailMaxActivation,
+    )
+
+
+# Identity events
+def test_identity_requested_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "identity_id": identity_id,
+                "time": event_time,
+                "event_type": "identity_requested",
+            },
+            [],
+        )[0],
+        IdentityRequested,
+    )
+
+
+def test_identity_requested_returns_no_metric():
+    assert (
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "identity_id": identity_id,
+                "time": event_time,
+                "event_type": "identity_requested",
+            },
+            [],
+        )[1]
+        == []
+    )
+
+
+def test_identity_created_returns_correct_type():
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "identity_id": identity_id,
+                "time": event_time,
+                "event_type": "identity_created",
+            },
+            [],
+        )[0],
+        IdentityCreated,
+    )
+
+
+def test_identity_created_returns_metric():
+    requested_event = IdentityRequested(
+        aggregate_id,
+        "Account",
+        1,
+        uuid4(),
+        1,
+        IdentityRequestedPayload(account_id=identity_id, requested_time=event_time),
+    )
+    assert isinstance(
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "identity_id": identity_id,
+                "time": event_time,
+                "event_type": "identity_created",
+            },
+            [requested_event],
+        )[1][0],
+        IdentityLeadTime,
+    )
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "identity_id": identity_id,
+            "time": event_time,
+            "event_type": "identity_created",
+        },
+        [requested_event],
+    )[1] == [IdentityLeadTime(aggregate_id, 0)]
+
+
+def test_identity_created_returns_no_metric_with_no_identity_requested():
+    assert (
+        handle_event(
+            {
+                "aggregate_id": aggregate_id,
+                "identity_id": identity_id,
+                "time": event_time,
+                "event_type": "identity_created",
+            },
+            [],
+        )[1]
+        == []
     )
 
 
@@ -557,6 +592,3 @@ def test_handles_malformed_event():
         ),
         Exception,
     )
-
-
-

@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional
 import time
 
@@ -11,20 +12,20 @@ from src.entities.compliance import ResourceComplianceLeadTime
 from src.entities.guardrail import (
     GuardrailActivationCount,
     GuardrailMaxActivation,
-    GuardrailLeadTime
+    GuardrailLeadTime,
 )
 from src.entities.patch import PatchCompliancePercentage
-from src.entities.projects import ProjectLeadTime, ProjectAssignedLeadTime
+from src.entities.projects import ProjectLeadTime
 
-
-TIMESTREAM_DATABASE_NAME = "core_timestream_db"
-TIMESTREAM_TABLE_NAME = "metrics_table"
+from src.entities.identity import IdentityLeadTime
 
 logger = structlog.get_logger(__name__)
 
 
 class TimeStreamMetricSink(MetricSink):
     def __init__(self) -> None:
+        self.database_name = os.environ.get("TIMESTREAM_DATABASE_NAME")
+        self.table_name = os.environ.get("TIMESTREAM_TABLE_NAME")
         self.timestream_client = boto3.client("timestream-write")
 
     def store_metrics(self, metrics: List[Metric]) -> Optional[Exception]:
@@ -43,8 +44,6 @@ class TimeStreamMetricSink(MetricSink):
             }
             if isinstance(metric, ProjectLeadTime):
                 record["MeasureValue"] = str(metric.lead_time)
-            elif isinstance(metric, ProjectAssignedLeadTime):
-                record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, ResourceComplianceLeadTime):
                 record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, AccountLeadTime):
@@ -52,13 +51,21 @@ class TimeStreamMetricSink(MetricSink):
             elif isinstance(metric, PatchCompliancePercentage):
                 record["MeasureValue"] = str(metric.percentage)
             elif isinstance(metric, GuardrailActivationCount):
-                record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
+                record["Dimensions"].append(
+                    {"Name": "guardrail_id", "Value": metric.guardrail_id}
+                )
                 record["MeasureValue"] = str(metric.count)
             elif isinstance(metric, GuardrailMaxActivation):
-                record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
+                record["Dimensions"].append(
+                    {"Name": "guardrail_id", "Value": metric.guardrail_id}
+                )
                 record["MeasureValue"] = str(metric.count)
             elif isinstance(metric, GuardrailLeadTime):
-                record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
+                record["Dimensions"].append(
+                    {"Name": "guardrail_id", "Value": metric.guardrail_id}
+                )
+                record["MeasureValue"] = str(metric.lead_time)
+            elif isinstance(metric, IdentityLeadTime):
                 record["MeasureValue"] = str(metric.lead_time)
 
             records.append(record)
@@ -66,17 +73,14 @@ class TimeStreamMetricSink(MetricSink):
         try:
             if len(records) > 0:
                 result = self.timestream_client.write_records(
-                    DatabaseName=TIMESTREAM_DATABASE_NAME,
-                    TableName=TIMESTREAM_TABLE_NAME,
+                    DatabaseName=self.database_name,
+                    TableName=self.table_name,
                     Records=records,
                     CommonAttributes={},
                 )
                 logger.msg(
                     f"WriteRecords Status: {result['ResponseMetadata']['HTTPStatusCode']}"
                 )
-        except self.timestream_client.exceptions.RejectedRecordsException as err:
-            logger.error(f"rejected records: {err.response['RejectedRecords']}")
-            return err
         except Exception as err:
             logger.error(f"Error: {err}")
             return err

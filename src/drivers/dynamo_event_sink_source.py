@@ -29,13 +29,8 @@ from src.entities.guardrail import (
     GuardrailActivatedPayload,
 )
 from src.entities.events import Event
-from src.entities.patch import (
-    PatchRunSummary,
-    PatchRunSummaryPayload
-)
+from src.entities.patch import PatchRunSummary, PatchRunSummaryPayload
 from src.entities.projects import (
-    ProjectAssigned,
-    ProjectAssignedPayload,
     ProjectCreated,
     ProjectCreatedPayload,
     ProjectRequested,
@@ -43,10 +38,12 @@ from src.entities.projects import (
 )
 
 
-TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME", "event_sourcing_table")
-# TODO fix the test environment variable
-# did not work https://github.com/MobileDynasty/pytest-env
-# TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
+from src.entities.identity import (
+    IdentityCreated,
+    IdentityCreatedPayload,
+    IdentityRequested,
+    IdentityRequestedPayload,
+)
 
 dynamo_db_resource = boto3.resource("dynamodb")
 logger = structlog.get_logger(__name__)
@@ -54,6 +51,7 @@ logger = structlog.get_logger(__name__)
 
 class DynamoEventSink(EventSink):
     def __init__(self) -> None:
+        TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
         self.dynamo_db_table = dynamo_db_resource.Table(TABLE_NAME)
 
     def store_events(self, events: List[Event]) -> Optional[Exception]:
@@ -83,6 +81,7 @@ class DynamoEventSink(EventSink):
 
 class DynamoEventSource(EventSource):
     def __init__(self) -> None:
+        TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
         self.dynamo_db_table = dynamo_db_resource.Table(TABLE_NAME)
 
     def _sort_events(self, event: Event) -> int:
@@ -107,21 +106,6 @@ class DynamoEventSource(EventSource):
                         ProjectRequestedPayload(
                             json.loads(item["payload"])["project_id"],
                             int(json.loads(item["payload"])["requested_time"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "project_assigned":
-                events.append(
-                    ProjectAssigned(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        ProjectAssignedPayload(
-                            json.loads(item["payload"])["project_id"],
-                            int(json.loads(item["payload"])["assigned_time"]),
                         ),
                         item["event_type"],
                     )
@@ -180,8 +164,12 @@ class DynamoEventSource(EventSource):
                         UUID(item["event_id"]),
                         item["event_version"],
                         PatchRunSummaryPayload(
-                            failed_instances=json.loads(item["payload"])["failed_instances"],
-                            successful_instances=json.loads(item["payload"])["successful_instances"],
+                            failed_instances=json.loads(item["payload"])[
+                                "failed_instances"
+                            ],
+                            successful_instances=json.loads(item["payload"])[
+                                "successful_instances"
+                            ],
                         ),
                         item["event_type"],
                     )
@@ -243,6 +231,36 @@ class DynamoEventSource(EventSource):
                         GuardrailActivatedPayload(
                             guardrail_id=json.loads(item["payload"])["guardrail_id"],
                             timestamp=int(json.loads(item["payload"])["timestamp"]),
+                        ),
+                        item["event_type"],
+                    )
+                )
+            elif item["event_type"] == "identity_requested":
+                events.append(
+                    IdentityRequested(
+                        item["aggregate_id"],
+                        item["aggregate_type"],
+                        item["aggregate_version"],
+                        UUID(item["event_id"]),
+                        item["event_version"],
+                        IdentityRequestedPayload(
+                            json.loads(item["payload"])["account_id"],
+                            int(json.loads(item["payload"])["requested_time"]),
+                        ),
+                        item["event_type"],
+                    )
+                )
+            elif item["event_type"] == "identity_created":
+                events.append(
+                    IdentityCreated(
+                        item["aggregate_id"],
+                        item["aggregate_type"],
+                        item["aggregate_version"],
+                        UUID(item["event_id"]),
+                        item["event_version"],
+                        IdentityCreatedPayload(
+                            json.loads(item["payload"])["account_id"],
+                            int(json.loads(item["payload"])["created_time"]),
                         ),
                         item["event_type"],
                     )

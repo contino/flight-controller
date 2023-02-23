@@ -17,18 +17,6 @@ class ProjectRequested(BaseEvent):
 
 
 @dataclass
-class ProjectAssignedPayload:
-    project_id: str
-    assigned_time: float
-
-
-@dataclass
-class ProjectAssigned(BaseEvent):
-    payload: ProjectAssignedPayload
-    event_type: Literal["project_assigned"] = "project_assigned"
-
-
-@dataclass
 class ProjectCreatedPayload:
     project_id: str
     created_time: float
@@ -44,9 +32,3 @@ class ProjectCreated(BaseEvent):
 class ProjectLeadTime(BaseMetric):
     lead_time: float
     metric_type: Literal["project_lead_time"] = "project_lead_time"
-
-
-@dataclass
-class ProjectAssignedLeadTime(BaseMetric):
-    lead_time: float
-    metric_type: Literal["project_assigned_leadTime"] = "project_assigned_lead_time"
