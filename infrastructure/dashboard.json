@@ -121,8 +121,8 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "guardrail_max_activation",
-          "rawQuery": "SELECT \"time\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "measure": "GuardrailMaxActivation",
+          "rawQuery": "SELECT bin(time, $__interval) as binned_time, AVG(\"measure_value\"::double)\nFROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY bin(time, $__interval)\nORDER BY binned_time",
           "refId": "A",
           "table": "\"metrics_table\""
         }
@@ -182,7 +182,7 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "guardrail_activation_count",
+          "measure": "GuardrailActivationCount",
           "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\""
@@ -242,7 +242,7 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "account_lead_time",
+          "measure": "AccountLeadTime",
           "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\""
@@ -310,7 +310,7 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "patch_compliance_percentage",
+          "measure": "PatchCompliancePercentage",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -379,7 +379,7 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "resource_compliance_lead_time",
+          "measure": "ResourceComplianceLeadTime",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -444,7 +444,7 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "project_lead_time",
+          "measure": "ProjectLeadTime",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -510,7 +510,7 @@
             "type": "grafana-timestream-datasource",
             "uid": "bmr1Db24z"
           },
-          "measure": "account_lead_time",
+          "measure": "AccountLeadTime",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -528,13 +528,13 @@
     "list": []
   },
   "time": {
-    "from": "now-7d",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }

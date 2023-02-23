@@ -13,7 +13,6 @@ class GuardrailActivatedPayload:
 @dataclass
 class GuardrailActivated(BaseEvent):
     payload: GuardrailActivatedPayload
-    eventVersion: int
     eventType: Literal["GuardrailActivated"] = "GuardrailActivated"
 
 
@@ -26,7 +25,6 @@ class GuardrailPassedPayload:
 @dataclass
 class GuardrailPassed(BaseEvent):
     payload: GuardrailPassedPayload
-    eventVersion: int
     eventType: Literal["GuardrailPassed"] = "GuardrailPassed"
 
 
@@ -35,15 +33,18 @@ class GuardrailPassed(BaseEvent):
 class GuardrailActivationCount(BaseMetric):
     guardrail_id: str
     count: int
+    metricType: Literal["GuardrailActivationCount"] = "GuardrailActivationCount"
 
 
 @dataclass
 class GuardrailMaxActivation(BaseMetric):
     guardrail_id: str
     count: int
+    metricType: Literal["GuardrailMaxActivation"] = "GuardrailMaxActivation"
 
 
 @dataclass
 class GuardrailLeadTime(BaseMetric):
     guardrail_id: str
     lead_time: float
+    metricType: Literal["GuardrailLeadTime"] = "GuardrailLeadTime"

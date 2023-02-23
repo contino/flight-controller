@@ -4,8 +4,9 @@ from datetime import datetime
 import json
 import random
 import string
-
 import boto3
+
+from src.entities.patch import PatchCompliancePercentage
 
 eventBridge = boto3.client("events")
 timeStream = boto3.client("timestream-query")
@@ -40,6 +41,6 @@ def received_summary(context):
 def compliance_percentage_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'patch_compliance_percentage'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{PatchCompliancePercentage.metricType}'"
     )
     assert len(result["Rows"]) == 1

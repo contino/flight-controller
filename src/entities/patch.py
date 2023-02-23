@@ -13,10 +13,10 @@ class PatchRunSummaryPayload:
 @dataclass
 class PatchRunSummary(BaseEvent):
     payload: PatchRunSummaryPayload
-    eventVersion: int
     eventType: Literal["PatchRunSummary"] = "PatchRunSummary"
 
 
 @dataclass
 class PatchCompliancePercentage(BaseMetric):
     percentage: float
+    metricType: Literal["PatchCompliancePercentage"] = "PatchCompliancePercentage"

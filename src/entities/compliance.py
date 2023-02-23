@@ -13,7 +13,6 @@ class ResourceFoundNonCompliantPayload:
 @dataclass
 class ResourceFoundNonCompliant(BaseEvent):
     payload: ResourceFoundNonCompliantPayload
-    eventVersion: int
     eventType: Literal["ResourceFoundNonCompliant"] = "ResourceFoundNonCompliant"
 
 
@@ -26,10 +25,10 @@ class ResourceFoundCompliantPayload:
 @dataclass
 class ResourceFoundCompliant(BaseEvent):
     payload: ResourceFoundCompliantPayload
-    eventVersion: int
     eventType: Literal["ResourceFoundCompliant"] = "ResourceFoundCompliant"
 
 
 @dataclass
 class ResourceComplianceLeadTime(BaseMetric):
     lead_time: float
+    metricType: Literal["ResourceComplianceLeadTime"] = "ResourceComplianceLeadTime"
