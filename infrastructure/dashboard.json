@@ -519,6 +519,66 @@
       ],
       "title": "Account Lead Time (Average)",
       "type": "gauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 20,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.4.7",
+      "targets": [
+        {
+          "database": "\"core_timestream_db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "4tnTKWb4z"
+          },
+          "measure": "identity_lead_time",
+          "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "refId": "A",
+          "table": "\"metrics_table\""
+        }
+      ],
+      "title": "Identity Lead Time (Average)",
+      "type": "gauge"
     }
   ],
   "schemaVersion": 35,
@@ -535,6 +595,6 @@
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

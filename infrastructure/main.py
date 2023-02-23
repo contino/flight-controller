@@ -35,18 +35,23 @@ class MyStack(TerraformStack):
         dynamoDBcomponent = DynamoDBcomponent(
             self, "event_table", self.dynamotable_name
         )
+        # create timestream data base
+        timeStreamComponent = TimeStreamDBcomponent(
+            self, "time_stream", self.timestream_db_name
+        )
         # create lambda function
         lambdaComponent = LambdaWithPermissionsComponent(
-            self, "lambda_function", self.lambda_name, dynamoDBcomponent.table
+            self,
+            "lambda_function",
+            self.lambda_name,
+            dynamoDBcomponent.table,
+            timeStreamComponent.timestream_table,
         )
         # create event bridge
         eventBridgeComponent = EventBridgeComponent(
             self, "event_bridge", self.event_bridge_name, lambdaComponent.lambda_func
         )
-        # create timestream data base
-        timeStreamComponent = TimeStreamDBcomponent(
-            self, "time_stream", self.timestream_db_name
-        )
+
         # Create Grafana workspace
         grafanaWorkspace = GrafanaWithPermissionsComponent(
             self,

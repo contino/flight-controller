@@ -20,14 +20,15 @@ from src.entities.guardrail import (
     GuardrailPassed,
     GuardrailPassedPayload,
 )
-from src.entities.metrics import Metric
-from src.entities.patch import(
-    PatchRunSummary,
-    PatchRunSummaryPayload
+from src.entities.identity import (
+    IdentityCreated,
+    IdentityCreatedPayload,
+    IdentityRequested,
+    IdentityRequestedPayload,
 )
+from src.entities.metrics import Metric
+from src.entities.patch import PatchRunSummary, PatchRunSummaryPayload
 from src.entities.projects import (
-    ProjectAssigned,
-    ProjectAssignedPayload,
     ProjectCreated,
     ProjectCreatedPayload,
     ProjectRequested,
@@ -35,9 +36,10 @@ from src.entities.projects import (
 )
 from src.usecases.accounts import handle_account_created
 from src.usecases.compliance import handle_resource_found_compliant
-from src.usecases.guardrail import handle_guardrail_passed, handle_guardrail_activated
+from src.usecases.guardrail import handle_guardrail_activated, handle_guardrail_passed
+from src.usecases.identity import handle_identity_created
 from src.usecases.patch import handle_patch_summary
-from src.usecases.projects import handle_project_created, handle_project_assigned
+from src.usecases.projects import handle_project_created
 
 
 def _convert_payload_to_event(
@@ -51,17 +53,6 @@ def _convert_payload_to_event(
             event_id=str(uuid4()),
             event_version=1,
             payload=ProjectRequestedPayload(
-                payload["aggregate_id"], int(payload["time"])
-            ),
-        )
-    elif event_type == "project_assigned":
-        return ProjectAssigned(
-            aggregate_id=payload["aggregate_id"],
-            aggregate_type="Project",
-            aggregate_version=aggregate_version + 1,
-            event_id=str(uuid4()),
-            event_version=1,
-            payload=ProjectAssignedPayload(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
@@ -153,6 +144,28 @@ def _convert_payload_to_event(
                 payload["guardrail_id"], int(payload["time"])
             ),
         )
+    elif event_type == "identity_requested":
+        return IdentityRequested(
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Account",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
+            payload=IdentityRequestedPayload(
+                payload["aggregate_id"], int(payload["time"])
+            ),
+        )
+    elif event_type == "identity_created":
+        return IdentityCreated(
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Account",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
+            payload=IdentityCreatedPayload(
+                payload["aggregate_id"], int(payload["time"])
+            ),
+        )
 
 
 def handle_event(
@@ -169,6 +182,8 @@ def handle_event(
             "project_assigned",
             "account_created",
             "account_requested",
+            "identity_created",
+            "identity_requested",
             "resource_found_non_compliant",
         ]:
             metrics = []
@@ -177,17 +192,15 @@ def handle_event(
                     aggregate_event, ProjectRequested
                 ):
                     metrics.append(handle_project_created(aggregate_event, event))
-                elif payload["event_type"] == "project_assigned" and isinstance(
-                    aggregate_event, ProjectRequested
-                ):
-                    metrics.append(handle_project_assigned(aggregate_event, event))
                 elif payload["event_type"] == "account_created" and isinstance(
                     aggregate_event, AccountRequested
                 ):
                     metrics.append(handle_account_created(aggregate_event, event))
+                elif payload["event_type"] == "identity_created" and isinstance(
+                    aggregate_event, IdentityRequested
+                ):
+                    metrics.append(handle_identity_created(aggregate_event, event))
             return (event, metrics)
-        elif payload["event_type"] in ["account_created"]:
-            return (event, [handle_account_created(event, aggregate_events)])
         elif payload["event_type"] in ["resource_found_compliant"]:
             return (event, [handle_resource_found_compliant(event, aggregate_events)])
         elif payload["event_type"] in ["patch_run_summary"]:

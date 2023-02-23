@@ -6,25 +6,25 @@ import random
 import string
 import boto3
 
-from src.entities.accounts import AccountLeadTime
+from src.entities.identity import IdentityLeadTime
 
-event_bridge = boto3.client("events")
-time_stream = boto3.client('timestream-query')
+eventBridge = boto3.client("events")
+timeStream = boto3.client("timestream-query")
 
 
-@given("an account has been requested")
-def request_account(context):
+@given("an identity has been requested")
+def request_identity(context):
     context.aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     requested_time = int(round(datetime.utcnow().timestamp()))
 
-    response = event_bridge.put_events(
+    response = eventBridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
-                "DetailType": "Test account request Event",
+                "DetailType": "Test identity request Event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "account_requested",
+                        "event_type": "identity_requested",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
@@ -37,19 +37,18 @@ def request_account(context):
     assert response["FailedEntryCount"] == 0
 
 
-
-@when("the account has been created")
-def created_account(context):
+@when("the identity has been created")
+def created_identity(context):
     sleep(3)
     requested_time = int(round(datetime.utcnow().timestamp()))
-    event_bridge.put_events(
+    eventBridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
-                "DetailType": "Test account create Event",
+                "DetailType": "Test identity create Event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "account_created",
+                        "event_type": "identity_created",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
@@ -60,10 +59,10 @@ def created_account(context):
     )
 
 
-@then("the account created lead time is stored correctly")
+@then("the identity created lead time is stored correctly")
 def lead_time_stored(context):
     sleep(2)
-    result = time_stream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{AccountLeadTime.metric_type}'"
+    result = timeStream.query(
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{IdentityLeadTime.metric_type}'"
     )
     assert len(result["Rows"]) == 1
