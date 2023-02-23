@@ -37,34 +37,27 @@ class TimeStreamMetricSink(MetricSink):
             record = {
                 "Dimensions": dimensions,
                 "MeasureValueType": "DOUBLE",
+                "MeasureName": metric.metricType,
                 "Time": str(current_time),
             }
             if isinstance(metric, ProjectLeadTime):
-                record["MeasureName"] = "project_lead_time"
                 record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, ProjectAssignedLeadTime):
-                record["MeasureName"] = "project_assign_time"
                 record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, ResourceComplianceLeadTime):
-                record["MeasureName"] = "resource_compliance_lead_time"
                 record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, AccountLeadTime):
-                record["MeasureName"] = "account_lead_time"
                 record["MeasureValue"] = str(metric.lead_time)
             elif isinstance(metric, PatchCompliancePercentage):
-                record["MeasureName"] = "patch_compliance_percentage"
                 record["MeasureValue"] = str(metric.percentage)
             elif isinstance(metric, GuardrailActivationCount):
                 record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
-                record["MeasureName"] = "guardrail_activation_count"
                 record["MeasureValue"] = str(metric.count)
             elif isinstance(metric, GuardrailMaxActivation):
                 record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
-                record["MeasureName"] = "guardrail_max_activation"
                 record["MeasureValue"] = str(metric.count)
             elif isinstance(metric, GuardrailLeadTime):
                 record["Dimensions"].append({"Name": "guardrail_id", "Value": metric.guardrail_id})
-                record["MeasureName"] = "guardrail_lead_time"
                 record["MeasureValue"] = str(metric.lead_time)
 
             records.append(record)

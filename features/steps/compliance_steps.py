@@ -4,8 +4,9 @@ from datetime import datetime
 import json
 import random
 import string
-
 import boto3
+
+from src.entities.compliance import ResourceComplianceLeadTime
 
 eventBridge = boto3.client("events")
 timeStream = boto3.client("timestream-query")
@@ -64,6 +65,6 @@ def found_compliant(context):
 def lead_time_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'resource_compliance_lead_time'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{ResourceComplianceLeadTime.metricType}'"
     )
     assert len(result["Rows"]) == 1

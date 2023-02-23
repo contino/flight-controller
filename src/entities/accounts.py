@@ -14,7 +14,6 @@ class AccountRequestedPayload:
 @dataclass
 class AccountRequested(BaseEvent):
     payload: AccountRequestedPayload
-    eventVersion: int
     eventType: Literal["AccountRequested"] = "AccountRequested"
 
 
@@ -27,10 +26,10 @@ class AccountCreatedPayload:
 @dataclass
 class AccountCreated(BaseEvent):
     payload: AccountCreatedPayload
-    eventVersion: int
     eventType: Literal["AccountCreated"] = "AccountCreated"
 
 
 @dataclass
 class AccountLeadTime(BaseMetric):
     lead_time: float
+    metricType: Literal["AccountLeadTime"] = "AccountLeadTime"

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Literal, Union
 
 from src.entities.projects import ProjectLeadTime
 from src.entities.accounts import AccountLeadTime
@@ -7,8 +7,8 @@ from src.entities.patch import PatchCompliancePercentage
 from src.entities.guardrail import (
     GuardrailActivationCount,
     GuardrailMaxActivation,
-    GuardrailLeadTime,
-)
+    GuardrailLeadTime
+    )
 
 Metric: "TypeAlias" = Union[
     ProjectLeadTime, 
@@ -18,4 +18,14 @@ Metric: "TypeAlias" = Union[
     GuardrailActivationCount,
     GuardrailMaxActivation,
     GuardrailLeadTime
+    ]
+
+MetricType: "TypeAlias" = Union[
+    Literal["ProjectLeadTime"],
+    Literal["ResourceComplianceLeadTime"],
+    Literal["AccountLeadTime"],
+    Literal["PatchCompliancePercentage"],
+    Literal["GuardrailActivationCount"],
+    Literal["GuardrailMaxActivation"],
+    Literal["GuardrailLeadTime"],
     ]

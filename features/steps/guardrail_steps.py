@@ -4,9 +4,13 @@ from datetime import datetime
 import json
 import random
 import string
-
 import boto3
 
+from src.entities.guardrail import (
+    GuardrailActivationCount,
+    GuardrailMaxActivation,
+    GuardrailLeadTime,
+)
 eventBridge = boto3.client("events")
 timeStream = boto3.client("timestream-query")
 
@@ -71,7 +75,7 @@ def guardrail_passes(context):
 def metric_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'guardrail_activation_count'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailActivationCount.metricType}'"
     )
     assert len(result["Rows"]) == 1
 
@@ -80,7 +84,7 @@ def metric_stored(context):
 def metric_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'guardrail_lead_time'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailLeadTime.metricType}'"
     )
     assert len(result["Rows"]) == 1
 
@@ -89,6 +93,6 @@ def metric_stored(context):
 def metric_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'guardrail_max_activation'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailMaxActivation.metricType}'"
     )
     assert len(result["Rows"]) == 1
