@@ -1,75 +1,76 @@
 from datetime import datetime
 from uuid import uuid4
+
 import pytest
 
-from src.usecases.projects import handle_project_created, handle_project_assigned
 from src.entities.projects import (
+    ProjectAssigned,
+    ProjectAssignedLeadTime,
+    ProjectAssignedPayload,
     ProjectCreated,
     ProjectCreatedPayload,
-    ProjectAssigned,
-    ProjectAssignedPayload,
+    ProjectLeadTime,
     ProjectRequestedPayload,
     ProjectRequested,
-    ProjectLeadTime,
-    ProjectAssignedLeadTime
 )
+from src.usecases.projects import handle_project_assigned, handle_project_created
 
-projectRequested = ProjectRequested(
-    aggregateId="test-project",
-    aggregateType="Project",
-    aggregateVersion=1,
-    eventId=uuid4(),
-    eventVersion=1,
+event = ProjectRequested(
+    aggregate_id="test-project",
+    aggregate_type="Project",
+    aggregate_version=1,
+    event_id=uuid4(),
+    event_version=1,
     payload=ProjectRequestedPayload(
         "test-project", int(round(datetime(2022, 8, 2, 10, 0, 0).timestamp()))
     ),
 )
 
-projectAssigned = ProjectAssigned(
-    aggregateId="test-project",
-    aggregateType="Project",
-    aggregateVersion=1,
-    eventId=uuid4(),
-    eventVersion=1,
+assigned_event = ProjectAssigned(
+    aggregate_id="test-project",
+    aggregate_type="Project",
+    aggregate_version=1,
+    event_id=uuid4(),
+    event_version=1,
     payload=ProjectAssignedPayload(
         "test-project", int(round(datetime(2022, 8, 2, 11, 0, 0).timestamp()))
     ),
 )
 
-projectCreated = ProjectCreated(
-    aggregateId="test-project",
-    aggregateType="Project",
-    aggregateVersion=2,
-    eventId=uuid4(),
-    eventVersion=1,
+created_event = ProjectCreated(
+    aggregate_id="test-project",
+    aggregate_type="Project",
+    aggregate_version=2,
+    event_id=uuid4(),
+    event_version=1,
     payload=ProjectCreatedPayload(
         "test-project", int(round(datetime(2022, 8, 2, 12, 0, 0).timestamp()))
     ),
 )
 
 @pytest.fixture
-def project_created():
-    return handle_project_created(projectRequested, projectCreated)
+def ProjectCreated():
+    return handle_project_created(event, created_event)
 
 @pytest.fixture
-def project_assigned():
-    return handle_project_assigned(projectRequested, projectAssigned)
+def ProjectAssigned():
+    return handle_project_assigned(event, assigned_event)
 
 
-def test_create_project_returns_correct_type(project_created):
+def test_create_project_returns_correct_type(ProjectCreated):
     assert isinstance(
-        project_created, ProjectLeadTime
+        ProjectCreated, ProjectLeadTime
     )
 
 
-def test_create_project_calculates_lead_time_correctly(project_created):
-    assert project_created.lead_time == 7200
+def test_create_project_calculates_lead_time_correctly(ProjectCreated):
+    assert ProjectCreated.lead_time == 7200
 
-def test_assign_project_returns_correct_type(project_assigned):
+def test_assign_project_returns_correct_type(ProjectAssigned):
     assert isinstance(
-        project_assigned, ProjectAssignedLeadTime
+        ProjectAssigned, ProjectAssignedLeadTime
     )
 
 
-def test_assign_project_calculates_lead_time_correctly(project_assigned):
-    assert project_assigned.lead_time == 3600
+def test_assign_project_calculates_lead_time_correctly(ProjectAssigned):
+    assert ProjectAssigned.lead_time == 3600

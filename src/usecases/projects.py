@@ -1,24 +1,24 @@
 from src.entities.projects import (
-    ProjectCreated,
     ProjectAssigned,
     ProjectAssignedLeadTime,
+    ProjectCreated,
     ProjectLeadTime,
     ProjectRequested,
 )
 
 def handle_project_assigned(
-    project_requested: ProjectRequested, project_assigned: ProjectAssigned
+    ProjectRequested: ProjectRequested, ProjectAssigned: ProjectAssigned
 ) -> ProjectAssignedLeadTime:
     return ProjectAssignedLeadTime(
-        project_requested.payload.project_id,
-        (project_assigned.payload.assigned_time - project_requested.payload.requested_time),
+        ProjectRequested.payload.project_id,
+        (ProjectAssigned.payload.assigned_time - ProjectRequested.payload.requested_time),
     )
 
 
 def handle_project_created(
-    project_requested: ProjectRequested, project_created: ProjectCreated
+    ProjectRequested: ProjectRequested, ProjectCreated: ProjectCreated
 ) -> ProjectLeadTime:
     return ProjectLeadTime(
-        project_requested.payload.project_id,
-        (project_created.payload.created_time - project_requested.payload.requested_time),
+        ProjectRequested.payload.project_id,
+        (ProjectCreated.payload.created_time - ProjectRequested.payload.requested_time),
     )

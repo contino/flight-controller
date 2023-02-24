@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from src.entities.compliance import (
     ResourceComplianceLeadTime,
     ResourceFoundCompliant,
@@ -23,7 +24,7 @@ def handle_resource_found_compliant(
     for aggregate_event in events[last_compliant_event:]:
         if isinstance(aggregate_event, ResourceFoundNonCompliant):
             return ResourceComplianceLeadTime(
-                event.aggregateId,
+                event.aggregate_id,
                 (event.payload.timestamp - aggregate_event.payload.timestamp),
             )
     return None

@@ -1,8 +1,8 @@
 import structlog
 
+from src.adapters.controller import handle_event
 from src.drivers.dynamo_event_sink_source import DynamoEventSink, DynamoEventSource
 from src.drivers.timestream_metric_sink import TimeStreamMetricSink
-from src.adapters.controller import handle_event
 
 
 logger = structlog.get_logger(__name__)

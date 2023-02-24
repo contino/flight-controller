@@ -4,13 +4,12 @@ from uuid import uuid4
 
 from src.entities.guardrail import (
     GuardrailActivated,
+    GuardrailActivationCount,
     GuardrailActivatedPayload,
+    GuardrailLeadTime,
+    GuardrailMaxActivation,
     GuardrailPassed,
     GuardrailPassedPayload,
-    GuardrailActivationCount,
-    GuardrailMaxActivation,
-    GuardrailLeadTime
-
 )
 from src.usecases.guardrail import (
     handle_guardrail_activated,
@@ -27,7 +26,7 @@ event = GuardrailActivated(
 )
 
 compliant_event = GuardrailPassed(
-    event.aggregateId,
+    event.aggregate_id,
     "Resource",
     2,
     uuid4(),
@@ -63,7 +62,7 @@ def test_guardrail_passed_with_history_returns_correct_lead_time():
 
 def test_guardrail_passed_with_multiple_history_events_returns_correct_lead_time():
     second_event = GuardrailActivated(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -79,7 +78,7 @@ def test_guardrail_passed_with_multiple_history_events_returns_correct_lead_time
 
 def test_guardrail_passed_returns_correct_lead_time_from_oldest_pertinent_non_compliant():
     second_event = GuardrailPassed(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -89,7 +88,7 @@ def test_guardrail_passed_returns_correct_lead_time_from_oldest_pertinent_non_co
         ),
     )
     third_event = GuardrailActivated(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -116,7 +115,7 @@ def test_guardrail_passed_with_history_returns_correct_max_activation():
 
 def test_guardrail_passed_with_multiple_history_events_returns_max_activation():
     second_event = GuardrailActivated(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -131,7 +130,7 @@ def test_guardrail_passed_with_multiple_history_events_returns_max_activation():
 
 def test_guardrail_passed_returns_correct_max_activation_from_last_pertinent_non_compliant():
     second_event = GuardrailPassed(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -141,7 +140,7 @@ def test_guardrail_passed_returns_correct_max_activation_from_last_pertinent_non
         ),
     )
     third_event = GuardrailActivated(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -151,7 +150,7 @@ def test_guardrail_passed_returns_correct_max_activation_from_last_pertinent_non
         ),
     )
     fourth_event = GuardrailActivated(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),

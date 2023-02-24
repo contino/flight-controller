@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from .base import BaseEvent, BaseMetric
+from src.entities.base import BaseEvent, BaseMetric
 
 # Event
 @dataclass
@@ -13,7 +13,7 @@ class GuardrailActivatedPayload:
 @dataclass
 class GuardrailActivated(BaseEvent):
     payload: GuardrailActivatedPayload
-    eventType: Literal["GuardrailActivated"] = "GuardrailActivated"
+    event_type: Literal["guardrail_activated"] = "guardrail_activated"
 
 
 @dataclass
@@ -25,7 +25,7 @@ class GuardrailPassedPayload:
 @dataclass
 class GuardrailPassed(BaseEvent):
     payload: GuardrailPassedPayload
-    eventType: Literal["GuardrailPassed"] = "GuardrailPassed"
+    event_type: Literal["guardrail_passed"] = "guardrail_passed"
 
 
 # Event Metrics
@@ -33,18 +33,18 @@ class GuardrailPassed(BaseEvent):
 class GuardrailActivationCount(BaseMetric):
     guardrail_id: str
     count: int
-    metricType: Literal["GuardrailActivationCount"] = "GuardrailActivationCount"
+    metric_type: Literal["guardrail_activation_count"] = "guardrail_activation_count"
 
 
 @dataclass
 class GuardrailMaxActivation(BaseMetric):
     guardrail_id: str
     count: int
-    metricType: Literal["GuardrailMaxActivation"] = "GuardrailMaxActivation"
+    metric_type: Literal["guardrail_max_activation"] = "guardrail_max_activation"
 
 
 @dataclass
 class GuardrailLeadTime(BaseMetric):
     guardrail_id: str
     lead_time: float
-    metricType: Literal["GuardrailLeadTime"] = "GuardrailLeadTime"
+    metric_type: Literal["guardrail_lead_time"] = "guardrail_lead_time"

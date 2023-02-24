@@ -6,8 +6,8 @@ from cdktf_cdktf_provider_aws import dynamodb_table
 class DynamoDBcomponent(Construct):
     def __init__(self, scope: Construct, id: str, name: str):
         super().__init__(scope, id)
-        self.partition_key = "aggregateId"
-        self.sort_key = "eventId"
+        self.partition_key = "aggregate_id"
+        self.sort_key = "event_id"
 
         # create dynamoDB table
         self.table = dynamodb_table.DynamodbTable(

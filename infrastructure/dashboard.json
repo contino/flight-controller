@@ -35,7 +35,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 28,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -119,9 +119,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "GuardrailMaxActivation",
+          "measure": "guardrail_max_activation",
           "rawQuery": "SELECT bin(time, $__interval) as binned_time, AVG(\"measure_value\"::double)\nFROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY bin(time, $__interval)\nORDER BY binned_time",
           "refId": "A",
           "table": "\"metrics_table\""
@@ -180,9 +180,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "GuardrailActivationCount",
+          "measure": "guardrail_activation_count",
           "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\""
@@ -240,9 +240,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "AccountLeadTime",
+          "measure": "guardrail_lead_time",
           "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\""
@@ -308,9 +308,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "PatchCompliancePercentage",
+          "measure": "patch_compliance_percentage",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -377,9 +377,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "ResourceComplianceLeadTime",
+          "measure": "resource_compliance_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -442,9 +442,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "ProjectLeadTime",
+          "measure": "project_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -508,9 +508,9 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "bmr1Db24z"
+            "uid": "4tnTKWb4z"
           },
-          "measure": "AccountLeadTime",
+          "measure": "account_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
           "refId": "A",
           "table": "\"metrics_table\"",
@@ -528,13 +528,13 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 4,
+  "version": 1,
   "weekStart": ""
 }

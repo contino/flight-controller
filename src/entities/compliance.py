@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from .base import BaseEvent, BaseMetric
+from src.entities.base import BaseEvent, BaseMetric
 
 
 @dataclass
@@ -13,7 +13,7 @@ class ResourceFoundNonCompliantPayload:
 @dataclass
 class ResourceFoundNonCompliant(BaseEvent):
     payload: ResourceFoundNonCompliantPayload
-    eventType: Literal["ResourceFoundNonCompliant"] = "ResourceFoundNonCompliant"
+    event_type: Literal["resource_found_non_compliant"] = "resource_found_non_compliant"
 
 
 @dataclass
@@ -25,10 +25,10 @@ class ResourceFoundCompliantPayload:
 @dataclass
 class ResourceFoundCompliant(BaseEvent):
     payload: ResourceFoundCompliantPayload
-    eventType: Literal["ResourceFoundCompliant"] = "ResourceFoundCompliant"
+    event_type: Literal["resource_found_compliant"] = "resource_found_compliant"
 
 
 @dataclass
 class ResourceComplianceLeadTime(BaseMetric):
     lead_time: float
-    metricType: Literal["ResourceComplianceLeadTime"] = "ResourceComplianceLeadTime"
+    metric_type: Literal["resource_compliance_lead_time"] = "resource_compliance_lead_time"

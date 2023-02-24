@@ -1,25 +1,5 @@
 from typing import Any, Dict, List, Tuple, Union
 from uuid import uuid4
-from src.entities.events import Event, EventType
-from src.entities.metrics import Metric
-from src.entities.compliance import (
-    ResourceFoundCompliant,
-    ResourceFoundCompliantPayload,
-    ResourceFoundNonCompliant,
-    ResourceFoundNonCompliantPayload,
-)
-from src.entities.patch import(
-    PatchRunSummary,
-    PatchRunSummaryPayload
-)
-from src.entities.projects import (
-    ProjectCreated,
-    ProjectCreatedPayload,
-    ProjectAssigned,
-    ProjectAssignedPayload,
-    ProjectRequested,
-    ProjectRequestedPayload,
-)
 
 from src.entities.accounts import (
     AccountCreated,
@@ -27,128 +7,148 @@ from src.entities.accounts import (
     AccountRequested,
     AccountRequestedPayload,
 )
+from src.entities.compliance import (
+    ResourceFoundCompliant,
+    ResourceFoundCompliantPayload,
+    ResourceFoundNonCompliant,
+    ResourceFoundNonCompliantPayload,
+)
+from src.entities.events import Event, Event_Type
 from src.entities.guardrail import (
+    GuardrailActivated,
+    GuardrailActivatedPayload,
     GuardrailPassed,
     GuardrailPassedPayload,
-    GuardrailActivated,
-    GuardrailActivatedPayload
 )
+from src.entities.metrics import Metric
+from src.entities.patch import(
+    PatchRunSummary,
+    PatchRunSummaryPayload
+)
+from src.entities.projects import (
+    ProjectAssigned,
+    ProjectAssignedPayload,
+    ProjectCreated,
+    ProjectCreatedPayload,
+    ProjectRequested,
+    ProjectRequestedPayload,
+)
+from src.usecases.accounts import handle_account_created
 from src.usecases.compliance import handle_resource_found_compliant
+from src.usecases.guardrail import handle_guardrail_passed, handle_guardrail_activated
 from src.usecases.patch import handle_patch_summary
 from src.usecases.projects import handle_project_created, handle_project_assigned
-from src.usecases.accounts import handle_account_created
-from src.usecases.guardrail import handle_guardrail_passed, handle_guardrail_activated
 
 
 def _convert_payload_to_event(
-    payload: Dict[str, Any], event_type: EventType, aggregateVersion: int
+    payload: Dict[str, Any], event_type: Event_Type, aggregate_version: int
 ) -> Event:
-    if event_type == "ProjectRequested":
+    if event_type == "project_requested":
         return ProjectRequested(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Project",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Project",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=ProjectRequestedPayload(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
-    elif event_type == "ProjectAssigned":
+    elif event_type == "project_assigned":
         return ProjectAssigned(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Project",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Project",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=ProjectAssignedPayload(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
-    elif event_type == "ProjectCreated":
+    elif event_type == "project_created":
         return ProjectCreated(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Project",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Project",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=ProjectCreatedPayload(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
-    elif event_type == "ResourceFoundNonCompliant":
+    elif event_type == "resource_found_non_compliant":
         return ResourceFoundNonCompliant(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Resource",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Resource",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=ResourceFoundNonCompliantPayload(
                 payload["container_id"], int(payload["time"])
             ),
         )
-    elif event_type == "ResourceFoundCompliant":
+    elif event_type == "resource_found_compliant":
         return ResourceFoundCompliant(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Resource",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Resource",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=ResourceFoundCompliantPayload(
                 payload["container_id"], int(payload["time"])
             ),
         )
-    elif event_type == "PatchRunSummary":
+    elif event_type == "patch_run_summary":
         return PatchRunSummary(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Account",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Account",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=PatchRunSummaryPayload(
                 payload["failed_instances"], payload["successful_instances"]
             ),
         )
-    elif event_type == "AccountRequested":
+    elif event_type == "account_requested":
         return AccountRequested(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Account",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Account",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=AccountRequestedPayload(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
-    elif event_type == "AccountCreated":
+    elif event_type == "account_created":
         return AccountCreated(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Account",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Account",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=AccountCreatedPayload(
                 payload["aggregate_id"], int(payload["time"])
             ),
         )
-    elif event_type == "GuardrailPassed":
+    elif event_type == "guardrail_passed":
         return GuardrailPassed(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Resource",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Resource",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=GuardrailPassedPayload(
                 payload["guardrail_id"], int(payload["time"])
             ),
         )
-    elif event_type == "GuardrailActivated":
+    elif event_type == "guardrail_activated":
         return GuardrailActivated(
-            aggregateId=payload["aggregate_id"],
-            aggregateType="Resource",
-            aggregateVersion=aggregateVersion + 1,
-            eventId=str(uuid4()),
-            eventVersion=1,
+            aggregate_id=payload["aggregate_id"],
+            aggregate_type="Resource",
+            aggregate_version=aggregate_version + 1,
+            event_id=str(uuid4()),
+            event_version=1,
             payload=GuardrailActivatedPayload(
                 payload["guardrail_id"], int(payload["time"])
             ),
@@ -165,36 +165,36 @@ def handle_event(
         if isinstance(event, ProjectRequested):
             return (event, [])
         elif payload["event_type"] in [
-            "ProjectCreated",
-            "ProjectAssigned",
-            "AccountCreated",
-            "AccountRequested",
-            "ResourceFoundNonCompliant",
+            "project_created",
+            "project_assigned",
+            "account_created",
+            "account_requested",
+            "resource_found_non_compliant",
         ]:
             metrics = []
             for aggregate_event in aggregate_events:
-                if payload["event_type"] == "ProjectCreated" and isinstance(
+                if payload["event_type"] == "project_created" and isinstance(
                     aggregate_event, ProjectRequested
                 ):
                     metrics.append(handle_project_created(aggregate_event, event))
-                elif payload["event_type"] == "ProjectAssigned" and isinstance(
+                elif payload["event_type"] == "project_assigned" and isinstance(
                     aggregate_event, ProjectRequested
                 ):
                     metrics.append(handle_project_assigned(aggregate_event, event))
-                elif payload["event_type"] == "AccountCreated" and isinstance(
+                elif payload["event_type"] == "account_created" and isinstance(
                     aggregate_event, AccountRequested
                 ):
                     metrics.append(handle_account_created(aggregate_event, event))
             return (event, metrics)
-        elif payload["event_type"] in ["AccountCreated"]:
+        elif payload["event_type"] in ["account_created"]:
             return (event, [handle_account_created(event, aggregate_events)])
-        elif payload["event_type"] in ["ResourceFoundCompliant"]:
+        elif payload["event_type"] in ["resource_found_compliant"]:
             return (event, [handle_resource_found_compliant(event, aggregate_events)])
-        elif payload["event_type"] in ["PatchRunSummary"]:
+        elif payload["event_type"] in ["patch_run_summary"]:
             return (event, [handle_patch_summary(event)])
-        elif payload["event_type"] in ["GuardrailPassed"]:
+        elif payload["event_type"] in ["guardrail_passed"]:
             return (event, handle_guardrail_passed(event, aggregate_events))
-        elif payload["event_type"] in ["GuardrailActivated"]:
+        elif payload["event_type"] in ["guardrail_activated"]:
             return (event, [handle_guardrail_activated(event, aggregate_events)])
         else:
             return Exception(f"Unknown Event type {payload['event_type']}")

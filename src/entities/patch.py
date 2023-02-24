@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from .base import BaseEvent, BaseMetric
+from src.entities.base import BaseEvent, BaseMetric
 
 
 @dataclass
@@ -13,10 +13,10 @@ class PatchRunSummaryPayload:
 @dataclass
 class PatchRunSummary(BaseEvent):
     payload: PatchRunSummaryPayload
-    eventType: Literal["PatchRunSummary"] = "PatchRunSummary"
+    event_type: Literal["patch_run_summary"] = "patch_run_summary"
 
 
 @dataclass
 class PatchCompliancePercentage(BaseMetric):
     percentage: float
-    metricType: Literal["PatchCompliancePercentage"] = "PatchCompliancePercentage"
+    metric_type: Literal["patch_compliance_percentage"] = "patch_compliance_percentage"

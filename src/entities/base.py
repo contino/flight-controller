@@ -2,16 +2,16 @@ from dataclasses import dataclass
 from typing import Literal, Union
 from uuid import UUID
 
-AggregateType: "TypeAlias" = Union[Literal["Project"], Literal["Resource"], Literal["Account"]]
+aggregate_type: "TypeAlias" = Union[Literal["Project"], Literal["Resource"], Literal["Account"]]
 
 
 @dataclass
 class BaseEvent:
-    aggregateId: str
-    aggregateType: AggregateType
-    aggregateVersion: int
-    eventId: UUID
-    eventVersion: int
+    aggregate_id: str
+    aggregate_type: aggregate_type
+    aggregate_version: int
+    event_id: UUID
+    event_version: int
 
 
 @dataclass
