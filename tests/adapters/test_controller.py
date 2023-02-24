@@ -1,102 +1,78 @@
+from datetime import datetime
 import random
 import string
-from datetime import datetime
 from uuid import uuid4
 
 from src.adapters.controller import handle_event
+from src.entities.accounts import (
+    AccountCreated,
+    AccountLeadTime,
+    AccountRequested,
+    AccountRequestedPayload,
+)
 from src.entities.compliance import (
     ResourceComplianceLeadTime,
     ResourceFoundCompliant,
     ResourceFoundNonCompliant,
     ResourceFoundNonCompliantPayload,
 )
-from src.entities.projects import (
-    ProjectCreated,
-    ProjectAssigned,
-    ProjectCreatedPayload,
-    ProjectRequested,
-    ProjectRequestedPayload,
-    ProjectLeadTime,
-    ProjectAssignedLeadTime,
-)
-from src.entities.patch import (
-    PatchRunSummary,
-    PatchRunSummaryPayload,
-    PatchCompliancePercentage
-)
-from src.entities.accounts import (
-    AccountCreated,
-    AccountRequested,
-    AccountRequestedPayload,
-    AccountLeadTime,
-)
 from src.entities.guardrail import (
     GuardrailActivated,
     GuardrailActivatedPayload,
-    GuardrailPassed,
-    GuardrailPassedPayload,
     GuardrailActivationCount,
+    GuardrailLeadTime,
     GuardrailMaxActivation,
-    GuardrailLeadTime
+    GuardrailPassed,
 )
+from src.entities.patch import (
+    PatchCompliancePercentage,
+    PatchRunSummary,
+)
+from src.entities.projects import (
+    ProjectAssigned,
+    ProjectAssignedLeadTime,
+    ProjectCreated,
+    ProjectCreatedPayload,
+    ProjectLeadTime,
+    ProjectRequested,
+    ProjectRequestedPayload,
+)
+
 
 aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
 guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
 account_id = aggregate_id
 event_time = int(round(datetime.utcnow().timestamp()))
-project_requested_payload = {
-    "aggregate_id": aggregate_id,
-    "time": event_time,
-    "event_type": "ProjectRequested",
-}
-
-project_assigned_payload = {
-    "aggregate_id": aggregate_id,
-    "time": event_time,
-    "event_type": "ProjectAssigned",
-}
-
-project_created_payload = {
-    "aggregate_id": aggregate_id,
-    "time": event_time,
-    "event_type": "ProjectCreated",
-}
-
-account_requested_payload = {
-    "aggregate_id": aggregate_id,
-    "time": event_time,
-    "event_type": "AccountRequested",
-}
-
-
-account_created_payload = {
-    "aggregate_id": aggregate_id,
-    "time": event_time,
-    "event_type": "AccountCreated",
-}
-
 
 def test_project_requested_returns_no_metrics():
     assert (
         handle_event(
-            project_requested_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_requested",
+            },
             [],
         )[1]
         == []
     )
 
 
-def test_project_requested_returns_correct_event():
+def test_project_requested_returns_correct_type():
     assert isinstance(
         handle_event(
-            project_requested_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_requested",
+            },
             [],
         )[0],
         ProjectRequested,
     )
 
 
-def test_project_created_returns_correct_event():
+def test_project_created_returns_correct_type():
     requested_event = ProjectRequested(
         aggregate_id,
         "Project",
@@ -107,14 +83,18 @@ def test_project_created_returns_correct_event():
     )
     assert isinstance(
         handle_event(
-            project_created_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_created",
+            },
             [requested_event],
         )[0],
         ProjectCreated,
     )
 
 
-def test_project_assigned_returns_correct_event():
+def test_project_assigned_returns_correct_type ():
     requested_event = ProjectRequested(
         aggregate_id,
         "Project",
@@ -125,7 +105,11 @@ def test_project_assigned_returns_correct_event():
     )
     assert isinstance(
         handle_event(
-            project_assigned_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "project_assigned",
+            },
             [requested_event],
         )[0],
         ProjectAssigned,
@@ -141,9 +125,14 @@ def test_project_created_returns_lead_time():
         1,
         ProjectRequestedPayload(aggregate_id, event_time),
     )
-    assert handle_event(project_created_payload, [requested_event])[1] == [
-        ProjectLeadTime(aggregate_id, 0)
-    ]
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_created",
+        }, 
+        [requested_event]
+    )[1] == [ ProjectLeadTime(aggregate_id, 0)]
 
 
 def test_project_assigned_returns_lead_time():
@@ -155,9 +144,14 @@ def test_project_assigned_returns_lead_time():
         1,
         ProjectRequestedPayload(aggregate_id, event_time),
     )
-    assert handle_event(project_assigned_payload, [requested_event])[1] == [
-        ProjectAssignedLeadTime(aggregate_id, 0)
-    ]
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_assigned",
+        }, 
+        [requested_event]
+    )[1] == [ProjectAssignedLeadTime(aggregate_id, 0)]
 
 
 def test_project_assigned_returns_lead_time_with_multiple_aggregates():
@@ -178,25 +172,58 @@ def test_project_assigned_returns_lead_time_with_multiple_aggregates():
         1,
         ProjectCreatedPayload(aggregate_id, event_time),
     )
-    assert handle_event(project_assigned_payload, [created_event, requested_event])[
-        1
-    ] == [ProjectAssignedLeadTime(aggregate_id, 0)]
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_assigned",
+        },
+        [created_event, requested_event]
+    )[1] == [ProjectAssignedLeadTime(aggregate_id, 0)]
 
 
 def test_project_created_handles_no_project_requested():
-    assert isinstance(handle_event(project_created_payload, [])[0], ProjectCreated)
+    assert isinstance(handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_created",
+        },
+        []
+    )[0], ProjectCreated)
 
 
 def test_project_assigned_handles_no_project_requested():
-    assert isinstance(handle_event(project_assigned_payload, [])[0], ProjectAssigned)
+    assert isinstance(handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_assigned",
+        },
+        []
+    )[0], ProjectAssigned)
 
 
 def test_project_created_returns_no_metric_with_no_project_requested():
-    assert handle_event(project_created_payload, [])[1] == []
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_created",
+        },
+        []
+    )[1] == []
 
 
 def test_project_assigned_returns_no_metric_with_no_project_requested():
-    assert handle_event(project_assigned_payload, [])[1] == []
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "project_assigned",
+        },
+        []
+    )[1] == []
 
 
 # Patch Summary Events
@@ -208,7 +235,7 @@ def test_patch_summary_returns_correct_type():
                 "time": event_time,
                 "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
                 "successful_instances": "i-peoritdsfl",
-                "event_type": "PatchRunSummary",
+                "event_type": "patch_run_summary",
             },
             [],
         )[0],
@@ -224,7 +251,7 @@ def test_patch_summary_returns_metric():
                 "time": event_time,
                 "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
                 "successful_instances": "i-peoritdsfl",
-                "event_type": "PatchRunSummary",
+                "event_type": "patch_run_summary",
             },
             [],
         )[1][0],
@@ -240,7 +267,7 @@ def test_resource_non_compliant_returns_correct_type():
                 "aggregate_id": aggregate_id,
                 "container_id": "123456789012",
                 "time": event_time,
-                "event_type": "ResourceFoundNonCompliant",
+                "event_type": "resource_found_non_compliant",
             },
             [],
         )[0],
@@ -255,7 +282,7 @@ def test_resource_non_compliant_returns_no_metric():
                 "aggregate_id": aggregate_id,
                 "container_id": "123456789012",
                 "time": event_time,
-                "event_type": "ResourceFoundNonCompliant",
+                "event_type": "resource_found_non_compliant",
             },
             [],
         )[1]
@@ -270,7 +297,7 @@ def test_resource_compliant_returns_correct_type():
                 "aggregate_id": aggregate_id,
                 "container_id": "123456789012",
                 "time": event_time,
-                "event_type": "ResourceFoundCompliant",
+                "event_type": "resource_found_compliant",
             },
             [],
         )[0],
@@ -285,7 +312,7 @@ def test_resource_compliant_returns_metric():
                 "aggregate_id": aggregate_id,
                 "container_id": "123456789012",
                 "time": event_time,
-                "event_type": "ResourceFoundCompliant",
+                "event_type": "resource_found_compliant",
             },
             [
                 ResourceFoundNonCompliant(
@@ -308,7 +335,11 @@ def test_resource_compliant_returns_metric():
 def test_account_requested_returns_no_metrics():
     assert (
         handle_event(
-            account_requested_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "account_requested",
+            },
             [],
         )[1]
         == []
@@ -318,7 +349,11 @@ def test_account_requested_returns_no_metrics():
 def test_account_requested_returns_correct_event():
     assert isinstance(
         handle_event(
-            account_requested_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "account_requested",
+            },
             [],
         )[0],
         AccountRequested,
@@ -336,7 +371,11 @@ def test_account_created_returns_correct_event():
     )
     assert isinstance(
         handle_event(
-            account_created_payload,
+            {
+                "aggregate_id": aggregate_id,
+                "time": event_time,
+                "event_type": "account_created",
+            },
             [requested_event],
         )[0],
         AccountCreated,
@@ -352,17 +391,36 @@ def test_account_created_returns_lead_time():
         1,
         AccountRequestedPayload(aggregate_id, event_time),
     )
-    assert handle_event(account_created_payload, [requested_event])[1] == [
-        AccountLeadTime(aggregate_id, 0)
-    ]
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "account_created",
+        },
+        [requested_event]
+    )[1] == [AccountLeadTime(aggregate_id, 0)]
 
 
 def test_account_created_handles_no_project_requested():
-    assert isinstance(handle_event(account_created_payload, [])[0], AccountCreated)
+    assert isinstance(handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "account_created",
+        },
+        []
+    )[0], AccountCreated)
 
 
 def test_account_created_returns_no_metric_with_no_project_requested():
-    assert handle_event(account_created_payload, [])[1] == []
+    assert handle_event(
+        {
+            "aggregate_id": aggregate_id,
+            "time": event_time,
+            "event_type": "account_created",
+        },
+        []
+    )[1] == []
 
 
 # Guardrail Events
@@ -373,7 +431,7 @@ def test_guardrail_activated_returns_correct_type():
                 "aggregate_id": aggregate_id,
                 "guardrail_id": guardrail_id,
                 "time": event_time,
-                "event_type": "GuardrailActivated",
+                "event_type": "guardrail_activated",
             },
             []
         )[0],
@@ -388,7 +446,7 @@ def test_guardrail_activated_returns_metric():
                 "aggregate_id": aggregate_id,
                 "guardrail_id": guardrail_id,
                 "time": event_time,
-                "event_type": "GuardrailActivated",
+                "event_type": "guardrail_activated",
             },
             [
                 GuardrailActivated(
@@ -413,7 +471,7 @@ def test_guardrail_passed_returns_correct_type():
                 "aggregate_id": aggregate_id,
                 "guardrail_id": guardrail_id,
                 "time": event_time,
-                "event_type": "GuardrailPassed",
+                "event_type": "guardrail_passed",
             },
             []
         )[0],
@@ -428,7 +486,7 @@ def test_guardrail_passed_returns_metric_lead_time():
                 "aggregate_id": aggregate_id,
                 "guardrail_id": guardrail_id,
                 "time": event_time,
-                "event_type": "GuardrailPassed",
+                "event_type": "guardrail_passed",
             },
             [
                 GuardrailActivated(
@@ -453,7 +511,7 @@ def test_guardrail_passed_returns_metric_max_activation():
                 "aggregate_id": aggregate_id,
                 "guardrail_id": guardrail_id,
                 "time": event_time,
-                "event_type": "GuardrailPassed",
+                "event_type": "guardrail_passed",
             },
             [
                 GuardrailActivated(

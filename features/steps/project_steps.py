@@ -8,8 +8,8 @@ import boto3
 
 from src.entities.projects import ProjectLeadTime
 
-eventBridge = boto3.client("events")
-timeStream = boto3.client("timestream-query")
+event_bridge = boto3.client("events")
+time_stream = boto3.client("timestream-query")
 aggregate_id = "behaveTest"
 
 
@@ -18,14 +18,14 @@ def request_project(context):
     context.aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     requested_time = int(round(datetime.utcnow().timestamp()))
 
-    eventBridge.put_events(
+    event_bridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test project request Event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "ProjectRequested",
+                        "event_type": "project_requested",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
@@ -40,14 +40,14 @@ def request_project(context):
 def create_project(context):
     sleep(3)
     requested_time = int(round(datetime.utcnow().timestamp()))
-    eventBridge.put_events(
+    event_bridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test project create Event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "ProjectCreated",
+                        "event_type": "project_created",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
@@ -61,7 +61,7 @@ def create_project(context):
 @then("the lead time is stored correctly")
 def lead_time_stored(context):
     sleep(2)
-    result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{ProjectLeadTime.metricType}'"
+    result = time_stream.query(
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{ProjectLeadTime.metric_type}'"
     )
     assert len(result["Rows"]) == 1

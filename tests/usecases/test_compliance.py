@@ -24,7 +24,7 @@ event = ResourceFoundNonCompliant(
 )
 
 compliant_event = ResourceFoundCompliant(
-    event.aggregateId,
+    event.aggregate_id,
     "Resource",
     2,
     uuid4(),
@@ -56,7 +56,7 @@ def test_resource_found_compliant_returns_with_history_returns_correct_lead_time
 
 def test_resource_found_compliant_returns_with_multiple_history_events_returns_correct_lead_time():
     second_event = ResourceFoundNonCompliant(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -75,7 +75,7 @@ def test_resource_found_compliant_returns_with_multiple_history_events_returns_c
 
 def test_resource_found_compliant_returns_correct_lead_time_from_oldest_pertinent_non_compliant():
     second_event = ResourceFoundCompliant(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),
@@ -85,7 +85,7 @@ def test_resource_found_compliant_returns_correct_lead_time_from_oldest_pertinen
         ),
     )
     third_event = ResourceFoundNonCompliant(
-        event.aggregateId,
+        event.aggregate_id,
         "Resource",
         2,
         uuid4(),

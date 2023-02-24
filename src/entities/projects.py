@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from .base import BaseEvent, BaseMetric
+from src.entities.base import BaseEvent, BaseMetric
 
 
 @dataclass
@@ -13,7 +13,7 @@ class ProjectRequestedPayload:
 @dataclass
 class ProjectRequested(BaseEvent):
     payload: ProjectRequestedPayload
-    eventType: Literal["ProjectRequested"] = "ProjectRequested"
+    event_type: Literal["project_requested"] = "project_requested"
 
 
 @dataclass
@@ -25,7 +25,7 @@ class ProjectAssignedPayload:
 @dataclass
 class ProjectAssigned(BaseEvent):
     payload: ProjectAssignedPayload
-    eventType: Literal["ProjectAssigned"] = "ProjectAssigned"
+    event_type: Literal["project_assigned"] = "project_assigned"
 
 
 @dataclass
@@ -37,16 +37,16 @@ class ProjectCreatedPayload:
 @dataclass
 class ProjectCreated(BaseEvent):
     payload: ProjectCreatedPayload
-    eventType: Literal["ProjectCreated"] = "ProjectCreated"
+    event_type: Literal["project_created"] = "project_created"
 
 
 @dataclass
 class ProjectLeadTime(BaseMetric):
     lead_time: float
-    metricType: Literal["ProjectLeadTime"] = "ProjectLeadTime"
+    metric_type: Literal["project_lead_time"] = "project_lead_time"
 
 
 @dataclass
 class ProjectAssignedLeadTime(BaseMetric):
     lead_time: float
-    metricType: Literal["ProjectAssignedLeadTime"] = "ProjectAssignedLeadTime"
+    metric_type: Literal["project_assigned_leadTime"] = "project_assigned_lead_time"

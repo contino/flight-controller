@@ -11,22 +11,22 @@ from src.entities.guardrail import (
     GuardrailMaxActivation,
     GuardrailLeadTime,
 )
-eventBridge = boto3.client("events")
-timeStream = boto3.client("timestream-query")
+event_bridge = boto3.client("events")
+time_stream = boto3.client("timestream-query")
 
 
 def guardrail_activated(context):
     context.aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     context.guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
     requested_time = int(round(datetime.utcnow().timestamp()))
-    eventBridge.put_events(
+    event_bridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test guardrail activated event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "GuardrailActivated",
+                        "event_type": "guardrail_activated",
                         "guardrail_id": f"{context.guardrail_id}",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
@@ -52,14 +52,14 @@ def when_guardrail_activated(context):
 def guardrail_passes(context):
     sleep(3)
     requested_time = int(round(datetime.utcnow().timestamp()))
-    eventBridge.put_events(
+    event_bridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test guardrail passed event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "GuardrailPassed",
+                        "event_type": "guardrail_passed",
                         "guardrail_id": f"{context.guardrail_id}",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
@@ -74,8 +74,8 @@ def guardrail_passes(context):
 @then("the activation count is stored correctly")
 def metric_stored(context):
     sleep(2)
-    result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailActivationCount.metricType}'"
+    result = time_stream.query(
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailActivationCount.metric_type}'"
     )
     assert len(result["Rows"]) == 1
 
@@ -83,8 +83,8 @@ def metric_stored(context):
 @then("the guardrail lead time is stored correctly")
 def metric_stored(context):
     sleep(2)
-    result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailLeadTime.metricType}'"
+    result = time_stream.query(
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailLeadTime.metric_type}'"
     )
     assert len(result["Rows"]) == 1
 
@@ -92,7 +92,7 @@ def metric_stored(context):
 @then("the max activation count is stored correctly")
 def metric_stored(context):
     sleep(2)
-    result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailMaxActivation.metricType}'"
+    result = time_stream.query(
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{GuardrailMaxActivation.metric_type}'"
     )
     assert len(result["Rows"]) == 1

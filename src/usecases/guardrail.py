@@ -1,13 +1,12 @@
 from typing import List, Optional, Union
 
 from src.entities.events import Event
-
 from src.entities.guardrail import (
-    GuardrailPassed,
     GuardrailActivated,
     GuardrailActivationCount,
+    GuardrailLeadTime,
     GuardrailMaxActivation,
-    GuardrailLeadTime
+    GuardrailPassed,
 )
 
 
@@ -19,7 +18,7 @@ def handle_guardrail_activated(
         if isinstance(aggregate_event, GuardrailActivated):
             gaurdrail_activation_count += 1
     return GuardrailActivationCount(
-        event.aggregateId,
+        event.aggregate_id,
         event.payload.guardrail_id,
         gaurdrail_activation_count
     )
@@ -34,12 +33,12 @@ def handle_guardrail_passed(
     for aggregate_event in events[last_compliant_event:]:
         if isinstance(aggregate_event, GuardrailActivated):
             return [GuardrailLeadTime(
-                event.aggregateId,
+                event.aggregate_id,
                 event.payload.guardrail_id,
                 (event.payload.timestamp - aggregate_event.payload.timestamp),
             ),
             GuardrailMaxActivation(
-                event.aggregateId,
+                event.aggregate_id,
                 event.payload.guardrail_id,
                 len(events[last_compliant_event + 1:]) if last_compliant_event > 0 else len(events[last_compliant_event:]) 
             )

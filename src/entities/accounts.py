@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from .base import BaseEvent
-from .base import BaseMetric
+from src.entities.base import BaseEvent, BaseMetric
 
 
 @dataclass
@@ -14,7 +13,7 @@ class AccountRequestedPayload:
 @dataclass
 class AccountRequested(BaseEvent):
     payload: AccountRequestedPayload
-    eventType: Literal["AccountRequested"] = "AccountRequested"
+    event_type: Literal["account_requested"] = "account_requested"
 
 
 @dataclass
@@ -26,10 +25,10 @@ class AccountCreatedPayload:
 @dataclass
 class AccountCreated(BaseEvent):
     payload: AccountCreatedPayload
-    eventType: Literal["AccountCreated"] = "AccountCreated"
+    event_type: Literal["account_created"] = "account_created"
 
 
 @dataclass
 class AccountLeadTime(BaseMetric):
     lead_time: float
-    metricType: Literal["AccountLeadTime"] = "AccountLeadTime"
+    metric_type: Literal["account_lead_time"] = "account_lead_time"

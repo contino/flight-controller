@@ -1,7 +1,6 @@
 from time import time
 from uuid import uuid4
 
-
 from src.entities.patch import (
     PatchCompliancePercentage,
     PatchRunSummary,

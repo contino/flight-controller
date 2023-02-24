@@ -6,12 +6,12 @@ from src.entities.accounts import (
 
 
 def handle_account_created(
-    account_requested: AccountRequested, account_created: AccountCreated
+    AccountRequested: AccountRequested, AccountCreated: AccountCreated
 ) -> AccountLeadTime:
     return AccountLeadTime(
-        account_requested.aggregateId,
+        AccountRequested.aggregate_id,
         (
-            account_created.payload.created_time
-            - account_requested.payload.requested_time
+            AccountCreated.payload.created_time
+            - AccountRequested.payload.requested_time
         ),
     )

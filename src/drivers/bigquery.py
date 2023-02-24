@@ -4,7 +4,10 @@ from typing import List, Optional
 from uuid import UUID, uuid4
 
 from google.cloud import bigquery
+
+from src.drivers.event_sink import EventSink
 from src.drivers.event_source import EventSource
+from src.drivers.metric_sink import MetricSink
 from src.entities.events import Event
 from src.entities.metrics import Metric
 from src.entities.projects import (
@@ -13,9 +16,6 @@ from src.entities.projects import (
     ProjectRequested,
     ProjectRequestedPayload,
 )
-
-from .metric_sink import MetricSink
-from .event_sink import EventSink
 
 
 class BigQueryMetricSink(MetricSink):
@@ -45,7 +45,7 @@ class BigQueryEventSink(EventSink):
         client = bigquery.Client()
         values = ""
         for event in events:
-            values += f"('{event.eventId}','{event.eventType}','{event.aggregateId}','{event.aggregateType}',{event.aggregateVersion},{event.eventVersion},SAFE.PARSE_JSON('{json.dumps(event.payload.__dict__)}'),'{datetime.utcnow()}'),"
+            values += f"('{event.event_id}','{event.event_type}','{event.aggregate_id}','{event.aggregate_type}',{event.aggregate_version},{event.event_version},SAFE.PARSE_JSON('{json.dumps(event.payload.__dict__)}'),'{datetime.utcnow()}'),"
         values = values[:-1]
 
         query = f"""

@@ -8,8 +8,8 @@ import boto3
 
 from src.entities.accounts import AccountLeadTime
 
-eventBridge = boto3.client("events")
-timeStream = boto3.client('timestream-query')
+event_bridge = boto3.client("events")
+time_stream = boto3.client('timestream-query')
 
 
 @given("an account has been requested")
@@ -17,14 +17,14 @@ def request_account(context):
     context.aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     requested_time = int(round(datetime.utcnow().timestamp()))
 
-    response = eventBridge.put_events(
+    response = event_bridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test account request Event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "AccountRequested",
+                        "event_type": "account_requested",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
@@ -42,14 +42,14 @@ def request_account(context):
 def assing_account(context):
     sleep(3)
     requested_time = int(round(datetime.utcnow().timestamp()))
-    eventBridge.put_events(
+    event_bridge.put_events(
         Entries=[
             {
                 "Source": "contino.custom",
                 "DetailType": "Test account create Event",
                 "Detail": json.dumps(
                     {
-                        "event_type": "AccountCreated",
+                        "event_type": "account_created",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
                     }
@@ -63,7 +63,7 @@ def assing_account(context):
 @then("the account created lead time is stored correctly")
 def lead_time_stored(context):
     sleep(2)
-    result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{AccountLeadTime.metricType}'"
+    result = time_stream.query(
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{AccountLeadTime.metric_type}'"
     )
     assert len(result["Rows"]) == 1
