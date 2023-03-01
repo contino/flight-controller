@@ -101,23 +101,20 @@ When developing, it is simplest to start at the first layer and work down ending
 
 ### Managing Grafana API Keys
 
-While writing this, Grafana API Keys are valid for maximum 30 days only. In case pipeline fails due to expired API keys, follow the below steps:
+While writing this, Grafana API Keys are valid for maximum 30 days only. 
+Hopefully, Amazon will address this limitation in the future - but in the meantime, this simple pattern can be used to automatically rotate an API key every 29 days and store it for use in AWS Secrets Manager.
 
-- Login into Grafana instance 
-- Click on the `configuration` icon on left side bar and select `API keys`
-- Add the new API keys with maximum allowable duration (e.g. 30 days)
-- For key role, select either `Editor` or `Admin`. Recommended role is `Admin`
-- Copy the API Key value 
-![Grafana](images/grafanaAPIKeys.png)
+![Grafana](images/manage_grafana_api_key.png)
 
 
-- Navigate to Github repo and click on the `Settings` icon
-    NOTE: You will need right level of access to see the `Settings` option
-- Locate the `Secrets & Variables` in the left column and select `Actions` option. 
-- Click the pencil icon to update the secret. Finally paste the API Key value and click `Update Secret`
-![Github](images/githubSecret.png)
+The solution is made up of two components:
 
-Prod and Dev environment have their respective Grafana API keys stored within Github secrets. So, update the right key accordingly. 
+1. AWS Secret is created with a rotation lifecycle policy that will trigger a Lambda function every 29 days
+2. AWS Lambda Function that will create a new API key in Amazon Managed Grafana and update the AWS Secret with the new key
+
+
+Python code handling the rotation is stored  at `src/entrypoint/grafana_lambda.py`. The code expects two input variables to retrieve secret values from AWS Secrets Manager viz. `grafana_api_key_name` and `grafana_workspace_id`. As the name suggest these values are secret names being used as filters. 
+
 
 ### Merging changes
 
