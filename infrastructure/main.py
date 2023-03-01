@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import os
-
 import boto3
 from cdktf import App, S3Backend, TerraformStack
 from cdktf_cdktf_provider_aws.provider import AwsProvider
@@ -13,7 +11,9 @@ from imports.grafana.provider import GrafanaProvider
 from lambda_with_permissions_component import LambdaWithPermissionsComponent
 from managed_grafana_component import GrafanaWithPermissionsComponent
 from timestream_database_component import TimeStreamDBcomponent
-
+from cdktf_cdktf_provider_aws import data_aws_secretsmanager_secret_version
+from grafana_lambda_with_permissions_component import GrafanaLambdaComponent
+from lambda_rotation_component import RotationComponent
 
 class MyStack(TerraformStack):
     def __init__(
@@ -30,6 +30,7 @@ class MyStack(TerraformStack):
         self.event_bridge_name = "main_lambda_bus_cdktf"
         self.timestream_db_name = "core_timestream_db"
         self.grafana_workspace_name = "grafana_dashboard"
+        self.grafana_lambda_name = "grafana_api_key_rotator"
 
         # create dynamodb
         dynamoDBcomponent = DynamoDBcomponent(
@@ -59,16 +60,35 @@ class MyStack(TerraformStack):
             self.grafana_workspace_name,
         )
 
-        self.grafana_workspace_id = grafanaWorkspace.grafana_workspace.id
+        self.grafana_workspace_id = grafanaWorkspace.grafana_workspace.id   # Pass variable to next stack
+        self.grafana_key_id = grafanaWorkspace.grafana_key.name             # Pass variable to next stack
 
+        # Create lambda function to rotate Grafana key 
+        grafanaLambdaComponent = GrafanaLambdaComponent(
+            self, "grafana_function", self.grafana_lambda_name, grafanaWorkspace.grafana_workspace,
+        )
+
+        # Create rotation rules to trigger every 29 days
+        rotationComponent = RotationComponent(
+            self, "rotation", grafanaWorkspace.grafana_key ,grafanaLambdaComponent.lambda_func
+        )
 
 class Grafana(TerraformStack):
-    def __init__(self, scope: Construct, id: str, workspace_id: str):
+    def __init__(self, scope: Construct, id: str, workspace_id: str, grafana_key_id: str):
         super().__init__(scope, id)
+        
+        AwsProvider(self, "AWS")
+        
+        api_key = data_aws_secretsmanager_secret_version.DataAwsSecretsmanagerSecretVersion(
+            self,
+            "api_key",
+            secret_id=grafana_key_id,               # Secret name stored in AWS Secrets Manager
+        )
+        
         GrafanaProvider(
             self,
             "Grafana",
-            auth=os.environ["GRAFANA_API_KEY"],
+            auth=api_key.secret_string,
             url="https://"
             + workspace_id
             + ".grafana-workspace.ap-southeast-2.amazonaws.com/",
@@ -86,7 +106,7 @@ stack = MyStack(
     app,
     "infra_tf_cdk",
 )
-grafana_stack = Grafana(app, "grafana", stack.grafana_workspace_id)
+grafana_stack = Grafana(app, "grafana", stack.grafana_workspace_id, stack.grafana_key_id)
 
 account_id = boto3.client("sts").get_caller_identity()["Account"]
 

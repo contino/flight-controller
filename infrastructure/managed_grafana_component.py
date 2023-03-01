@@ -4,12 +4,19 @@ from cdktf_cdktf_provider_aws import (
     grafana_workspace_api_key,
     iam_role,
     iam_role_policy_attachment,
+    secretsmanager_secret,
+    secretsmanager_secret_version,
 )
 from constructs import Construct
 
 
 class GrafanaWithPermissionsComponent(Construct):
-    def __init__(self, scope: Construct, id: str, name: str,):
+    def __init__(
+        self,
+        scope: Construct,
+        id: str,
+        name: str,
+    ):
         super().__init__(scope, id)
 
         # CREATE roles
@@ -79,14 +86,48 @@ class GrafanaWithPermissionsComponent(Construct):
             data_sources=["TIMESTREAM"],
         )
 
-        # # Create an API key for the admin role
-        # self.grafana_workspace_api_key = (
-        #     grafana_workspace_api_key.GrafanaWorkspaceApiKey(
-        #         self,
-        #         "grafana_workspace_api_key",
-        #         key_name="flight_controller_api_key",
-        #         key_role="ADMIN",
-        #         workspace_id=self.grafana_workspace.id,
-        #         seconds_to_live=2525000,
-        #     )
-        # )
+        # Create an API key for the admin role
+        self.grafana_workspace_api_key = (
+            grafana_workspace_api_key.GrafanaWorkspaceApiKey(
+                self,
+                "grafana_workspace_api_key",
+                key_name="flight_controller_api_key",
+                key_role="ADMIN",
+                workspace_id=self.grafana_workspace.id,
+                seconds_to_live=2525000,
+            )
+        )
+
+        # Create secret in AWS Secrets Manager
+        self.grafana_key = secretsmanager_secret.SecretsmanagerSecret(
+            self,
+            "grafana_key",
+            name="flight-controller-grafana-api-key",
+        )
+
+        # Store secret in above created resource
+        self.grafana_key_value = (
+            secretsmanager_secret_version.SecretsmanagerSecretVersion(
+                self,
+                "grafana_key_value",
+                secret_id=self.grafana_key.id,
+                secret_string=self.grafana_workspace_api_key.key,
+            )
+        )
+
+        # Store workspace ID in AWS Secrets Manager
+        self.workspace_id = secretsmanager_secret.SecretsmanagerSecret(
+            self,
+            "workspace_id",
+            name="flight-controller-grafana-workspace-id",
+        )
+
+        # Store workspace ID in above created resource
+        self.workspace_id_value = (
+            secretsmanager_secret_version.SecretsmanagerSecretVersion(
+                self,
+                "workspace_id_value",
+                secret_id=self.workspace_id.id,
+                secret_string=self.grafana_workspace.id,
+            )
+        )
