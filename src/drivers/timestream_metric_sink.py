@@ -1,23 +1,12 @@
 import os
-from typing import List, Optional
 import time
+from typing import List, Optional
 
 import boto3
 import structlog
 
 from src.drivers.metric_sink import MetricSink
 from src.entities.metrics import Metric
-from src.entities.accounts import AccountLeadTime
-from src.entities.compliance import ResourceComplianceLeadTime
-from src.entities.guardrail import (
-    GuardrailActivationCount,
-    GuardrailMaxActivation,
-    GuardrailLeadTime,
-)
-from src.entities.patch import PatchCompliancePercentage
-from src.entities.projects import ProjectLeadTime
-
-from src.entities.identity import IdentityLeadTime
 
 logger = structlog.get_logger(__name__)
 
@@ -36,37 +25,18 @@ class TimeStreamMetricSink(MetricSink):
             dimensions = [
                 {"Name": "aggregate_id", "Value": metric.aggregate_id},
             ]
+            if hasattr(metric, "dimensions"):
+                dimensions += [
+                    {"Name": dimension, "Value": getattr(metric.dimensions, dimension)}
+                    for dimension in metric.dimensions.dimension_names
+                ]
             record = {
                 "Dimensions": dimensions,
                 "MeasureValueType": "DOUBLE",
                 "MeasureName": metric.metric_type,
                 "Time": str(current_time),
+                "MeasureValue": str(metric.metric_value),
             }
-            if isinstance(metric, ProjectLeadTime):
-                record["MeasureValue"] = str(metric.lead_time)
-            elif isinstance(metric, ResourceComplianceLeadTime):
-                record["MeasureValue"] = str(metric.lead_time)
-            elif isinstance(metric, AccountLeadTime):
-                record["MeasureValue"] = str(metric.lead_time)
-            elif isinstance(metric, PatchCompliancePercentage):
-                record["MeasureValue"] = str(metric.percentage)
-            elif isinstance(metric, GuardrailActivationCount):
-                record["Dimensions"].append(
-                    {"Name": "guardrail_id", "Value": metric.guardrail_id}
-                )
-                record["MeasureValue"] = str(metric.count)
-            elif isinstance(metric, GuardrailMaxActivation):
-                record["Dimensions"].append(
-                    {"Name": "guardrail_id", "Value": metric.guardrail_id}
-                )
-                record["MeasureValue"] = str(metric.count)
-            elif isinstance(metric, GuardrailLeadTime):
-                record["Dimensions"].append(
-                    {"Name": "guardrail_id", "Value": metric.guardrail_id}
-                )
-                record["MeasureValue"] = str(metric.lead_time)
-            elif isinstance(metric, IdentityLeadTime):
-                record["MeasureValue"] = str(metric.lead_time)
 
             records.append(record)
 

@@ -1,7 +1,6 @@
 from time import time
 from uuid import uuid4
 
-
 from src.entities.compliance import (
     ResourceComplianceLeadTime,
     ResourceFoundCompliant,
@@ -14,89 +13,115 @@ from src.usecases.compliance import (
     handle_resource_found_non_compliant,
 )
 
-event = ResourceFoundNonCompliant(
-    uuid4(),
-    "Resource",
-    1,
-    uuid4(),
-    1,
-    ResourceFoundNonCompliantPayload(container_id=uuid4(), timestamp=int(time())),
-)
-
-compliant_event = ResourceFoundCompliant(
-    event.aggregate_id,
-    "Resource",
-    2,
-    uuid4(),
-    1,
-    ResourceFoundCompliantPayload(
-        container_id=uuid4(), timestamp=(event.payload.timestamp + 10)
+non_compliant_aggregate_event = ResourceFoundNonCompliant(
+    aggregate_id=str(uuid4()),
+    event_id=str(uuid4()),
+    event_type="resource_found_non_compliant",
+    aggregate_version=1,
+    payload=ResourceFoundNonCompliantPayload(
+        container_id=str(uuid4()), timestamp=int(time())
     ),
 )
 
+non_compliant_event = {
+    "event_type": "resource_found_non_compliant",
+    "aggregate_id": non_compliant_aggregate_event.aggregate_id,
+    "container_id": non_compliant_aggregate_event.payload.container_id,
+    "time": int(time()),
+}
 
-def test_resource_found_non_compliant_returns_none():
-    assert handle_resource_found_non_compliant(event, []) is None
+compliant_event = {
+    "event_type": "resource_found_compliant",
+    "aggregate_id": non_compliant_aggregate_event.aggregate_id,
+    "container_id": non_compliant_aggregate_event.payload.container_id,
+    "time": int(non_compliant_aggregate_event.payload.timestamp + 10),
+}
 
 
-def test_resource_found_compliant_returns_with_no_history_returns_none():
-    assert handle_resource_found_compliant(event, []) is None
+def test_resource_found_non_compliant_returns_correct_event_type():
+    assert isinstance(
+        handle_resource_found_non_compliant(non_compliant_event, [])[0],
+        ResourceFoundNonCompliant,
+    )
+
+
+def test_resource_found_compliant_returns_with_no_history_returns_correct_event_type():
+    assert isinstance(
+        handle_resource_found_compliant(compliant_event, [])[0], ResourceFoundCompliant
+    )
+
+
+def test_resource_found_compliant_returns_with_no_history_returns_no_metric():
+    assert len(handle_resource_found_compliant(compliant_event, [])[1]) == 0
 
 
 def test_resource_found_compliant_returns_with_history_returns_compliance_lead_time():
     assert isinstance(
-        handle_resource_found_compliant(compliant_event, [event]),
+        handle_resource_found_compliant(
+            compliant_event, [non_compliant_aggregate_event]
+        )[1][0],
         ResourceComplianceLeadTime,
     )
 
 
 def test_resource_found_compliant_returns_with_history_returns_correct_lead_time():
-    assert handle_resource_found_compliant(compliant_event, [event]).lead_time == 10
+    assert (
+        handle_resource_found_compliant(
+            compliant_event, [non_compliant_aggregate_event]
+        )[1][0].metric_value
+        == 10
+    )
 
 
 def test_resource_found_compliant_returns_with_multiple_history_events_returns_correct_lead_time():
-    second_event = ResourceFoundNonCompliant(
-        event.aggregate_id,
-        "Resource",
-        2,
-        uuid4(),
-        1,
-        ResourceFoundNonCompliantPayload(
-            container_id=uuid4(), timestamp=(event.payload.timestamp + 5)
+    second_non_compliant_aggregate_event = ResourceFoundNonCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        event_type="resource_found_non_compliant",
+        aggregate_version=2,
+        payload=ResourceFoundNonCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id,
+            timestamp=int(non_compliant_aggregate_event.payload.timestamp + 5),
         ),
     )
     assert (
         handle_resource_found_compliant(
-            compliant_event, [event, second_event]
-        ).lead_time
+            compliant_event,
+            [non_compliant_aggregate_event, second_non_compliant_aggregate_event],
+        )[1][0].metric_value
         == 10
     )
 
 
 def test_resource_found_compliant_returns_correct_lead_time_from_oldest_pertinent_non_compliant():
-    second_event = ResourceFoundCompliant(
-        event.aggregate_id,
-        "Resource",
-        2,
-        uuid4(),
-        1,
-        ResourceFoundCompliantPayload(
-            container_id=uuid4(), timestamp=(event.payload.timestamp + 4)
+    second_compliant_aggregate_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        event_type="resource_found_compliant",
+        aggregate_version=2,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id,
+            timestamp=int(non_compliant_aggregate_event.payload.timestamp + 4),
         ),
     )
-    third_event = ResourceFoundNonCompliant(
-        event.aggregate_id,
-        "Resource",
-        2,
-        uuid4(),
-        1,
-        ResourceFoundNonCompliantPayload(
-            container_id=uuid4(), timestamp=(event.payload.timestamp + 5)
+    third_non_compliant_aggregate_event = ResourceFoundNonCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        event_type="resource_found_non_compliant",
+        aggregate_version=3,
+        payload=ResourceFoundNonCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id,
+            timestamp=int(non_compliant_aggregate_event.payload.timestamp + 5),
         ),
     )
     assert (
         handle_resource_found_compliant(
-            compliant_event, [event, second_event, third_event]
-        ).lead_time
+            compliant_event,
+            [
+                non_compliant_aggregate_event,
+                second_compliant_aggregate_event,
+                third_non_compliant_aggregate_event,
+            ],
+        )[1][0].metric_value
         == 5
     )

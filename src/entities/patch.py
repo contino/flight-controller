@@ -1,22 +1,23 @@
-from dataclasses import dataclass
 from typing import Literal
+
+from pydantic import BaseModel
 
 from src.entities.base import BaseEvent, BaseMetric
 
 
-@dataclass
-class PatchRunSummaryPayload:
+# Events
+class PatchRunSummaryPayload(BaseModel):
     failed_instances: str
     successful_instances: str
 
 
-@dataclass
 class PatchRunSummary(BaseEvent):
+    aggregate_type = "Account"
+    event_version = 1
     payload: PatchRunSummaryPayload
     event_type: Literal["patch_run_summary"] = "patch_run_summary"
 
 
-@dataclass
+# Event Metrics
 class PatchCompliancePercentage(BaseMetric):
-    percentage: float
     metric_type: Literal["patch_compliance_percentage"] = "patch_compliance_percentage"

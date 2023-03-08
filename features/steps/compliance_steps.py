@@ -65,6 +65,6 @@ def found_compliant(context):
 def lead_time_stored(context):
     sleep(2)
     result = time_stream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{ResourceComplianceLeadTime.metric_type}'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'resource_compliance_lead_time'"
     )
     assert len(result["Rows"]) == 1

@@ -6,8 +6,6 @@ import random
 import string
 import boto3
 
-from src.entities.identity import IdentityLeadTime
-
 eventBridge = boto3.client("events")
 timeStream = boto3.client("timestream-query")
 
@@ -15,6 +13,7 @@ timeStream = boto3.client("timestream-query")
 @given("an identity has been requested")
 def request_identity(context):
     context.aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    context.account_id = "".join(random.choices(string.ascii_letters, k=12))
     requested_time = int(round(datetime.utcnow().timestamp()))
 
     response = eventBridge.put_events(
@@ -27,6 +26,7 @@ def request_identity(context):
                         "event_type": "identity_requested",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
+                        "account_id": f"{context.account_id}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",
@@ -51,6 +51,7 @@ def created_identity(context):
                         "event_type": "identity_created",
                         "aggregate_id": f"{context.aggregate_id}",
                         "time": f"{requested_time}",
+                        "account_id": f"{context.account_id}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",
@@ -63,6 +64,6 @@ def created_identity(context):
 def lead_time_stored(context):
     sleep(2)
     result = timeStream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{IdentityLeadTime.metric_type}'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'identity_lead_time'"
     )
     assert len(result["Rows"]) == 1

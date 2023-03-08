@@ -1,7 +1,7 @@
+from datetime import datetime
 import os
 import random
 import string
-from datetime import datetime
 from uuid import uuid4
 
 import pytest
@@ -54,16 +54,15 @@ def test_returns_error_on_non_existent_table():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     event = ProjectRequested(
         aggregate_id=aggregate_id,
-        aggregate_type="Project",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
         payload=ProjectRequestedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            timestamp=int(round(datetime.utcnow().timestamp()))
         ),
     )
     sink = DynamoEventSink()
-    sink.store_events([event])
+
+    assert isinstance(sink.store_events([event]), Exception)
 
 
 @pytest.mark.integration
@@ -71,22 +70,18 @@ def test_retrieves_project_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     event = ProjectRequested(
         aggregate_id=aggregate_id,
-        aggregate_type="Project",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
         payload=ProjectRequestedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            timestamp=int(round(datetime.utcnow().timestamp()))
         ),
     )
     event_2 = ProjectCreated(
         aggregate_id=aggregate_id,
-        aggregate_type="Project",
         aggregate_version=2,
         event_id=uuid4(),
-        event_version=1,
         payload=ProjectCreatedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            timestamp=int(round(datetime.utcnow().timestamp()))
         ),
     )
     sink = DynamoEventSink()
@@ -105,22 +100,20 @@ def test_retrieves_compliance_events_from_dynamodb():
     container_id = "".join(random.choices(string.ascii_letters, k=12))
     event = ResourceFoundCompliant(
         aggregate_id=aggregate_id,
-        aggregate_type="Resource",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
         payload=ResourceFoundCompliantPayload(
-            container_id, int(round(datetime.utcnow().timestamp()))
+            container_id=container_id,
+            timestamp=int(round(datetime.utcnow().timestamp())),
         ),
     )
     event_2 = ResourceFoundNonCompliant(
         aggregate_id=aggregate_id,
-        aggregate_type="Resource",
         aggregate_version=2,
         event_id=uuid4(),
-        event_version=1,
         payload=ResourceFoundNonCompliantPayload(
-            container_id, int(round(datetime.utcnow().timestamp()))
+            container_id=container_id,
+            timestamp=int(round(datetime.utcnow().timestamp())),
         ),
     )
     sink = DynamoEventSink()
@@ -138,11 +131,12 @@ def test_retrieves_patch_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     event = PatchRunSummary(
         aggregate_id=aggregate_id,
-        aggregate_type="Account",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
-        payload=PatchRunSummaryPayload("i-adslkjfds,i-89dsfkjdkfj", "i-peoritdsfl"),
+        payload=PatchRunSummaryPayload(
+            successful_instances="i-adslkjfds,i-89dsfkjdkfj",
+            failed_instances="i-peoritdsfl",
+        ),
     )
     sink = DynamoEventSink()
     sink.store_events([event])
@@ -159,22 +153,18 @@ def test_retrieves_account_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     event = AccountRequested(
         aggregate_id=aggregate_id,
-        aggregate_type="Account",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
         payload=AccountRequestedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            timestamp=int(round(datetime.utcnow().timestamp()))
         ),
     )
     event_2 = AccountCreated(
         aggregate_id=aggregate_id,
-        aggregate_type="Account",
         aggregate_version=2,
         event_id=uuid4(),
-        event_version=1,
         payload=AccountCreatedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            timestamp=int(round(datetime.utcnow().timestamp()))
         ),
     )
     sink = DynamoEventSink()
@@ -193,22 +183,20 @@ def test_retrieves_guardrail_events_from_dynamodb():
     guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
     event = GuardrailPassed(
         aggregate_id=aggregate_id,
-        aggregate_type="Resource",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
         payload=GuardrailPassedPayload(
-            guardrail_id, int(round(datetime.utcnow().timestamp()))
+            guardrail_id=guardrail_id,
+            timestamp=int(round(datetime.utcnow().timestamp())),
         ),
     )
     event_2 = GuardrailActivated(
         aggregate_id=aggregate_id,
-        aggregate_type="Resource",
         aggregate_version=2,
         event_id=uuid4(),
-        event_version=1,
         payload=GuardrailActivatedPayload(
-            guardrail_id, int(round(datetime.utcnow().timestamp()))
+            guardrail_id=guardrail_id,
+            timestamp=int(round(datetime.utcnow().timestamp())),
         ),
     )
     sink = DynamoEventSink()
@@ -226,22 +214,20 @@ def test_retrieves_identity_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     event = IdentityRequested(
         aggregate_id=aggregate_id,
-        aggregate_type="Account",
         aggregate_version=1,
         event_id=uuid4(),
-        event_version=1,
         payload=IdentityRequestedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            account_id=aggregate_id,
+            timestamp=int(round(datetime.utcnow().timestamp())),
         ),
     )
     event_2 = IdentityCreated(
         aggregate_id=aggregate_id,
-        aggregate_type="Account",
         aggregate_version=2,
         event_id=uuid4(),
-        event_version=1,
         payload=IdentityCreatedPayload(
-            aggregate_id, int(round(datetime.utcnow().timestamp()))
+            account_id=aggregate_id,
+            timestamp=int(round(datetime.utcnow().timestamp())),
         ),
     )
     sink = DynamoEventSink()

@@ -9,7 +9,7 @@ import boto3
 from src.entities.accounts import AccountLeadTime
 
 event_bridge = boto3.client("events")
-time_stream = boto3.client('timestream-query')
+time_stream = boto3.client("timestream-query")
 
 
 @given("an account has been requested")
@@ -35,7 +35,6 @@ def request_account(context):
     )
 
     assert response["FailedEntryCount"] == 0
-
 
 
 @when("the account has been created")
@@ -64,6 +63,6 @@ def created_account(context):
 def lead_time_stored(context):
     sleep(2)
     result = time_stream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{AccountLeadTime.metric_type}'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'account_lead_time'"
     )
     assert len(result["Rows"]) == 1

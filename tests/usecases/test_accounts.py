@@ -1,49 +1,64 @@
-from datetime import datetime
+from time import time
 from uuid import uuid4
-
-import pytest
 
 from src.entities.accounts import (
     AccountCreated,
-    AccountCreatedPayload,
     AccountLeadTime,
     AccountRequested,
     AccountRequestedPayload,
 )
-from src.usecases.accounts import handle_account_created
+from src.usecases.accounts import handle_account_created, handle_account_requested
 
-
-event = AccountRequested(
-    aggregate_id="test-account",
-    aggregate_type="Account",
+requested_aggregate_event = AccountRequested(
+    aggregate_id=str(uuid4()),
+    event_id=str(uuid4()),
+    event_type="account_requested",
     aggregate_version=1,
-    event_id=uuid4(),
     event_version=1,
-    payload=AccountRequestedPayload(
-        "test-account", int(round(datetime(2022, 8, 2, 10, 0, 0).timestamp()))
-    ),
+    payload=AccountRequestedPayload(timestamp=int(time())),
 )
 
-created_event = AccountCreated(
-    aggregate_id="test-account",
-    aggregate_type="Account",
-    aggregate_version=2,
-    event_id=uuid4(),
-    event_version=1,
-    payload=AccountCreatedPayload(
-        "test-account", int(round(datetime(2022, 8, 2, 12, 0, 0).timestamp()))
-    ),
-)
+created_event = {
+    "event_type": "account_created",
+    "aggregate_id": requested_aggregate_event.aggregate_id,
+    "time": int(requested_aggregate_event.payload.timestamp + 10),
+}
+
+requested_event = {
+    "event_type": "account_requested",
+    "aggregate_id": requested_aggregate_event.aggregate_id,
+    "time": int(time()),
+}
 
 
-@pytest.fixture
-def AccountCreated():
-    return handle_account_created(event, created_event)
+def test_handle_account_requested_returns_correct_event_type():
+    assert isinstance(
+        handle_account_requested(requested_event, [])[0], AccountRequested
+    )
 
 
-def test_create_account_returns_correct_type(AccountCreated):
-    assert isinstance(AccountCreated, AccountLeadTime)
+def test_handle_account_requested_returns_no_metrics():
+    assert len(handle_account_requested(requested_event, [])[1]) == 0
 
 
-def test_create_account_calculates_lead_time_correctly(AccountCreated):
-    assert AccountCreated.lead_time == 7200
+def test_handle_account_created_returns_correct_event_type():
+    assert isinstance(
+        handle_account_created(created_event, [requested_aggregate_event])[0],
+        AccountCreated,
+    )
+
+
+def test_handle_account_created_returns_correct_metric_type():
+    assert isinstance(
+        handle_account_created(created_event, [requested_aggregate_event])[1][0],
+        AccountLeadTime,
+    )
+
+
+def test_handle_account_created_calculates_lead_time_correctly():
+    assert (
+        handle_account_created(created_event, [requested_aggregate_event])[1][
+            0
+        ].metric_value
+        == 10
+    )
