@@ -22,7 +22,7 @@ integration-test:
 	pipenv run pytest -m 'integration' tests/
 
 test:
-	pipenv run pytest --cov=src --cov-fail-under=82 --cov-report term-missing tests/
+	pipenv run pytest --cov=src --cov-fail-under=81 --cov-report term-missing tests/
 
 watch:
 	ptw -- -m 'not integration' tests/

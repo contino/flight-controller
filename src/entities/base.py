@@ -1,21 +1,16 @@
-from dataclasses import dataclass
-from typing import Literal, Union
 from uuid import UUID
 
-aggregate_type: "TypeAlias" = Union[
-    Literal["Project"], Literal["Resource"], Literal["Account"]
-]
+from pydantic import BaseModel
 
 
-@dataclass
-class BaseEvent:
+class BaseEvent(BaseModel):
     aggregate_id: str
-    aggregate_type: aggregate_type
+    aggregate_type: str
     aggregate_version: int
     event_id: UUID
     event_version: int
 
 
-@dataclass
-class BaseMetric:
+class BaseMetric(BaseModel):
     aggregate_id: str
+    metric_value: float

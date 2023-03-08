@@ -11,7 +11,7 @@ event_sink = DynamoEventSink()
 metric_sink = TimeStreamMetricSink()
 
 
-def lambda_handler(event, _):
+def lambda_handler(event, _) -> None:
     print(f"event is {event}")
     full_event = event["detail"]
     events = event_source.get_events_for_aggregate(full_event["aggregate_id"])

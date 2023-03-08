@@ -1,34 +1,48 @@
-from dataclasses import dataclass
 from typing import Literal
+
+from pydantic import BaseModel
 
 from src.entities.base import BaseEvent, BaseMetric
 
 
-@dataclass
-class ProjectRequestedPayload:
-    project_id: str
-    requested_time: float
+# Event
+class ProjectRequestedPayload(BaseModel):
+    timestamp: float
 
 
-@dataclass
 class ProjectRequested(BaseEvent):
+    aggregate_type = "Account"
+    event_version = 1
     payload: ProjectRequestedPayload
     event_type: Literal["project_requested"] = "project_requested"
 
 
-@dataclass
-class ProjectCreatedPayload:
-    project_id: str
-    created_time: float
+class ProjectAssignedPayload(BaseModel):
+    timestamp: float
 
 
-@dataclass
+class ProjectAssigned(BaseEvent):
+    aggregate_type = "Account"
+    event_version = 1
+    payload: ProjectAssignedPayload
+    event_type: Literal["project_assigned"] = "project_assigned"
+
+
+class ProjectCreatedPayload(BaseModel):
+    timestamp: float
+
+
 class ProjectCreated(BaseEvent):
+    aggregate_type = "Account"
+    event_version = 1
     payload: ProjectCreatedPayload
     event_type: Literal["project_created"] = "project_created"
 
 
-@dataclass
+# Event Metrics
 class ProjectLeadTime(BaseMetric):
-    lead_time: float
     metric_type: Literal["project_lead_time"] = "project_lead_time"
+
+
+class ProjectAssignedLeadTime(BaseMetric):
+    metric_type: Literal["project_assigned_lead_time"] = "project_assigned_lead_time"

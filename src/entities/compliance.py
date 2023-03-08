@@ -1,34 +1,43 @@
-from dataclasses import dataclass
 from typing import Literal
+
+from pydantic import BaseModel
 
 from src.entities.base import BaseEvent, BaseMetric
 
 
-@dataclass
-class ResourceFoundNonCompliantPayload:
+# Events
+class ResourceFoundNonCompliantPayload(BaseModel):
     container_id: str
     timestamp: float
 
 
-@dataclass
 class ResourceFoundNonCompliant(BaseEvent):
+    aggregate_type = "Resource"
+    event_version = 1
     payload: ResourceFoundNonCompliantPayload
     event_type: Literal["resource_found_non_compliant"] = "resource_found_non_compliant"
 
 
-@dataclass
-class ResourceFoundCompliantPayload:
+class ResourceFoundCompliantPayload(BaseModel):
     container_id: str
     timestamp: float
 
 
-@dataclass
 class ResourceFoundCompliant(BaseEvent):
+    aggregate_type = "Resource"
+    event_version = 1
     payload: ResourceFoundCompliantPayload
     event_type: Literal["resource_found_compliant"] = "resource_found_compliant"
 
 
-@dataclass
+# Metrics
+class ResourceComplianceExtraDimensions(BaseModel):
+    dimension_names: list[Literal["container_id"]]
+    container_id: str
+
+
 class ResourceComplianceLeadTime(BaseMetric):
-    lead_time: float
-    metric_type: Literal["resource_compliance_lead_time"] = "resource_compliance_lead_time"
+    dimensions: ResourceComplianceExtraDimensions
+    metric_type: Literal[
+        "resource_compliance_lead_time"
+    ] = "resource_compliance_lead_time"

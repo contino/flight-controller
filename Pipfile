@@ -9,6 +9,7 @@ google-cloud-bigquery = "*"
 gunicorn = "*"
 structlog = "*"
 boto3= "*"
+pydantic = "*"
 
 [dev-packages]
 pytest = "*"

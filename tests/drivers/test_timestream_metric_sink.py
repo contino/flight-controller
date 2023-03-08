@@ -6,9 +6,13 @@ import pytest
 
 from src.drivers.timestream_metric_sink import TimeStreamMetricSink
 from src.entities.accounts import AccountLeadTime
-from src.entities.compliance import ResourceComplianceLeadTime
+from src.entities.compliance import (
+    ResourceComplianceExtraDimensions,
+    ResourceComplianceLeadTime,
+)
 from src.entities.guardrail import (
     GuardrailActivationCount,
+    GuardrailExtraDimensions,
     GuardrailLeadTime,
     GuardrailMaxActivation,
 )
@@ -32,7 +36,7 @@ def test_returns_error_on_non_existent_database():
     assert isinstance(
         sink.store_metrics(
             [
-                ProjectLeadTime(aggregate_id, lead_time),
+                ProjectLeadTime(aggregate_id=aggregate_id, metric_value=lead_time),
             ]
         ),
         Exception,
@@ -47,7 +51,7 @@ def test_store_metrics_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                ProjectLeadTime(aggregate_id, lead_time),
+                ProjectLeadTime(aggregate_id=aggregate_id, metric_value=lead_time),
             ]
         )
         is None
@@ -57,12 +61,19 @@ def test_store_metrics_does_not_return_error():
 @pytest.mark.integration
 def test_store_resource_compliance_lead_time_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
+    container_id = "".join(random.choices(string.ascii_letters, k=12))
     lead_time = random.randint(0, 7200)
     sink = TimeStreamMetricSink()
     assert (
         sink.store_metrics(
             [
-                ResourceComplianceLeadTime(aggregate_id, lead_time),
+                ResourceComplianceLeadTime(
+                    aggregate_id=aggregate_id,
+                    metric_value=lead_time,
+                    dimensions=ResourceComplianceExtraDimensions(
+                        dimension_names=["container_id"], container_id=container_id
+                    ),
+                ),
             ]
         )
         is None
@@ -77,7 +88,9 @@ def test_store_patch_compliance_percentage_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                PatchCompliancePercentage(aggregate_id, patch_percentage),
+                PatchCompliancePercentage(
+                    aggregate_id=aggregate_id, metric_value=patch_percentage
+                ),
             ]
         )
         is None
@@ -92,7 +105,7 @@ def test_store_resource_account_lead_time_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                AccountLeadTime(aggregate_id, lead_time=lead_time),
+                AccountLeadTime(aggregate_id=aggregate_id, metric_value=lead_time),
             ]
         )
         is None
@@ -100,7 +113,7 @@ def test_store_resource_account_lead_time_does_not_return_error():
 
 
 @pytest.mark.integration
-def test_store_gaurdrail_activation_count_does_not_return_error():
+def test_store_guardrail_activation_count_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
     count = random.randint(0, 100)
@@ -108,7 +121,13 @@ def test_store_gaurdrail_activation_count_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                GuardrailActivationCount(aggregate_id, guardrail_id, count),
+                GuardrailActivationCount(
+                    aggregate_id=aggregate_id,
+                    metric_value=count,
+                    dimensions=GuardrailExtraDimensions(
+                        dimension_names=["guardrail_id"], guardrail_id=guardrail_id
+                    ),
+                ),
             ]
         )
         is None
@@ -116,7 +135,7 @@ def test_store_gaurdrail_activation_count_does_not_return_error():
 
 
 @pytest.mark.integration
-def test_store_gaurdrail_max_activation_does_not_return_error():
+def test_store_guardrail_max_activation_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
     count = random.randint(0, 100)
@@ -124,7 +143,13 @@ def test_store_gaurdrail_max_activation_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                GuardrailMaxActivation(aggregate_id, guardrail_id, count),
+                GuardrailMaxActivation(
+                    aggregate_id=aggregate_id,
+                    metric_value=count,
+                    dimensions=GuardrailExtraDimensions(
+                        dimension_names=["guardrail_id"], guardrail_id=guardrail_id
+                    ),
+                ),
             ]
         )
         is None
@@ -132,7 +157,7 @@ def test_store_gaurdrail_max_activation_does_not_return_error():
 
 
 @pytest.mark.integration
-def test_store_gaurdrail_lead_time_does_not_return_error():
+def test_store_guardrail_lead_time_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
     guardrail_id = "".join(random.choices(string.ascii_letters, k=12))
     lead_time = random.randint(0, 7200)
@@ -140,7 +165,13 @@ def test_store_gaurdrail_lead_time_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                GuardrailLeadTime(aggregate_id, guardrail_id, lead_time),
+                GuardrailLeadTime(
+                    aggregate_id=aggregate_id,
+                    metric_value=lead_time,
+                    dimensions=GuardrailExtraDimensions(
+                        dimension_names=["guardrail_id"], guardrail_id=guardrail_id
+                    ),
+                ),
             ]
         )
         is None
@@ -155,7 +186,7 @@ def test_store_identity_lead_time_does_not_return_error():
     assert (
         sink.store_metrics(
             [
-                IdentityLeadTime(aggregate_id, lead_time=lead_time),
+                IdentityLeadTime(aggregate_id=aggregate_id, metric_value=lead_time),
             ]
         )
         is None

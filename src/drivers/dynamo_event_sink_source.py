@@ -10,40 +10,8 @@ import structlog
 
 from src.drivers.event_sink import EventSink
 from src.drivers.event_source import EventSource
-from src.entities.accounts import (
-    AccountCreated,
-    AccountCreatedPayload,
-    AccountRequested,
-    AccountRequestedPayload,
-)
-from src.entities.compliance import (
-    ResourceFoundCompliant,
-    ResourceFoundCompliantPayload,
-    ResourceFoundNonCompliant,
-    ResourceFoundNonCompliantPayload,
-)
-from src.entities.guardrail import (
-    GuardrailPassed,
-    GuardrailPassedPayload,
-    GuardrailActivated,
-    GuardrailActivatedPayload,
-)
-from src.entities.events import Event
-from src.entities.patch import PatchRunSummary, PatchRunSummaryPayload
-from src.entities.projects import (
-    ProjectCreated,
-    ProjectCreatedPayload,
-    ProjectRequested,
-    ProjectRequestedPayload,
-)
+from src.entities.events import Event, EVENT_CLASSES
 
-
-from src.entities.identity import (
-    IdentityCreated,
-    IdentityCreatedPayload,
-    IdentityRequested,
-    IdentityRequestedPayload,
-)
 
 dynamo_db_resource = boto3.resource("dynamodb")
 logger = structlog.get_logger(__name__)
@@ -74,7 +42,7 @@ class DynamoEventSink(EventSink):
                     batch.put_item(Item=value)
         except Exception as err:
             logger.error(
-                f"Couldn't add to table type of error is {type(err)} AND reason is {err} "
+                f"Couldn't add to table type of error is {type(err)} AND reason is {err}"
             )
             return err
 
@@ -94,177 +62,21 @@ class DynamoEventSource(EventSource):
         logger.msg(f"responses {response}")
 
         events: List[Event] = []
-        for item in response["Items"]:
-            if item["event_type"] == "project_requested":
-                events.append(
-                    ProjectRequested(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        ProjectRequestedPayload(
-                            json.loads(item["payload"])["project_id"],
-                            int(json.loads(item["payload"])["requested_time"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "project_created":
-                events.append(
-                    ProjectCreated(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        ProjectCreatedPayload(
-                            json.loads(item["payload"])["project_id"],
-                            int(json.loads(item["payload"])["created_time"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "resource_found_compliant":
-                events.append(
-                    ResourceFoundCompliant(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        ResourceFoundCompliantPayload(
-                            timestamp=int(json.loads(item["payload"])["timestamp"]),
-                            container_id=json.loads(item["payload"])["container_id"],
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "resource_found_non_compliant":
-                events.append(
-                    ResourceFoundNonCompliant(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        ResourceFoundNonCompliantPayload(
-                            timestamp=int(json.loads(item["payload"])["timestamp"]),
-                            container_id=json.loads(item["payload"])["container_id"],
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "patch_run_summary":
-                events.append(
-                    PatchRunSummary(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        PatchRunSummaryPayload(
-                            failed_instances=json.loads(item["payload"])[
-                                "failed_instances"
-                            ],
-                            successful_instances=json.loads(item["payload"])[
-                                "successful_instances"
-                            ],
-                        ),
-                        item["event_type"],
-                    )
-                )
 
-            elif item["event_type"] == "account_requested":
-                events.append(
-                    AccountRequested(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        AccountRequestedPayload(
-                            json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["requested_time"]),
-                        ),
-                        item["event_type"],
-                    )
+        for item in response["Items"]:
+            event_type = item["event_type"]
+            if event_type in EVENT_CLASSES:
+                event_class, payload_class = EVENT_CLASSES[event_type]
+                payload = payload_class(**json.loads(item["payload"]))
+                event = event_class(
+                    aggregate_id=item["aggregate_id"],
+                    aggregate_type=item["aggregate_type"],
+                    aggregate_version=int(item["aggregate_version"]),
+                    event_id=UUID(item["event_id"]),
+                    event_version=int(item["event_version"]),
+                    payload=payload,
                 )
-            elif item["event_type"] == "account_created":
-                events.append(
-                    AccountCreated(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        AccountCreatedPayload(
-                            json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["created_time"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "guardrail_passed":
-                events.append(
-                    GuardrailPassed(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        GuardrailPassedPayload(
-                            guardrail_id=json.loads(item["payload"])["guardrail_id"],
-                            timestamp=int(json.loads(item["payload"])["timestamp"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "guardrail_activated":
-                events.append(
-                    GuardrailActivated(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        GuardrailActivatedPayload(
-                            guardrail_id=json.loads(item["payload"])["guardrail_id"],
-                            timestamp=int(json.loads(item["payload"])["timestamp"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "identity_requested":
-                events.append(
-                    IdentityRequested(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        IdentityRequestedPayload(
-                            json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["requested_time"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
-            elif item["event_type"] == "identity_created":
-                events.append(
-                    IdentityCreated(
-                        item["aggregate_id"],
-                        item["aggregate_type"],
-                        item["aggregate_version"],
-                        UUID(item["event_id"]),
-                        item["event_version"],
-                        IdentityCreatedPayload(
-                            json.loads(item["payload"])["account_id"],
-                            int(json.loads(item["payload"])["created_time"]),
-                        ),
-                        item["event_type"],
-                    )
-                )
+                events.append(event)
 
         events.sort(key=self._sort_events)
 

@@ -6,8 +6,6 @@ import random
 import string
 import boto3
 
-from src.entities.projects import ProjectLeadTime
-
 event_bridge = boto3.client("events")
 time_stream = boto3.client("timestream-query")
 aggregate_id = "behaveTest"
@@ -62,6 +60,6 @@ def create_project(context):
 def lead_time_stored(context):
     sleep(2)
     result = time_stream.query(
-        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = '{ProjectLeadTime.metric_type}'"
+        QueryString=f"select * from core_timestream_db.metrics_table where aggregate_id = '{context.aggregate_id}' and measure_name = 'project_lead_time'"
     )
     assert len(result["Rows"]) == 1

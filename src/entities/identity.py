@@ -1,35 +1,34 @@
-from dataclasses import dataclass
 from typing import Literal
+
+from pydantic import BaseModel
 
 from .base import BaseEvent
 from .base import BaseMetric
 
 
-@dataclass
-class IdentityRequestedPayload:
+class IdentityRequestedPayload(BaseModel):
     account_id: str
-    requested_time: float
+    timestamp: float
 
 
-@dataclass
 class IdentityRequested(BaseEvent):
+    aggregate_type = "Identity"
+    event_version = 1
     payload: IdentityRequestedPayload
     event_type: Literal["identity_requested"] = "identity_requested"
 
 
-@dataclass
-class IdentityCreatedPayload:
+class IdentityCreatedPayload(BaseModel):
     account_id: str
-    created_time: float
+    timestamp: float
 
 
-@dataclass
 class IdentityCreated(BaseEvent):
+    aggregate_type = "Identity"
+    event_version = 1
     payload: IdentityCreatedPayload
     event_type: Literal["identity_created"] = "identity_created"
 
 
-@dataclass
 class IdentityLeadTime(BaseMetric):
-    lead_time: float
-    metric_type: Literal["IdentityLeadTime"] = "IdentityLeadTime"
+    metric_type: Literal["identity_lead_time"] = "identity_lead_time"
