@@ -9,6 +9,7 @@ google-cloud-bigquery = "*"
 gunicorn = "*"
 structlog = "*"
 boto3= "*"
+flask = "*"
 pydantic = "*"
 
 [dev-packages]
@@ -23,6 +24,8 @@ constructs = "*"
 cdktf = "*"
 cdktf-cdktf-provider-aws = "*"
 cdktf-cdktf-provider-archive = "*"
+cdktf-cdktf-provider-google = "*"
+cdktf-cdktf-provider-external = "*"
 pytest-watch = "*"
 dirhash = "*"
 

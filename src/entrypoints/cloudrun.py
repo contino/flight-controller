@@ -3,9 +3,8 @@ import json
 import os
 from typing import Any, Literal, Tuple, Union
 
-from flask import Flask, request
 import structlog
-
+from flask import Flask, request
 from src.adapters.controller import handle_event
 from src.drivers.bigquery import (
     BigQueryEventSink,
