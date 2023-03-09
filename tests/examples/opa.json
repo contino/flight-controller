@@ -1,0 +1,70 @@
+{
+    "results": [
+        {
+            "allow": true,
+            "query": "data.kubernetes.admission.allow",
+            "timestamp": "2023-03-03T10:00:00Z",
+            "input": {
+                "kind": {
+                    "kind": "Pod",
+                    "apiVersion": "v1"
+                },
+                "metadata": {
+                    "name": "example-pod",
+                    "namespace": "example-namespace",
+                    "creationTimestamp": "2023-03-03T10:00:00Z",
+                    "labels": {
+                        "app": "example-app"
+                    }
+                },
+                "spec": {
+                    "containers": [
+                        {
+                            "name": "example-container",
+                            "image": "example-image",
+                            "ports": [
+                                {
+                                    "containerPort": 80
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "allow": false,
+            "query": "data.kubernetes.admission.deny",
+            "timestamp": "2023-03-03T10:01:00Z",
+            "input": {
+                "kind": {
+                    "kind": "Pod",
+                    "apiVersion": "v1"
+                },
+                "metadata": {
+                    "name": "restricted-pod",
+                    "namespace": "restricted-namespace",
+                    "creationTimestamp": "2023-03-03T10:01:00Z",
+                    "labels": {
+                        "app": "restricted-app"
+                    }
+                },
+                "spec": {
+                    "containers": [
+                        {
+                            "name": "restricted-container",
+                            "image": "restricted-image",
+                            "ports": [
+                                {
+                                    "containerPort": 8080
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "message": "Pod creation denied by policy"
+        }
+    ]
+}
+
