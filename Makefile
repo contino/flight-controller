@@ -35,6 +35,7 @@ build-python:
 	pipenv requirements | tee requirements.txt
 	rsync -avu $(shell pwd)/src $(shell pwd)/infrastructure/all_files
 	pip install -r requirements.txt --target=$(shell pwd)/infrastructure/all_files
+	pip install boto3 --target=$(shell pwd)/infrastructure/api_key_rotation
 
 clean:
 	cd infrastructure; rm -rf cdktf.out
