@@ -6,8 +6,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 # secret's name and region
-grafana_api_key_name = "grafana-api-key"
-grafana_workspace_id = "grafana-workspace-id"
+grafana_api_key_name = "flight-controller-grafana-api-key"
+grafana_workspace_id = "flight-controller-grafana-workspace-id"
 region_name = "ap-southeast-2"
 
 #Set up our Session and Client
