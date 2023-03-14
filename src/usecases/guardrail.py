@@ -43,7 +43,7 @@ def handle_guardrail_activated(
     event = _convert_payload_to_event(event, len(aggregate_events))
     guardrail_activation_count = 1
     for aggregate_event in aggregate_events:
-        if isinstance(aggregate_event, GuardrailActivated):
+        if isinstance(aggregate_event, GuardrailActivated) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
             guardrail_activation_count += 1
     return (
         event,
@@ -65,11 +65,17 @@ def handle_guardrail_passed(
 ) -> Tuple[GuardrailPassed, List[Union[GuardrailLeadTime, GuardrailMaxActivation]]]:
     event = _convert_payload_to_event(event, len(aggregate_events))
     last_compliant_event = 0
+    max_activations = 0
+    activations_since_last_pass = 0
     for i, aggregate_event in enumerate(aggregate_events):
-        if isinstance(aggregate_event, GuardrailPassed):
+        if isinstance(aggregate_event, GuardrailPassed) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
             last_compliant_event = i
+            activations_since_last_pass = 0
+        elif isinstance(aggregate_event, GuardrailActivated) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
+            activations_since_last_pass += 1
+            max_activations = max(max_activations, activations_since_last_pass)
     for aggregate_event in aggregate_events[last_compliant_event:]:
-        if isinstance(aggregate_event, GuardrailActivated):
+        if isinstance(aggregate_event, GuardrailActivated) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
             return (
                 event,
                 [
@@ -89,9 +95,7 @@ def handle_guardrail_passed(
                             dimension_names=["guardrail_id"],
                             guardrail_id=event.payload.guardrail_id,
                         ),
-                        metric_value=len(aggregate_events[last_compliant_event + 1 :])
-                        if last_compliant_event > 0
-                        else len(aggregate_events[last_compliant_event:]),
+                        metric_value=max_activations,
                     ),
                 ],
             )
