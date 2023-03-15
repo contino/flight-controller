@@ -6,5 +6,5 @@ from publisher.entities.events import Event
 
 class EventSink(ABC):
     @abstractmethod
-    def send_events(self, events: List[Event]) -> Optional[Union[Exception, str]]:
+    def send_events(self, events: List[Event]) -> Union[Exception, str]:
         raise NotImplementedError()  # pragma: no cover

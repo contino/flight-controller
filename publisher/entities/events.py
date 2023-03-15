@@ -2,9 +2,7 @@ from typing import Literal, Union
 
 from publisher.entities.guardrail import (
     GuardrailActivated,
-    GuardrailActivatedDetail,
     GuardrailPassed,
-    GuardrailPassedDetail,
 )
 
 
@@ -17,12 +15,6 @@ Event = Union[
 Event_Type = Union[
     Literal["guardrail_passed"],
     Literal["guardrail_activated"]
-]
-
-
-Detail = Union[
-    GuardrailActivatedDetail,
-    GuardrailPassedDetail
 ]
 
 
