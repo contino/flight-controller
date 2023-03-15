@@ -1,14 +1,10 @@
 import json
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, List, Union
 
 import boto3
-import structlog
 
 from publisher.drivers.event_sink import EventSink
 from publisher.entities.events import Event
-
-
-LOGGER = structlog.get_logger(__name__)
 
 
 class EventBridge(EventSink):
@@ -22,22 +18,22 @@ class EventBridge(EventSink):
 
     def _format_events(self, event: Dict) -> Dict:
         return {
-            "Source": event.source,
-            "DetailType": event.detail_type,
-            "Detail": json.dumps(event.detail.__dict__),
-            "EventBusName": event.event_bus_name,
+            "Source": "contino.flight_controller",
+            "DetailType": event.event_type,
+            "Detail": json.dumps(event.__dict__),
+            "EventBusName": "main_lambda_bus_cdktf",
         }
 
-    def send_events(self, events: List[Event]) -> Optional[Union[Exception, str]]:
+    def send_events(self, events: List[Event]) -> Union[Exception, str]:
         try:
             events = [self._format_events(event) for event in events]
             if len(events) > 10:
                 event_groups = self._split_events(events)
+                response = []
                 for event_group in event_groups:
-                    response = self.event_bridge_client.put_events(Entries=event_group)
+                    response.append(self.event_bridge_client.put_events(Entries=event_group))
             else:
                 response = self.event_bridge_client.put_events(Entries=events)
             return str(response)
         except Exception as err:
             return err
-        

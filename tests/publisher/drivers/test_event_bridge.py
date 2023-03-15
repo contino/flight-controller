@@ -4,11 +4,9 @@ from uuid import uuid4
 import pytest
 
 from publisher.drivers.event_bridge import EventBridge
-from publisher.entities.guardrail import (
+from publisher.entities.events import (
     GuardrailActivated,
-    GuardrailActivatedDetail,
     GuardrailPassed,
-    GuardrailPassedDetail,
 )
 
 EVENT_SINK = EventBridge()
@@ -18,34 +16,22 @@ CURRENT_TIME = int(time())
 
 EVENTS = [
     GuardrailActivated(
-        detail_type = "Test Custom Guardrail Activated Event",
-        source = "contino.custom",
-        detail = GuardrailActivatedDetail(
-            aggregate_id = AGGREGATE_ID,
-            guardrail_id = ALTERNATE_ID,
-            time = CURRENT_TIME,
-        )
+        aggregate_id = AGGREGATE_ID,
+        guardrail_id = ALTERNATE_ID,
+        time = CURRENT_TIME,
     ),
     GuardrailPassed(
-        detail_type = "Test Custom Guardrail Activated Event",
-        source = "contino.custom",
-        detail = GuardrailPassedDetail(
-            aggregate_id = AGGREGATE_ID,
-            guardrail_id = ALTERNATE_ID,
-            time = CURRENT_TIME,
-        )
+        aggregate_id = AGGREGATE_ID,
+        guardrail_id = ALTERNATE_ID,
+        time = CURRENT_TIME,
     ),
 ]
 
 DOZEN_EVENTS = [
     GuardrailActivated(
-        detail_type = "Test Custom Guardrail Activated Event",
-        source = "contino.custom",
-        detail = GuardrailActivatedDetail(
-            aggregate_id = AGGREGATE_ID,
-            guardrail_id = ALTERNATE_ID,
-            time = CURRENT_TIME,
-        )
+        aggregate_id = AGGREGATE_ID,
+        guardrail_id = ALTERNATE_ID,
+        time = CURRENT_TIME,
     ) for i in range(12)
 ]
 
@@ -66,5 +52,5 @@ def test_event_bridge_handles_more_then_10_events():
 
 
 @pytest.mark.integration
-def test_event_bridge_handles_no_event_returns_exception():
+def test_event_bridge_returns_exception_on_no_events():
     assert isinstance(EVENT_SINK.send_events([]), Exception)
