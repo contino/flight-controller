@@ -6,8 +6,6 @@ import random
 import string
 import boto3
 
-from src.entities.compliance import ResourceComplianceLeadTime
-
 event_bridge = boto3.client("events")
 time_stream = boto3.client("timestream-query")
 

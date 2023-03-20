@@ -258,3 +258,7 @@ Thumbs.db
 # CDKTF Specifics
 requirements.txt
 all_files/
+api_key_rotation/
+!api_key_rotation/main.py
+imports/
+cdktf.out

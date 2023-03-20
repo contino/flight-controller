@@ -1,12 +1,10 @@
 {
-  "specversion": "1.0",
-  "type": "io.contino.identity.identitycreated",
-  "source": "https://github.com/contino/apac-flight-controller-aws",
-  "subject": "josh.armitage@contino.io",
-  "id": "61fbd566-0757-4d12-ac03-5641ddd8c4f9",
-  "time": "2018-04-05T17:31:00Z",
-  "datacontenttype": "application/json",
-  "data": {
-    "event_version": "1"
-  }
+  "Source": "contino.custom",
+  "DetailType": "Identity Created",
+  "Detail": {
+          "event_type": "identity_created",
+          "aggregate_id": "123456789",
+          "time": "1679368469"
+      },
+  "EventBusName": "main_lambda_bus_cdktf"
 }

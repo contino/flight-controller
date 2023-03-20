@@ -9,13 +9,8 @@ owners:
     - josharmi
 ---
 
-### Details
+## <u>Details</u>
 
-Flight Controller looks at a previous guardrail activation and calculates time till it is resolved.
-
+Flight Controller looks at all previous pertinent guardrail activations for a resource and the guardrail, then calculates the time it took to resolve.
 
 <NodeGraph title="Consumer / Producer Diagram" />
-
-<Schema />
-
-<EventExamples />

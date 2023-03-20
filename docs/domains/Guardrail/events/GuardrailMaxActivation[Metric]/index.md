@@ -9,13 +9,8 @@ owners:
     - josharmi
 ---
 
-### Details
+## <u>Details</u>
 
-Flight Controller calculates the guardrail activations before a guardrail pass.
-
+Flight Controller calculates the total guardrail activations since the last pertinent guardrail pass.
 
 <NodeGraph title="Consumer / Producer Diagram" />
-
-<Schema />
-
-<EventExamples />

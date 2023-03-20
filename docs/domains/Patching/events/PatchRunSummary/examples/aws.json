@@ -1,12 +1,10 @@
 {
-  "specversion": "1.0",
-  "type": "io.contino.identity.patchrunfailed",
-  "source": "https://github.com/contino/apac-flight-controller-aws",
-  "subject": "arn:aws:organizations::369236305845:account/o-laqmqtdr68/099267815798",
-  "id": "61fbd566-0757-4d12-ac03-5641ddd8c4f9",
-  "time": "2018-04-05T17:31:00Z",
-  "datacontenttype": "application/json",
-  "data": {
+  "Source": "contino.custom",
+  "DetailType": "Patch Run Summary",
+  "Detail": {
+    "event_type": "patch_run_summary",
+    "aggregate_id": "123456789",
+    "time": "1679368469",
     "failed_instances": [
       "i-adslkjfds",
       "i-89dsfkjdkfj"
@@ -14,5 +12,6 @@
     "successful_instances": [
       "i-peoritdsfl"
     ]
-  }
+  },
+  "EventBusName": "main_lambda_bus_cdktf"
 }
