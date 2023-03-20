@@ -1,8 +1,8 @@
 {
   "Source": "contino.custom",
-  "DetailType": "Identity Requested",
+  "DetailType": "Project Created",
   "Detail": {
-          "event_type": "identity_requested",
+          "event_type": "project_created",
           "aggregate_id": "123456789",
           "time": "1679368469"
       },

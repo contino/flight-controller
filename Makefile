@@ -16,19 +16,19 @@ docs-run: docs-build
 
 # Test Commands
 unittest:
-	pipenv run pytest -m 'not integration' tests/
+	pipenv run pytest -m 'not integration' tests/src tests/publisher
 
 integration-test:
-	pipenv run pytest -m 'integration' tests/
+	pipenv run pytest -m 'integration' tests/src tests/publisher
 
 test:
-	pipenv run pytest --cov=src --cov=publisher --cov-fail-under=81 --cov-report term-missing tests/
+	pipenv run pytest --cov=src --cov=publisher --cov-fail-under=81 --cov-report term-missing tests/src tests/publisher
 
 watch:
-	ptw -- -m 'not integration' tests/
+	ptw -- -m 'not integration' tests/src tests/publisher
 
 e2e:
-	pipenv run behave
+	cd tests/; pipenv run behave
 
 # Infrastructure Commands
 build-python:

@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@eventcatalog/types": "0.4.0",
+    "@eventcatalog/types": "0.4.1",
     "@types/node": "18.11.17",
     "@types/react": "18.0.26",
     "autoprefixer": "10.4.5",
@@ -20,6 +20,6 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@eventcatalog/core": "0.6.1"
+    "@eventcatalog/core": "0.6.8"
   }
 }

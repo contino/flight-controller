@@ -3,6 +3,8 @@ name: GuardrailPassed
 version: 1
 summary: |
   Dispatched when a guardrail passes
+producers:
+    - Flight Controller Custom Publisher
 consumers:
     - Flight Controller
 owners:

@@ -9,13 +9,8 @@ owners:
     - josharmi
 ---
 
-### Details
+## <u>Details</u>
 
-Flight Controller looks at all guardrail activations and gives you the total amount.
-
+Flight Controller looks at all previous pertinent guardrail activations for a resource and the guardrail, then gives you the total amount.
 
 <NodeGraph title="Consumer / Producer Diagram" />
-
-<Schema />
-
-<EventExamples />

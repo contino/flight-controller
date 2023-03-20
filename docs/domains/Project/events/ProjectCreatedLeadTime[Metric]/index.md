@@ -9,8 +9,8 @@ owners:
     - josharmi
 ---
 
+## <u>Details</u>
+
+Flight Controller looks at the last pertinent project requested event and calculates the time from it being requested to created.
+
 <NodeGraph title="Consumer / Producer Diagram" />
-
-<Schema />
-
-<EventExamples />
