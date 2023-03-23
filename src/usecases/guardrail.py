@@ -65,7 +65,6 @@ def handle_guardrail_passed(
 ) -> Tuple[GuardrailPassed, List[Union[GuardrailLeadTime, GuardrailMaxActivation]]]:
     event = _convert_payload_to_event(event, len(aggregate_events))
     last_compliant_event = 0
-    max_activations = 0
     activations_since_last_pass = 0
     for i, aggregate_event in enumerate(aggregate_events):
         if isinstance(aggregate_event, GuardrailPassed) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
@@ -73,7 +72,6 @@ def handle_guardrail_passed(
             activations_since_last_pass = 0
         elif isinstance(aggregate_event, GuardrailActivated) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
             activations_since_last_pass += 1
-            max_activations = max(max_activations, activations_since_last_pass)
     for aggregate_event in aggregate_events[last_compliant_event:]:
         if isinstance(aggregate_event, GuardrailActivated) and aggregate_event.payload.guardrail_id == event.payload.guardrail_id:
             return (
@@ -95,7 +93,7 @@ def handle_guardrail_passed(
                             dimension_names=["guardrail_id"],
                             guardrail_id=event.payload.guardrail_id,
                         ),
-                        metric_value=max_activations,
+                        metric_value=activations_since_last_pass,
                     ),
                 ],
             )

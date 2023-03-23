@@ -131,7 +131,7 @@
       "type": "timeseries"
     },
     {
-      "description": "Total Guardrail Activation Count",
+      "description": "Guardrail Total Activation Count per Resource and Guardrail ID.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -146,12 +146,16 @@
                 "value": null
               },
               {
+                "color": "#EAB839",
+                "value": 25
+              },
+              {
                 "color": "red",
-                "value": 80
+                "value": 50
               }
             ]
           },
-          "unit": "Activations"
+          "unit": "none"
         },
         "overrides": []
       },
@@ -169,7 +173,7 @@
           "calcs": [
             "sum"
           ],
-          "fields": "/^measure_value::double$/",
+          "fields": "/^total_activations$/",
           "values": true
         },
         "showUnfilled": true
@@ -183,15 +187,16 @@
             "uid": "4tnTKWb4z"
           },
           "measure": "guardrail_activation_count",
-          "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "rawQuery": "SELECT \"aggregate_id\", \"guardrail_id\", MAX(\"measure_value\"::double) as \"total_activations\" FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY \"aggregate_id\", \"guardrail_id\"\nORDER BY \"total_activations\" DESC",
           "refId": "A",
           "table": "\"metrics_table\""
         }
       ],
-      "title": "Guardrail Activation Count",
+      "title": "Guardrail Total Activation Count",
       "type": "bargauge"
     },
     {
+      "description": "Average lead time from last pertinent activation to resolution.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -223,16 +228,17 @@
       },
       "id": 16,
       "options": {
-        "orientation": "auto",
+        "displayMode": "gradient",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "lastNotNull"
           ],
-          "fields": "/^measure_value::double$/",
-          "values": false
+          "fields": "/^average_lead_time$/",
+          "values": true
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showUnfilled": true,
+        "text": {}
       },
       "pluginVersion": "8.4.7",
       "targets": [
@@ -243,13 +249,13 @@
             "uid": "4tnTKWb4z"
           },
           "measure": "guardrail_lead_time",
-          "rawQuery": "SELECT \"aggregate_id\", \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
+          "rawQuery": "SELECT \"aggregate_id\", \"guardrail_id\", AVG(\"measure_value\"::double) as \"average_lead_time\" FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY \"aggregate_id\", \"guardrail_id\"\nORDER BY \"average_lead_time\" DESC",
           "refId": "A",
           "table": "\"metrics_table\""
         }
       ],
       "title": "Guardrail Lead Time Average",
-      "type": "gauge"
+      "type": "bargauge"
     },
     {
       "description": "Percentage based on the number of patch compliant instances.",
@@ -588,13 +594,13 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 2,
+  "version": 10,
   "weekStart": ""
 }
