@@ -359,3 +359,49 @@ def test_guardrail_passed_returns_correct_max_activation_from_last_pertinent_act
         )[1][1].metric_value
         == 2
     )
+
+
+def test_guardrail_passed_with_history_returns_correct_max_activation_from_last_pertinent_activated_with_a_max_less_then_previous():
+    second_activated_aggregate_event = GuardrailActivated(
+        aggregate_id=activated_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        event_type="guardrail_activated",
+        aggregate_version=2,
+        payload=GuardrailActivatedPayload(
+            guardrail_id=activated_aggregate_event.payload.guardrail_id,
+            timestamp=int(activated_aggregate_event.payload.timestamp + 2),
+        ),
+    )
+    third_passed_aggregate_event = GuardrailPassed(
+        aggregate_id=activated_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        event_type="guardrail_passed",
+        aggregate_version=3,
+        payload=GuardrailPassedPayload(
+            guardrail_id=activated_aggregate_event.payload.guardrail_id,
+            timestamp=int(activated_aggregate_event.payload.timestamp + 4),
+        ),
+    )
+    fourth_activated_aggregate_event = GuardrailActivated(
+        aggregate_id=activated_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        event_type="guardrail_activated",
+        aggregate_version=4,
+        payload=GuardrailActivatedPayload(
+            guardrail_id=activated_aggregate_event.payload.guardrail_id,
+            timestamp=int(activated_aggregate_event.payload.timestamp + 6),
+        ),
+    )
+    assert (
+        handle_guardrail_passed(
+            passed_event,
+            [
+                activated_aggregate_event,
+                second_activated_aggregate_event,
+                third_passed_aggregate_event,
+                fourth_activated_aggregate_event,
+
+            ],
+        )[1][1].metric_value
+        == 1
+    )
