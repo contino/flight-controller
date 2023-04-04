@@ -12,15 +12,24 @@ metric_sink = TimeStreamMetricSink()
 
 
 def lambda_handler(event, _) -> None:
-    print(f"event is {event}")
+    logger.msg("Incoming event", incoming_event=event)
     full_event = event["detail"]
-    events = event_source.get_events_for_aggregate(full_event["aggregate_id"])
-    logger.msg("Returned aggregate events", events=events)
-    response = handle_event(full_event, events)
+    aggregate_events = event_source.get_events_for_aggregate(full_event["aggregate_id"])
+    if isinstance(aggregate_events, Exception):
+            logger.error("Exception retrieving aggregate events", exception=str(aggregate_events))
+    logger.msg("Aggregate event/s retrieved", aggregate_count=len(aggregate_events))
+    response = handle_event(full_event, aggregate_events)
     if isinstance(response, Exception):
-        logger.msg("Exception handling event", exception=str(response))
+        logger.error("Exception handling event", exception=str(response))
     else:
         event, metrics = response
-        logger.msg("Received from handling event", response=str(response))
-        event_sink.store_events([event])
-        metric_sink.store_metrics(metrics)
+        logger.msg("Received from handling event", outgoing_event=str(event), outgoing_metrics=str(metrics))
+        response = event_sink.store_events([event])
+        if isinstance(response, Exception):
+            logger.error("Exception storing event", exception=str(response))
+        logger.info("Event stored in DynamoDB", stored_event=str(event))
+        response = metric_sink.store_metrics(metrics)
+        if isinstance(response, Exception):
+            logger.error("Exception storing metric", exception=str(response))
+        logger.info("Metrics stored in Timestream", stored_metrics=str(metrics))
+

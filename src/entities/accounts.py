@@ -13,7 +13,7 @@ class AccountRequested(BaseEvent):
     aggregate_type = "Account"
     event_version = 1
     payload: AccountRequestedPayload
-    event_type = "account_requested"
+    event_type: Literal["account_requested"] = "account_requested"
 
 
 class AccountCreatedPayload(BaseModel):

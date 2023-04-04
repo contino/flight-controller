@@ -16,26 +16,29 @@ from src.usecases.compliance import (
 non_compliant_aggregate_event = ResourceFoundNonCompliant(
     aggregate_id=str(uuid4()),
     event_id=str(uuid4()),
-    event_type="resource_found_non_compliant",
     aggregate_version=1,
     payload=ResourceFoundNonCompliantPayload(
         container_id=str(uuid4()), timestamp=int(time())
     ),
 )
 
-non_compliant_event = {
-    "event_type": "resource_found_non_compliant",
-    "aggregate_id": non_compliant_aggregate_event.aggregate_id,
-    "container_id": non_compliant_aggregate_event.payload.container_id,
-    "time": int(time()),
-}
+non_compliant_event = ResourceFoundNonCompliant(
+    aggregate_id=non_compliant_aggregate_event.aggregate_id,
+    event_id=str(uuid4()),
+    aggregate_version=1,
+    payload=ResourceFoundNonCompliantPayload(
+        container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(time())
+    ),
+)
 
-compliant_event = {
-    "event_type": "resource_found_compliant",
-    "aggregate_id": non_compliant_aggregate_event.aggregate_id,
-    "container_id": non_compliant_aggregate_event.payload.container_id,
-    "time": int(non_compliant_aggregate_event.payload.timestamp + 10),
-}
+compliant_event = ResourceFoundCompliant(
+    aggregate_id=non_compliant_aggregate_event.aggregate_id,
+    event_id=str(uuid4()),
+    aggregate_version=1,
+    payload=ResourceFoundNonCompliantPayload(
+        container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+    ),
+)
 
 
 def test_resource_found_non_compliant_returns_correct_event_type():
@@ -56,6 +59,7 @@ def test_resource_found_compliant_returns_with_no_history_returns_no_metric():
 
 
 def test_resource_found_compliant_returns_with_history_returns_compliance_lead_time():
+    compliant_event.aggregate_version = 2
     assert isinstance(
         handle_resource_found_compliant(
             compliant_event, [non_compliant_aggregate_event]
@@ -65,6 +69,7 @@ def test_resource_found_compliant_returns_with_history_returns_compliance_lead_t
 
 
 def test_resource_found_compliant_returns_with_history_returns_correct_lead_time():
+    compliant_event.aggregate_version = 2
     assert (
         handle_resource_found_compliant(
             compliant_event, [non_compliant_aggregate_event]
@@ -84,6 +89,7 @@ def test_resource_found_compliant_returns_with_multiple_history_events_returns_c
             timestamp=int(non_compliant_aggregate_event.payload.timestamp + 5),
         ),
     )
+    compliant_event.aggregate_version = 3
     assert (
         handle_resource_found_compliant(
             compliant_event,
@@ -114,6 +120,7 @@ def test_resource_found_compliant_returns_correct_lead_time_from_oldest_pertinen
             timestamp=int(non_compliant_aggregate_event.payload.timestamp + 5),
         ),
     )
+    compliant_event.aggregate_version = 4
     assert (
         handle_resource_found_compliant(
             compliant_event,

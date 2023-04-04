@@ -18,12 +18,12 @@ EVENTS = [
     GuardrailActivated(
         aggregate_id = AGGREGATE_ID,
         guardrail_id = ALTERNATE_ID,
-        time = CURRENT_TIME,
+        timestamp = CURRENT_TIME,
     ),
     GuardrailPassed(
         aggregate_id = AGGREGATE_ID,
         guardrail_id = ALTERNATE_ID,
-        time = CURRENT_TIME,
+        timestamp = CURRENT_TIME,
     ),
 ]
 
@@ -31,7 +31,7 @@ DOZEN_EVENTS = [
     GuardrailActivated(
         aggregate_id = AGGREGATE_ID,
         guardrail_id = ALTERNATE_ID,
-        time = CURRENT_TIME,
+        timestamp = CURRENT_TIME,
     ) for i in range(12)
 ]
 

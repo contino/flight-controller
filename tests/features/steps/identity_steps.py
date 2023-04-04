@@ -25,7 +25,7 @@ def request_identity(context):
                     {
                         "event_type": "identity_requested",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                         "account_id": f"{context.account_id}",
                     }
                 ),
@@ -50,7 +50,7 @@ def created_identity(context):
                     {
                         "event_type": "identity_created",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                         "account_id": f"{context.account_id}",
                     }
                 ),

@@ -25,7 +25,7 @@ def request_project(context):
                     {
                         "event_type": "project_requested",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",
@@ -47,7 +47,7 @@ def create_project(context):
                     {
                         "event_type": "project_created",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",

@@ -24,7 +24,7 @@ def guardrail_activated(context):
                         "event_type": "guardrail_activated",
                         "guardrail_id": f"{context.guardrail_id}",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",
@@ -57,7 +57,7 @@ def guardrail_passes(context):
                         "event_type": "guardrail_passed",
                         "guardrail_id": f"{context.guardrail_id}",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",

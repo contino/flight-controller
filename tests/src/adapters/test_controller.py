@@ -31,7 +31,7 @@ CURRENT_TIME = int(time())
 patch_run_summary_event = {
     "event_type": "patch_run_summary",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
     "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
     "successful_instances": "i-peoritdsfl",
 }
@@ -50,58 +50,58 @@ guardrail_activated_event = {
     "event_type": "guardrail_activated",
     "aggregate_id": guardrail_activated_aggregate_event.aggregate_id,
     "guardrail_id": guardrail_activated_aggregate_event.payload.guardrail_id,
-    "time": CURRENT_TIME,
+    "timestamp": CURRENT_TIME,
 }
 
 guardrail_passed_event = {
     "event_type": "guardrail_passed",
     "aggregate_id": guardrail_activated_aggregate_event.aggregate_id,
     "guardrail_id": guardrail_activated_aggregate_event.payload.guardrail_id,
-    "time": int(guardrail_activated_aggregate_event.payload.timestamp + 10),
+    "timestamp": int(guardrail_activated_aggregate_event.payload.timestamp + 10),
 }
 
 resource_found_non_compliant = {
     "event_type": "resource_found_non_compliant",
     "container_id": f"{ALTERNATE_ID}",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 resource_found_compliant = {
     "event_type": "resource_found_compliant",
     "container_id": f"{ALTERNATE_ID}",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 account_requested = {
     "event_type": "account_requested",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 account_created = {
     "event_type": "account_created",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 project_requested = {
     "event_type": "project_requested",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 project_assigned = {
     "event_type": "project_assigned",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 project_created = {
     "event_type": "project_created",
     "aggregate_id": f"{AGGREGATE_ID}",
-    "time": f"{CURRENT_TIME}",
+    "timestamp": f"{CURRENT_TIME}",
 }
 
 

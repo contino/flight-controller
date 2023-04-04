@@ -41,9 +41,6 @@ class DynamoEventSink(EventSink):
                     }
                     batch.put_item(Item=value)
         except Exception as err:
-            logger.error(
-                f"Couldn't add to table type of error is {type(err)} AND reason is {err}"
-            )
             return err
 
 
@@ -56,28 +53,30 @@ class DynamoEventSource(EventSource):
         return event.aggregate_version
 
     def get_events_for_aggregate(self, aggregate_id: str) -> List[Event]:
-        response = self.dynamo_db_table.query(
-            KeyConditionExpression=Key("aggregate_id").eq(aggregate_id)
-        )
-        logger.msg(f"responses {response}")
+        try:
+            response = self.dynamo_db_table.query(
+                KeyConditionExpression=Key("aggregate_id").eq(aggregate_id)
+            )
 
-        events: List[Event] = []
+            events: List[Event] = []
 
-        for item in response["Items"]:
-            event_type = item["event_type"]
-            if event_type in EVENT_CLASSES:
-                event_class, payload_class = EVENT_CLASSES[event_type]
-                payload = payload_class(**json.loads(item["payload"]))
-                event = event_class(
-                    aggregate_id=item["aggregate_id"],
-                    aggregate_type=item["aggregate_type"],
-                    aggregate_version=int(item["aggregate_version"]),
-                    event_id=UUID(item["event_id"]),
-                    event_version=int(item["event_version"]),
-                    payload=payload,
-                )
-                events.append(event)
+            for item in response["Items"]:
+                event_type = item["event_type"]
+                if event_type in EVENT_CLASSES:
+                    event_class, payload_class = EVENT_CLASSES[event_type]
+                    payload = payload_class(**json.loads(item["payload"]))
+                    event = event_class(
+                        aggregate_id=item["aggregate_id"],
+                        aggregate_type=item["aggregate_type"],
+                        aggregate_version=int(item["aggregate_version"]),
+                        event_id=UUID(item["event_id"]),
+                        event_version=int(item["event_version"]),
+                        payload=payload,
+                    )
+                    events.append(event)
 
-        events.sort(key=self._sort_events)
+            events.sort(key=self._sort_events)
 
-        return events
+            return events
+        except Exception as err:
+            return err

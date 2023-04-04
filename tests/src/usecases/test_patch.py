@@ -4,18 +4,22 @@ from uuid import uuid4
 from src.entities.patch import (
     PatchCompliancePercentage,
     PatchRunSummary,
+    PatchRunSummaryPayload,
 )
 from src.usecases.patch import (
     handle_patch_summary,
 )
 
-event = {
-    "event_type": "patch_run_summary",
-    "aggregate_id": str(uuid4()),
-    "time": int(time()),
-    "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
-    "successful_instances": "i-peoritdsfl",
-}
+event = PatchRunSummary(
+    aggregate_id=str(uuid4()),
+    event_id=str(uuid4()),
+    aggregate_version=1,
+    payload=PatchRunSummaryPayload(
+        timestamp=int(time()),
+        failed_instances="i-adslkjfds,i-89dsfkjdkfj",
+        successful_instances="i-peoritdsfl",
+    ),
+)
 
 
 def test_patch_summary_returns_correct_event_type():

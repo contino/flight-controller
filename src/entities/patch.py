@@ -7,6 +7,7 @@ from src.entities.base import BaseEvent, BaseMetric
 
 # Events
 class PatchRunSummaryPayload(BaseModel):
+    timestamp: float
     failed_instances: str
     successful_instances: str
 
