@@ -18,7 +18,6 @@ class TimeStreamMetricSink(MetricSink):
         self.timestream_client = boto3.client("timestream-write")
 
     def store_metrics(self, metrics: List[Metric]) -> Optional[Exception]:
-        logger.msg(f"Writing records for metrics {metrics}")
         current_time = round(time.time() * 1000)
         records = []
         for metric in metrics:
@@ -48,9 +47,5 @@ class TimeStreamMetricSink(MetricSink):
                     Records=records,
                     CommonAttributes={},
                 )
-                logger.msg(
-                    f"WriteRecords Status: {result['ResponseMetadata']['HTTPStatusCode']}"
-                )
         except Exception as err:
-            logger.error(f"Error: {err}")
             return err

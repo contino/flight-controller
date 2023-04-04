@@ -25,7 +25,7 @@ def found_non_compliant(context):
                         "event_type": "resource_found_non_compliant",
                         "container_id": "123456789012",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",
@@ -50,7 +50,7 @@ def found_compliant(context):
                         "event_type": "resource_found_compliant",
                         "container_id": "123456789012",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",

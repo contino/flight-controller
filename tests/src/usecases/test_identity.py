@@ -12,7 +12,7 @@ from src.entities.identity import (
 )
 
 identity_requested = IdentityRequested(
-    aggregate_id="test-identity",
+    aggregate_id=str(uuid4()),
     aggregate_version=1,
     event_id=uuid4(),
     event_version=1,
@@ -23,7 +23,7 @@ identity_requested = IdentityRequested(
 )
 
 identity_created = IdentityCreated(
-    aggregate_id="test-identity",
+    aggregate_id=identity_requested.aggregate_id,
     aggregate_version=2,
     event_id=uuid4(),
     event_version=1,
@@ -34,29 +34,14 @@ identity_created = IdentityCreated(
 )
 
 
-requested_event = {
-    "event_type": "identity_requested",
-    "aggregate_id": identity_created.aggregate_id,
-    "time": int(identity_requested.payload.timestamp),
-    "account_id": "test-account",
-}
-
-created_event = {
-    "event_type": "identity_created",
-    "aggregate_id": identity_requested.aggregate_id,
-    "time": int(identity_created.payload.timestamp),
-    "account_id": "test-account",
-}
-
-
 @pytest.fixture
 def lead_time():
-    return handle_identity_created(created_event, [identity_requested])
+    return handle_identity_created(identity_created, [identity_requested])
 
 
 def test_request_identity_returns_correct_type():
     assert isinstance(
-        handle_identity_requested(requested_event, [])[0], IdentityRequested
+        handle_identity_requested(identity_requested, [])[0], IdentityRequested
     )
 
 

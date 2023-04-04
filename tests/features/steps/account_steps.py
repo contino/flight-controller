@@ -24,7 +24,7 @@ def request_account(context):
                     {
                         "event_type": "account_requested",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",
@@ -48,7 +48,7 @@ def created_account(context):
                     {
                         "event_type": "account_created",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                     }
                 ),
                 "EventBusName": "main_lambda_bus_cdktf",

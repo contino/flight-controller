@@ -18,13 +18,13 @@ class Checkov(EventSource):
                 events.append(GuardrailPassed(
                     aggregate_id = repo_name + "." + result["resource"],
                     guardrail_id = result["check_id"],
-                    time = current_time,
+                    timestamp = current_time,
                 ))
             for result in file_data["results"]["failed_checks"]:
                 events.append(GuardrailActivated(
                     aggregate_id = repo_name + "." + result["resource"],
                     guardrail_id = result["check_id"],
-                    time = current_time,
+                    timestamp = current_time,
                 ))
             return tuple(events)
         return Exception(f"Unable to read Checkov results from file")

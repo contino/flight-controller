@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from src.entities.accounts import (
     AccountCreated,
+    AccountCreatedPayload,
     AccountLeadTime,
     AccountRequested,
     AccountRequestedPayload,
@@ -12,23 +13,23 @@ from src.usecases.accounts import handle_account_created, handle_account_request
 requested_aggregate_event = AccountRequested(
     aggregate_id=str(uuid4()),
     event_id=str(uuid4()),
-    event_type="account_requested",
     aggregate_version=1,
-    event_version=1,
     payload=AccountRequestedPayload(timestamp=int(time())),
 )
 
-created_event = {
-    "event_type": "account_created",
-    "aggregate_id": requested_aggregate_event.aggregate_id,
-    "time": int(requested_aggregate_event.payload.timestamp + 10),
-}
+created_event = AccountCreated(
+    aggregate_id=requested_aggregate_event.aggregate_id,
+    event_id=str(uuid4()),
+    aggregate_version=2,
+    payload=AccountCreatedPayload(timestamp=int(requested_aggregate_event.payload.timestamp + 10))
+)
 
-requested_event = {
-    "event_type": "account_requested",
-    "aggregate_id": requested_aggregate_event.aggregate_id,
-    "time": int(time()),
-}
+requested_event = AccountRequested(
+    aggregate_id=requested_aggregate_event.aggregate_id,
+    event_id=str(uuid4()),
+    aggregate_version=1,
+    payload=AccountRequestedPayload(timestamp=int(time())),
+)
 
 
 def test_handle_account_requested_returns_correct_event_type():

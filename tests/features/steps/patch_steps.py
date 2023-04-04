@@ -24,7 +24,7 @@ def received_summary(context):
                     {
                         "event_type": "patch_run_summary",
                         "aggregate_id": f"{context.aggregate_id}",
-                        "time": f"{requested_time}",
+                        "timestamp": f"{requested_time}",
                         "failed_instances": "i-adslkjfds,i-89dsfkjdkfj",
                         "successful_instances": "i-peoritdsfl",
                     }

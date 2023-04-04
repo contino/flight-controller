@@ -134,6 +134,7 @@ def test_retrieves_patch_events_from_dynamodb():
         aggregate_version=1,
         event_id=uuid4(),
         payload=PatchRunSummaryPayload(
+            timestamp=int(round(datetime.utcnow().timestamp())),
             successful_instances="i-adslkjfds,i-89dsfkjdkfj",
             failed_instances="i-peoritdsfl",
         ),

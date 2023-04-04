@@ -19,13 +19,13 @@ class OpenPolicyAgent(EventSource):
                     events.append(GuardrailPassed(
                         aggregate_id = repo_name + "." + result["input"]["metadata"]["namespace"] + "."  + result["input"]["metadata"]["name"],
                         guardrail_id = result["query"],
-                        time = current_time,
+                        timestamp = current_time,
                     ))
                 else:
                     events.append(GuardrailActivated(
                         aggregate_id = repo_name + "." + result["input"]["metadata"]["namespace"] + "." + result["input"]["metadata"]["name"],
                         guardrail_id = result["query"],
-                        time = current_time,
+                        timestamp = current_time,
                     ))
             return tuple(events)
         return Exception(f"Unable to read Open Policy Agent results from file")

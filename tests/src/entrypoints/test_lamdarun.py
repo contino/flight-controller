@@ -18,7 +18,7 @@ def test_lambda_handles_basic_event():
             "detail": {
                 "event_type": "account_requested",
                 "aggregate_id": f"{aggregate_id}",
-                "time": f"{requested_time}",
+                "timestamp": f"{requested_time}",
             }
         },
         {},
@@ -32,7 +32,7 @@ def test_lambda_handles_unknown_event_type():
             "detail": {
                 "event_type": "not_an_event_type",
                 "aggregate_id": f"{aggregate_id}",
-                "time": f"{requested_time}",
+                "timestamp": f"{requested_time}",
             }
         },
         {},
