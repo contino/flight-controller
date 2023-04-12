@@ -33,14 +33,14 @@ class LambdaWithPermissionsComponent(Construct):
 
         # create lambda helpers
         # TODO build the pip file
-        # currently manually building and copying the src and pip requirements manually under "all_files" folder
+        # currently manually building and copying the src and pip requirements manually under "controller_core" folder
 
         asset = TerraformAsset(
             self,
             "lambda-asset",
-            path=Path.join(os.getcwd(), "all_files"),
+            path=Path.join(os.getcwd(), "controller_core"),
             type=AssetType.ARCHIVE,
-            asset_hash=dirhash(Path.join(os.getcwd(), "all_files"), "md5"),
+            asset_hash=dirhash(Path.join(os.getcwd(), "controller_core"), "md5"),
         )
 
         # CREATE roles

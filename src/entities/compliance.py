@@ -12,8 +12,8 @@ class ResourceFoundNonCompliantPayload(BaseModel):
 
 
 class ResourceFoundNonCompliant(BaseEvent):
-    aggregate_type = "Resource"
-    event_version = 1
+    aggregate_type: Literal["Resource"] = "Resource"
+    event_version: Literal[1] = 1
     payload: ResourceFoundNonCompliantPayload
     event_type: Literal["resource_found_non_compliant"] = "resource_found_non_compliant"
 
@@ -24,8 +24,8 @@ class ResourceFoundCompliantPayload(BaseModel):
 
 
 class ResourceFoundCompliant(BaseEvent):
-    aggregate_type = "Resource"
-    event_version = 1
+    aggregate_type: Literal["Resource"] = "Resource"
+    event_version: Literal[1] = 1
     payload: ResourceFoundCompliantPayload
     event_type: Literal["resource_found_compliant"] = "resource_found_compliant"
 

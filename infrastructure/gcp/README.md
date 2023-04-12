@@ -26,25 +26,31 @@ Subsequently, following components are built in stage `main_gcp_infra`:
 
 - Authenticate to Google Cloud and set the correct project using `gcloud config set project $MY_PROJECT_ID`
 - Synth, plan and deploy both infra & Grafana Dashboard.
-  - `make build`
-  - `make plan`
-  - `make deploy`
+  - `make gcp-synth`
+  - `make gcp-plan-all`
+  - `make gcp-deploy-all`
 
 ### Make Commands
 
-- `make clean` remove the cdktf.out file.
-- `make synth-gcp` cdktf synth the core GCP infrastructure
-- `make synth-gcp-grafana` cdktf synth the grafana infrastructure
-- `make plan-gcp` cdktf plan the core GCP infrastructure
-- `make plan-gcp-grafana` cdktf plan the grafana infrastructure
-- `make plan-gcpstack` cdktf both base and main stacks for GCP infrastructure
-- `make deploy-base-gcp` deploy base GCP infrastructure
-- `make build-image` build, tag and push docker image to artifact registry
-- `make deploy-main-gcp` deploy main GCP infrastructure
+- `make gcp-build-dependencies` install gcp build dependencies
+- `make gcp-build-image` build the docker image for cloud run
+- `make gcp-synth` cdktf synth the all the stacks
+- `make gcp-plan-base` cdktf plan the base stack
+- `make gcp-plan-core` cdktf plan the core stack
+- `make gcp-plan-grafana` cdktf plan the grafana stack
+- `make gcp-plan-all` cdktf plan all stacks
+- `make gcp-deploy-base` cdktf deploy the base stack
+- `make gcp-deploy-core` cdktf deploy the core_stack
+- `make gcp-deploy-grafana` cdktf deploy the grafana stack
+- `make gcp-deploy-all` cdktf deploy all stacks
+- `make gcp-destroy-base` cdktf destroy the base stack
+- `make gcp-destroy-core` cdktf destroy core stack
+- `make gcp-destroy-grafana` cdktf destroy grafana stack
+- `make gcp-destroy-all` cdktf destroy all stacks
 
 ### Configure Grafana
 
-WHilst writing this, running Grafana with Identiy-Aware Proxy is work in progress due to Cognizant ingetation. Therefore, accessing Grafana from the Cloud Run is not possible. 
+WHilst writing this, running Grafana with Identiy-Aware Proxy is work in progress due to Cognizant integration. Therefore, accessing Grafana from the Cloud Run is not possible. 
 
 As a workaround, it is recommended to run the Grafana container locally using the below image on `PORT: 3000`:
 `mirror.gcr.io/grafana/grafana:latest`
@@ -55,7 +61,7 @@ As a workaround, it is recommended to run the Grafana container locally using th
 2. In the side menu under `Configuration` you should find a link named `Plugins`.
 3. Type `BigQuery` in the search bar
 4. Select Google BigQuery by "doitintl" from the list.
-4. Finally, click on `Install`
+5. Finally, click on `Install`
 
 #### Adding the DataSource to Grafana
 
@@ -64,6 +70,7 @@ There are two ways to authenticate the BigQuery plugin - either by uploading a G
 ##### Using a Google Service Account Key File
 
 Create a GCP Service Account for a Project
+
 1. Navigate to the `APIs & Services Credentials` page.
 2. Click on `Create credentials` and choose `Service account key`.
 ![Create Credentials](images/credentials.png)
@@ -80,7 +87,6 @@ Create a GCP Service Account for a Project
 ![Grafana authentication](images/grafana_authentication.png)
 
 7. The file contents will be encrypted and saved in the Grafana database. Don't forget to save after uploading the file!
-
 
 #### Creating Dashboards
 

@@ -10,8 +10,8 @@ class AccountRequestedPayload(BaseModel):
 
 
 class AccountRequested(BaseEvent):
-    aggregate_type = "Account"
-    event_version = 1
+    aggregate_type: Literal["Account"] = "Account"
+    event_version: Literal[1] = 1
     payload: AccountRequestedPayload
     event_type: Literal["account_requested"] = "account_requested"
 
@@ -21,8 +21,8 @@ class AccountCreatedPayload(BaseModel):
 
 
 class AccountCreated(BaseEvent):
-    aggregate_type = "Account"
-    event_version = 1
+    aggregate_type: Literal["Account"] = "Account"
+    event_version: Literal[1] = 1
     payload: AccountCreatedPayload
     event_type: Literal["account_created"] = "account_created"
 

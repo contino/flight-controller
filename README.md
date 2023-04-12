@@ -52,10 +52,11 @@ The approach to scaling a landing zone on AWS is [elaborated here](https://aws.a
 
 - `make local` setup local environment and install dependencies.
 - `make docs-run` install, build and run a dev version of the docs.
-- `make build` builds the stacks for infra & Grafana with TF CDK.
-- `make plan` plans the 2 stacks created in build step
-- `make deploy` deploys the both infra & Grafana stacks with TF CDK.
-- `make destroy` destroys the both infra & Grafana with TF CDK.
+- `make synth` synth all cloud stacks with TF CDK.
+- `make plan` plans all cloud stacks with TF CDK
+- `make deploy` deploys all cloud stacks with TF CDK
+- `make destroy` destroys all cloud stacks with TF CDK.
+- `make clean` remove the cdktf.out folders for all clouds.
 
 Testing is split into four commands:
 

@@ -39,7 +39,6 @@ patch_run_summary_event = {
 guardrail_activated_aggregate_event = GuardrailActivated(
     aggregate_id=AGGREGATE_ID,
     event_id=EVENT_ID,
-    event_type="guardrail_activated",
     aggregate_version=1,
     payload=GuardrailActivatedPayload(
         guardrail_id=ALTERNATE_ID, timestamp=CURRENT_TIME

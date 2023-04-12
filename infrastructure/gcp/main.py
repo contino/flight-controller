@@ -27,7 +27,7 @@ cloudrunservice_name = "flight-controller-service"
 grafanaservice_name = "flight-controller-grafana"
 loadbalanacer_name = "flight-controller-grafana-lb"
 
-class BASE_GCP(TerraformStack):
+class GcpBase(TerraformStack):
     def __init__(
         self,
         scope: Construct,
@@ -61,7 +61,7 @@ class BASE_GCP(TerraformStack):
         )
 
         
-class MAIN_GCP(TerraformStack):
+class GcpCore(TerraformStack):
     def __init__(
         self,
         scope: Construct,
@@ -127,7 +127,7 @@ class MAIN_GCP(TerraformStack):
         )
         # self.grafana_workspace_id = lbComponent.global_address.address
 
-# class Grafana(TerraformStack):
+# class GcpGrafana(TerraformStack):
 #     def __init__(self, scope: Construct, id: str, workspace_id: str,):
 #         super().__init__(scope, id)
         
@@ -147,20 +147,20 @@ class MAIN_GCP(TerraformStack):
 
 app = App()
 
-base_gcp_infra = BASE_GCP(app, "base_gcp_infra",)
+base_stack = GcpBase(app, "gcp_base",)
 
-main_gcp_infra = MAIN_GCP(app, "main_gcp_infra", base_gcp_infra.fc_account, base_gcp_infra.cloudrun_account)
+core_stack = GcpCore(app, "gcp_core", base_stack.fc_account, base_stack.cloudrun_account)
 
-# grafana_stack = Grafana(app, "grafana", gcp_stack.grafana_workspace_id)
+# grafana_stack = GcpGrafana(app, "gcp_grafana", gcp_stack.grafana_workspace_id)
 
 GcsBackend(
-    base_gcp_infra,
+    base_stack,
     bucket = "flight-controller-state",
     prefix="base_gcp_infra/terraform.tfstate",
 )
 
 GcsBackend(
-    main_gcp_infra,
+    core_stack,
     bucket = "flight-controller-state",
     prefix="main_gcp_infra/terraform.tfstate",
 )

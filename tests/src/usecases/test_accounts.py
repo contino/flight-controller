@@ -17,13 +17,6 @@ requested_aggregate_event = AccountRequested(
     payload=AccountRequestedPayload(timestamp=int(time())),
 )
 
-created_event = AccountCreated(
-    aggregate_id=requested_aggregate_event.aggregate_id,
-    event_id=str(uuid4()),
-    aggregate_version=2,
-    payload=AccountCreatedPayload(timestamp=int(requested_aggregate_event.payload.timestamp + 10))
-)
-
 requested_event = AccountRequested(
     aggregate_id=requested_aggregate_event.aggregate_id,
     event_id=str(uuid4()),
@@ -43,6 +36,12 @@ def test_handle_account_requested_returns_no_metrics():
 
 
 def test_handle_account_created_returns_correct_event_type():
+    created_event = AccountCreated(
+        aggregate_id=requested_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=2,
+        payload=AccountCreatedPayload(timestamp=int(requested_aggregate_event.payload.timestamp + 10))
+    )
     assert isinstance(
         handle_account_created(created_event, [requested_aggregate_event])[0],
         AccountCreated,
@@ -50,6 +49,12 @@ def test_handle_account_created_returns_correct_event_type():
 
 
 def test_handle_account_created_returns_correct_metric_type():
+    created_event = AccountCreated(
+        aggregate_id=requested_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=2,
+        payload=AccountCreatedPayload(timestamp=int(requested_aggregate_event.payload.timestamp + 10))
+    )
     assert isinstance(
         handle_account_created(created_event, [requested_aggregate_event])[1][0],
         AccountLeadTime,
@@ -57,6 +62,12 @@ def test_handle_account_created_returns_correct_metric_type():
 
 
 def test_handle_account_created_calculates_lead_time_correctly():
+    created_event = AccountCreated(
+        aggregate_id=requested_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=2,
+        payload=AccountCreatedPayload(timestamp=int(requested_aggregate_event.payload.timestamp + 10))
+    )
     assert (
         handle_account_created(created_event, [requested_aggregate_event])[1][
             0

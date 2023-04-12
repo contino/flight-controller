@@ -13,8 +13,8 @@ class PatchRunSummaryPayload(BaseModel):
 
 
 class PatchRunSummary(BaseEvent):
-    aggregate_type = "Account"
-    event_version = 1
+    aggregate_type: Literal["Account"] = "Account"
+    event_version: Literal[1] = 1
     payload: PatchRunSummaryPayload
     event_type: Literal["patch_run_summary"] = "patch_run_summary"
 

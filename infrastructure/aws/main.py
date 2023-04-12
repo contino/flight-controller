@@ -16,7 +16,7 @@ from grafana_lambda_with_permissions_component import GrafanaLambdaComponent
 from lambda_rotation_component import RotationComponent
 
 
-class AWSStack(TerraformStack):
+class AwsCore(TerraformStack):
     def __init__(
         self,
         scope: Construct,
@@ -61,9 +61,6 @@ class AWSStack(TerraformStack):
             self.grafana_workspace_name,
         )
 
-        self.grafana_workspace_id = grafanaWorkspace.grafana_workspace.id   # Pass variable to next stack
-        self.grafana_key_id = grafanaWorkspace.grafana_key.name             # Pass variable to next stack
-
         # Create lambda function to rotate Grafana key 
         grafanaLambdaComponent = GrafanaLambdaComponent(
             self, "grafana_function", self.grafana_lambda_name, grafanaWorkspace.grafana_workspace,
@@ -74,8 +71,8 @@ class AWSStack(TerraformStack):
             self, "rotation", grafanaWorkspace.grafana_key ,grafanaLambdaComponent.lambda_func
         )
 
-class Grafana(TerraformStack):
-    def __init__(self, scope: Construct, id: str, workspace_id: str, grafana_key_id: str):
+class AwsGrafana(TerraformStack):
+    def __init__(self, scope: Construct, id: str):
         super().__init__(scope, id)
         
         AwsProvider(self, "AWS")
@@ -83,7 +80,13 @@ class Grafana(TerraformStack):
         api_key = data_aws_secretsmanager_secret_version.DataAwsSecretsmanagerSecretVersion(
             self,
             "api_key",
-            secret_id=grafana_key_id,               # Secret name stored in AWS Secrets Manager
+            secret_id="flight-controller/grafana-api-key",               # Secret name stored in AWS Secrets Manager
+        )
+
+        workspace_id = data_aws_secretsmanager_secret_version.DataAwsSecretsmanagerSecretVersion(
+            self,
+            "workspace_id",
+            secret_id="flight-controller/grafana-workspace-id",               # Secret name stored in AWS Secrets Manager
         )
         
         GrafanaProvider(
@@ -91,34 +94,34 @@ class Grafana(TerraformStack):
             "Grafana",
             auth=api_key.secret_string,
             url="https://"
-            + workspace_id
+            + workspace_id.secret_string
             + ".grafana-workspace.ap-southeast-2.amazonaws.com/",
         )
 
         # Create Grafana dashboard
         GrafanaDashboardComponent(
             self,
-            "grafana_dashboard",
+            "grafana_dashboard"
         )
 
 
 app = App()
 
-aws_stack = AWSStack(app, "aws_infra_cdktf",)
+core_stack = AwsCore(app, "aws_core")
 
-grafana_stack = Grafana(app, "grafana", aws_stack.grafana_workspace_id, aws_stack.grafana_key_id)
+grafana_dashboard_stack = AwsGrafana(app, "aws_grafana_dashboard")
 
 account_id = boto3.client("sts").get_caller_identity()["Account"]
 
 S3Backend(
-    aws_stack,
+    core_stack,
     bucket=f"{account_id}-apac-flight-controller-aws",
     key="infra_tf_cdk/terraform.tfstate",
     dynamodb_table=f"{account_id}-apac-flight-controller-aws",
 )
 
 S3Backend(
-    grafana_stack,
+    grafana_dashboard_stack,
     bucket=f"{account_id}-apac-flight-controller-aws",
     key="grafana/terraform.tfstate",
     dynamodb_table=f"{account_id}-apac-flight-controller-aws",

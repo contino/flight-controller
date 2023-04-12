@@ -12,8 +12,8 @@ class GuardrailActivatedPayload(BaseModel):
 
 
 class GuardrailActivated(BaseEvent):
-    aggregate_type = "Resource"
-    event_version = 1
+    aggregate_type: Literal["Resource"] = "Resource"
+    event_version: Literal[1] = 1
     payload: GuardrailActivatedPayload
     event_type: Literal["guardrail_activated"] = "guardrail_activated"
 
@@ -24,8 +24,8 @@ class GuardrailPassedPayload(BaseModel):
 
 
 class GuardrailPassed(BaseEvent):
-    aggregate_type = "Resource"
-    event_version = 1
+    aggregate_type: Literal["Resource"] = "Resource"
+    event_version: Literal[1] = 1
     payload: GuardrailPassedPayload
     event_type: Literal["guardrail_passed"] = "guardrail_passed"
 

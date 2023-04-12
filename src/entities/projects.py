@@ -11,8 +11,8 @@ class ProjectRequestedPayload(BaseModel):
 
 
 class ProjectRequested(BaseEvent):
-    aggregate_type = "Account"
-    event_version = 1
+    aggregate_type: Literal["Account"] = "Account"
+    event_version: Literal[1] = 1
     payload: ProjectRequestedPayload
     event_type: Literal["project_requested"] = "project_requested"
 
@@ -22,8 +22,8 @@ class ProjectAssignedPayload(BaseModel):
 
 
 class ProjectAssigned(BaseEvent):
-    aggregate_type = "Account"
-    event_version = 1
+    aggregate_type: Literal["Account"] = "Account"
+    event_version: Literal[1] = 1
     payload: ProjectAssignedPayload
     event_type: Literal["project_assigned"] = "project_assigned"
 
@@ -33,8 +33,8 @@ class ProjectCreatedPayload(BaseModel):
 
 
 class ProjectCreated(BaseEvent):
-    aggregate_type = "Account"
-    event_version = 1
+    aggregate_type: Literal["Account"] = "Account"
+    event_version: Literal[1] = 1
     payload: ProjectCreatedPayload
     event_type: Literal["project_created"] = "project_created"
 
