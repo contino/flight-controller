@@ -31,15 +31,6 @@ non_compliant_event = ResourceFoundNonCompliant(
     ),
 )
 
-compliant_event = ResourceFoundCompliant(
-    aggregate_id=non_compliant_aggregate_event.aggregate_id,
-    event_id=str(uuid4()),
-    aggregate_version=1,
-    payload=ResourceFoundNonCompliantPayload(
-        container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
-    ),
-)
-
 
 def test_resource_found_non_compliant_returns_correct_event_type():
     assert isinstance(
@@ -49,17 +40,40 @@ def test_resource_found_non_compliant_returns_correct_event_type():
 
 
 def test_resource_found_compliant_returns_with_no_history_returns_correct_event_type():
+    compliant_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=1,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+        ),
+    )
     assert isinstance(
         handle_resource_found_compliant(compliant_event, [])[0], ResourceFoundCompliant
     )
 
 
 def test_resource_found_compliant_returns_with_no_history_returns_no_metric():
+    compliant_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=1,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+        ),
+    )
     assert len(handle_resource_found_compliant(compliant_event, [])[1]) == 0
 
 
 def test_resource_found_compliant_returns_with_history_returns_compliance_lead_time():
-    compliant_event.aggregate_version = 2
+    compliant_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=2,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+        ),
+    )
     assert isinstance(
         handle_resource_found_compliant(
             compliant_event, [non_compliant_aggregate_event]
@@ -69,7 +83,14 @@ def test_resource_found_compliant_returns_with_history_returns_compliance_lead_t
 
 
 def test_resource_found_compliant_returns_with_history_returns_correct_lead_time():
-    compliant_event.aggregate_version = 2
+    compliant_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=2,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+        ),
+    )
     assert (
         handle_resource_found_compliant(
             compliant_event, [non_compliant_aggregate_event]
@@ -89,7 +110,14 @@ def test_resource_found_compliant_returns_with_multiple_history_events_returns_c
             timestamp=int(non_compliant_aggregate_event.payload.timestamp + 5),
         ),
     )
-    compliant_event.aggregate_version = 3
+    compliant_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=3,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+        ),
+    )
     assert (
         handle_resource_found_compliant(
             compliant_event,
@@ -120,7 +148,14 @@ def test_resource_found_compliant_returns_correct_lead_time_from_oldest_pertinen
             timestamp=int(non_compliant_aggregate_event.payload.timestamp + 5),
         ),
     )
-    compliant_event.aggregate_version = 4
+    compliant_event = ResourceFoundCompliant(
+        aggregate_id=non_compliant_aggregate_event.aggregate_id,
+        event_id=str(uuid4()),
+        aggregate_version=4,
+        payload=ResourceFoundCompliantPayload(
+            container_id=non_compliant_aggregate_event.payload.container_id, timestamp=int(non_compliant_aggregate_event.payload.timestamp + 10)
+        ),
+    )
     assert (
         handle_resource_found_compliant(
             compliant_event,

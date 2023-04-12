@@ -119,7 +119,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "guardrail_max_activation",
           "rawQuery": "SELECT bin(time, $__interval) as binned_time, AVG(\"measure_value\"::double)\nFROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY bin(time, $__interval)\nORDER BY binned_time",
@@ -184,7 +184,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "guardrail_activation_count",
           "rawQuery": "SELECT \"aggregate_id\", \"guardrail_id\", MAX(\"measure_value\"::double) as \"total_activations\" FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY \"aggregate_id\", \"guardrail_id\"\nORDER BY \"total_activations\" DESC",
@@ -246,7 +246,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "guardrail_lead_time",
           "rawQuery": "SELECT \"aggregate_id\", \"guardrail_id\", AVG(\"measure_value\"::double) as \"average_lead_time\" FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nGROUP BY \"aggregate_id\", \"guardrail_id\"\nORDER BY \"average_lead_time\" DESC",
@@ -314,7 +314,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "patch_compliance_percentage",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
@@ -383,7 +383,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "resource_compliance_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
@@ -448,7 +448,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "project_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
@@ -514,7 +514,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "account_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
@@ -575,7 +575,7 @@
           "database": "\"core_timestream_db\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
-            "uid": "4tnTKWb4z"
+            "uid": "UcQpdeY4k"
           },
           "measure": "identity_lead_time",
           "rawQuery": "SELECT \"measure_value\"::double FROM $__database.$__table\nWHERE \"measure_name\" = '$__measure' AND $__timeFilter\nORDER BY \"time\" ASC",
@@ -601,6 +601,6 @@
   "timezone": "",
   "title": "Flight Controller dashboard",
   "uid": "test",
-  "version": 10,
+  "version": 1,
   "weekStart": ""
 }

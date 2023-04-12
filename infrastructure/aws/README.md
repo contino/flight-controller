@@ -3,7 +3,7 @@
 
 ## Architecture
 
-![Flight Controller Architecture](images/aws_flight_controller.png)
+![Flight Controller Architecture](/images/aws_flight_controller.png)
 
 ## Development
 
@@ -11,26 +11,23 @@
 
 - Assume the correct AWS account/refresh credentials
 - Synth, plan and deploy both infra & Grafana Dashboard.
-  - `make build`
-  - `make plan`
-  - `make deploy`
+  - `make aws-synth`
+  - `make aws-plan-all`
+  - `make aws-deploy-all`
 
 ### Make Commands
 
-- `make build-python` build all the lambda requirements and store in `infrastructure/aws/all_files`
-- `make clean` remove the cdktf.out file.
-- `make synth-aws` cdktf synth the core AWS infrastructure
-- `make synth-grafana` cdktf synth the grafana infrastructure
-- `make synth` cdktf both grafana and core AWS infrastructure
-- `make build` combines build python and synth
-- `make plan-aws` cdktf plan the core AWS infrastructure
-- `make plan-grafana` cdktf plan the grafana infrastructure
-- `make plan` cdktf both grafana and core AWS infrastructure
-- `make deploy` build python and deploy both grafana and core AWS infrastructure
-- `make destroy-core` cdktf destroy the core AWS infrastructure
-- `make destroy-grafana` cdktf destroy the grafana infrastructure
-- `make destroy` cdktf destroy both grafana and core AWS infrastructure
-
+- `make aws-build-dependencies` build all the lambda requirements and store in `infrastructure/aws/controller_core`
+- `make aws-synth` cdktf synth the all the stacks
+- `make aws-plan-core` cdktf plan the core stack
+- `make aws-plan-grafana` cdktf plan the grafana dashboard stack
+- `make aws-plan-all` cdktf plan all stacks
+- `make aws-deploy-core` cdktf deploy the core_stack
+- `make aws-deploy-grafana` cdktf deploy the grafanadashboard stack
+- `make aws-deploy-all` cdktf deploy all stacks
+- `make aws-destroy-core` cdktf destroy core stack
+- `make aws-destroy-grafana` cdktf destroy grafana deashboard stack
+- `make aws-destroy-all` cdktf destroy all stacks
 
 ## Grafana
 

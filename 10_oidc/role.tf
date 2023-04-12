@@ -18,7 +18,7 @@ resource "aws_iam_role" "github_oidc" {
         Condition = {
           StringLike = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "token.actions.githubusercontent.com:sub" = "repo:contino/apac-flight-controller-aws:*"
+            "token.actions.githubusercontent.com:sub" = "repo:contino/flight-controller:*"
           }
         }
       },

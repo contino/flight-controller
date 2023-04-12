@@ -102,7 +102,7 @@ class GrafanaWithPermissionsComponent(Construct):
         self.grafana_key = secretsmanager_secret.SecretsmanagerSecret(
             self,
             "grafana_key",
-            name="flight-controller-grafana-api-key",
+            name="flight-controller/grafana-api-key",
         )
 
         # Store secret in above created resource
@@ -119,7 +119,7 @@ class GrafanaWithPermissionsComponent(Construct):
         self.workspace_id = secretsmanager_secret.SecretsmanagerSecret(
             self,
             "workspace_id",
-            name="flight-controller-grafana-workspace-id",
+            name="flight-controller/grafana-workspace-id",
         )
 
         # Store workspace ID in above created resource

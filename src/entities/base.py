@@ -10,7 +10,17 @@ class BaseEvent(BaseModel):
     event_id: UUID
     event_version: int
 
+    def __eq__(self, other):
+        if other.__class__ is self.__class__:
+            return self.model_dump(by_alias=True) == other.model_dump(by_alias=True)
+        return NotImplemented
+
 
 class BaseMetric(BaseModel):
     aggregate_id: str
     metric_value: float
+
+    def __eq__(self, other):
+        if other.__class__ is self.__class__:
+            return self.model_dump(by_alias=True) == other.model_dump(by_alias=True)
+        return NotImplemented

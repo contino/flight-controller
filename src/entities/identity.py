@@ -12,8 +12,8 @@ class IdentityRequestedPayload(BaseModel):
 
 
 class IdentityRequested(BaseEvent):
-    aggregate_type = "Identity"
-    event_version = 1
+    aggregate_type: Literal["Identity"] = "Identity"
+    event_version: Literal[1] = 1
     payload: IdentityRequestedPayload
     event_type: Literal["identity_requested"] = "identity_requested"
 
@@ -24,8 +24,8 @@ class IdentityCreatedPayload(BaseModel):
 
 
 class IdentityCreated(BaseEvent):
-    aggregate_type = "Identity"
-    event_version = 1
+    aggregate_type: Literal["Identity"] = "Identity"
+    event_version: Literal[1] = 1
     payload: IdentityCreatedPayload
     event_type: Literal["identity_created"] = "identity_created"
 
