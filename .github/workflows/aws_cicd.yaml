@@ -52,6 +52,12 @@ jobs:
 
       - name: Synthesize terraform configuration template
         run: make aws-synth
+
+      - name: Test with Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/aws/cdktf.out/stacks/aws_core        
         
       - name: Dev deployment
         run: make aws-deploy-all INFRA_ARGS=--auto-approve
