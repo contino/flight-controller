@@ -16,6 +16,7 @@ from cdktf_cdktf_provider_aws import (
     lambda_function,
     grafana_workspace,
     lambda_permission,
+    kms_key
 )
 
 
@@ -26,6 +27,7 @@ class GrafanaLambdaComponent(Construct):
         id: str,
         name: str,
         grafanaWorkspace: grafana_workspace.GrafanaWorkspace,
+        dynamo_db_key: str
     ):
         super().__init__(scope, id)
 
@@ -35,6 +37,15 @@ class GrafanaLambdaComponent(Construct):
             path=Path.join(os.getcwd(), "api_key_rotation"),
             type=AssetType.ARCHIVE,
             asset_hash=dirhash(Path.join(os.getcwd(), "api_key_rotation"), "md5"),
+        )
+
+        # KMS Key
+
+        key = kms_key.KmsKey(
+            self,
+            "flight_controller_grafana_rotation_lambda_key",
+            description="Flight Controller Grafana Rotation Lambda KMS Key",
+            enable_key_rotation=True
         )
 
         # CREATE roles
@@ -73,6 +84,30 @@ class GrafanaLambdaComponent(Construct):
                         }
                     ),
                 ),
+                iam_role.IamRoleInlinePolicy(
+                    name="AllowKMSDecrypt",
+                    policy=json.dumps(
+                        {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "kms:Decrypt",
+                                        "kms:Encrypt",
+                                        "kms:CreateGrant",
+                                    ],
+                                    "Resource": dynamo_db_key,
+                                    "Effect": "Allow",
+                                },
+                                {
+                                    "Action": "kms:ListAliases",
+                                    "Resource": "*",
+                                    "Effect": "Allow",
+                                }
+                            ]
+                        }
+                    ),
+                )
             ],
         )
 
@@ -97,6 +132,7 @@ class GrafanaLambdaComponent(Construct):
             function_name=name,
             handler="main.lambda_handler",
             runtime="python3.9",
+            kms_key_arn=key.arn,
             role=lambda_iam_role.arn,
             filename=asset.path,
         )

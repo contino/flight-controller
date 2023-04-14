@@ -55,10 +55,10 @@ class GrafanaComponent(Construct):
 
         self.allowusers = cloud_run_service_iam_member.CloudRunServiceIamMember(
             self,
-            "allowallusers",
+            "allow_contino_io",
             service=self.service.name,
             location=self.service.location,
             role="roles/run.invoker",
-            member="allUsers",
             project=project_id,
+            member="domain:contino.io"
         )
