@@ -3,6 +3,7 @@
 from cdktf import App, TerraformStack, GcsBackend
 from constructs import Construct
 from cdktf_cdktf_provider_google.provider import GoogleProvider
+from cdktf_cdktf_provider_google import kms_key_ring
 from services_component import ServicesComponent
 from service_account_component import ServiceAccountComponent
 from bigquery_component import BigQueryComponent
@@ -16,6 +17,7 @@ from grafana_dashboard_component import GrafanaDashboardComponent
 
 # ProjectID & location
 project_id = "contino-squad0-fc"
+project_number = "564183220985"
 location = "australia-southeast1"
 
 # Variables
@@ -37,27 +39,36 @@ class GcpBase(TerraformStack):
 
         GoogleProvider(self, "BASE_GCP")
 
-
         # Enable services API
         servicesComponent = ServicesComponent(
             self, "services", project_id,
         )
-        
+
         # Create service account
         serviceAccountComponent = ServiceAccountComponent(
             self, "service_account", project_id,
         )
         self.fc_account = serviceAccountComponent.flight_controller
         self.cloudrun_account = serviceAccountComponent.cloud_run
-
+        
+        flight_controller_key_ring = kms_key_ring.KmsKeyRing(
+            self,
+            "flight_controller_key_ring",
+            name="flight-controller",
+            location=location
+        )
+        
+        self.key_ring = flight_controller_key_ring
         # Create artifact registry to store docker images
         artifactRegistryComponent = ArtifactRegistryComponent(
             self, 
             "artifact_registry", 
             project_id, 
+            project_number,
             location, 
             artifactregistry_name, 
             serviceAccountComponent.cloud_run,
+            flight_controller_key_ring
         )
 
         
@@ -67,7 +78,8 @@ class GcpCore(TerraformStack):
         scope: Construct,
         id: str,
         fc_account: str,
-        cloudrun_account: str
+        cloudrun_account: str,
+        key_ring: kms_key_ring.KmsKeyRing
     ):
         super().__init__(scope, id)
 
@@ -78,11 +90,13 @@ class GcpCore(TerraformStack):
         bigQueryComponent = BigQueryComponent(
             self, 
             "event_table",  
-            project_id, 
+            project_id,
+            project_number, 
             location, 
             event_table_name, 
             metric_table_name,
             cloudrun_account,
+            key_ring
         )
 
         # Create cloud run service
@@ -99,11 +113,13 @@ class GcpCore(TerraformStack):
         eventArcComponent = EventarcWithPubsubComponent(
             self, "trigger", 
             project_id, 
+            project_number,
             location, 
             eventarc_name, 
             cloudRunComponent.service,
             fc_account,
             cloudrun_account,
+            key_ring
         )
 
         # Create Grafana Cloud Run service
@@ -134,7 +150,7 @@ class GcpCore(TerraformStack):
 #         GrafanaProvider(
 #             self,
 #             "Grafana",
-#             auth="eyJrIjoiYWwyZHV6VlN2aXM3ZEh5V051ZVI1ZkJyV0pQd05Xc2EiLCJuIjoidGVzdCIsImlkIjoxfQ==",
+#             auth="",
 #             url=workspace_id
 #             + ":80",
 #         )
@@ -149,7 +165,7 @@ app = App()
 
 base_stack = GcpBase(app, "gcp_base",)
 
-core_stack = GcpCore(app, "gcp_core", base_stack.fc_account, base_stack.cloudrun_account)
+core_stack = GcpCore(app, "gcp_core", base_stack.fc_account, base_stack.cloudrun_account, base_stack.key_ring)
 
 # grafana_stack = GcpGrafana(app, "gcp_grafana", gcp_stack.grafana_workspace_id)
 

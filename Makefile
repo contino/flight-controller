@@ -64,7 +64,7 @@ aws-synth: aws-build-dependencies
 	@echo "\n\n---AWS-SYNTH---\n"
 	cd infrastructure/aws;cdktf synth
 
-aws-plan-core:
+aws-plan-core: 
 	@echo "\n\n---AWS-PLAN-CORE---\n"
 	cd infrastructure/aws;cdktf plan aws_core
 
@@ -72,7 +72,16 @@ aws-plan-grafana:
 	@echo "\n\n---AWS-PLAN-GRAFANA---\n"
 	cd infrastructure/aws;cdktf plan aws_grafana_dashboard
 
-aws-plan-all: aws-plan-core aws-plan-grafana
+aws-plan-all: aws-build-dependencies aws-plan-core aws-plan-grafana aws-plan-convert
+
+aws-plan-convert: 
+	@echo "\n\n---Converting AWS plans file to json---\n"
+	cd infrastructure/aws/cdktf.out/stacks; \
+	find . -type f -name 'plan' -exec dirname {} \; | while read file; do \
+		cd "$$file"; \
+		terraform show -json plan > plan.json; \
+		cd -; \
+	done
 
 aws-deploy-core:
 	@echo "\n\n---AWS-DEPLOY-CORE---\n"
@@ -125,7 +134,16 @@ gcp-plan-grafana:
 	@echo "\n\n---GCP-PLAN-GRAFANA---\n"
 	cd infrastructure/gcp;cdktf plan gcp_grafana 
 
-gcp-plan-all: gcp-plan-base gcp-plan-core #gcp-plan-grafana
+gcp-plan-all: gcp-build-dependencies gcp-plan-base gcp-plan-core gcp-plan-convert
+
+gcp-plan-convert: 
+	@echo "\n\n---Converting GCP plans file to json---\n"
+	cd infrastructure/gcp/cdktf.out/stacks; \
+	find . -type f -name 'plan' -exec dirname {} \; | while read file; do \
+		cd "$$file"; \
+		terraform show -json plan > plan.json; \
+		cd -; \
+	done
 
 gcp-deploy-base:
 	@echo "\n\n---GCP-DEPLOY-BASE---\n"

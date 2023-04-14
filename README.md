@@ -14,7 +14,8 @@ The approach to scaling a landing zone on AWS is [elaborated here](https://aws.a
 - [Flight Controller Event Catalog](https://legendary-spoon-f82c1640.pages.github.io): `docs/`
   - [README.md](docs/README.md)
 - Flight Controller Infrastructure Terraform CDK Code - `infrastructure/`
-  - [README.md](infrastructure/README.md)
+  - [AWS](infrastructure/aws/README.md)
+  - [GCP](infrastructure/gcp/README.md)
 - Flight Controller Custom Publisher Code - `publisher/`
   - [README.md](publisher/README.md)
 - Flight Controller Code - `src/`

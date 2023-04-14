@@ -15,6 +15,7 @@ from cdktf_cdktf_provider_aws import (
     lambda_function,
     dynamodb_table,
     timestreamwrite_table,
+    kms_key
 )
 
 from dirhash import dirhash
@@ -28,6 +29,7 @@ class LambdaWithPermissionsComponent(Construct):
         name: str,
         dynamoDbTable: dynamodb_table.DynamodbTable,
         timestream_table: timestreamwrite_table,
+        dynamo_db_key: str
     ):
         super().__init__(scope, id)
 
@@ -41,6 +43,15 @@ class LambdaWithPermissionsComponent(Construct):
             path=Path.join(os.getcwd(), "controller_core"),
             type=AssetType.ARCHIVE,
             asset_hash=dirhash(Path.join(os.getcwd(), "controller_core"), "md5"),
+        )
+
+        # KMS Key
+
+        key = kms_key.KmsKey(
+            self,
+            "flight_controller_core_lambda_key",
+            description="Flight Controller Core Lambda KMS Key",
+            enable_key_rotation=True,
         )
 
         # CREATE roles
@@ -99,6 +110,30 @@ class LambdaWithPermissionsComponent(Construct):
                         }
                     ),
                 ),
+                iam_role.IamRoleInlinePolicy(
+                    name="AllowKMSDecrypt",
+                    policy=json.dumps(
+                        {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "kms:Decrypt",
+                                        "kms:Encrypt",
+                                        "kms:CreateGrant",
+                                    ],
+                                    "Resource": dynamo_db_key,
+                                    "Effect": "Allow",
+                                },
+                                {
+                                    "Action": "kms:ListAliases",
+                                    "Resource": "*",
+                                    "Effect": "Allow",
+                                }
+                            ]
+                        }
+                    ),
+                )
             ],
         )
 
@@ -109,13 +144,14 @@ class LambdaWithPermissionsComponent(Construct):
             role=lambda_iam_role.name,
         )
 
-        # # Create lambda function from asset
+        # Create lambda function from asset
         self.lambda_func = lambda_function.LambdaFunction(
             self,
             "lambda_flight_control",
             function_name=name,
             handler="src/entrypoints/aws_lambda.lambda_handler",
             runtime="python3.9",
+            kms_key_arn=key.arn,
             role=lambda_iam_role.arn,
             filename=asset.path,
             environment=lambda_function.LambdaFunctionEnvironment(

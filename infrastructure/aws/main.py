@@ -48,6 +48,7 @@ class AwsCore(TerraformStack):
             self.lambda_name,
             dynamoDBcomponent.table,
             timeStreamComponent.timestream_table,
+            dynamoDBcomponent.key.arn
         )
         # create event bridge
         eventBridgeComponent = EventBridgeComponent(
@@ -61,9 +62,11 @@ class AwsCore(TerraformStack):
             self.grafana_workspace_name,
         )
 
+        self.grafana_workspace_id = grafanaWorkspace.grafana_workspace.id
+
         # Create lambda function to rotate Grafana key 
         grafanaLambdaComponent = GrafanaLambdaComponent(
-            self, "grafana_function", self.grafana_lambda_name, grafanaWorkspace.grafana_workspace,
+            self, "grafana_function", self.grafana_lambda_name, grafanaWorkspace.grafana_workspace, dynamoDBcomponent.key.arn
         )
 
         # Create rotation rules to trigger every 29 days
@@ -72,7 +75,7 @@ class AwsCore(TerraformStack):
         )
 
 class AwsGrafana(TerraformStack):
-    def __init__(self, scope: Construct, id: str):
+    def __init__(self, scope: Construct, id: str, workspace_id: str):
         super().__init__(scope, id)
         
         AwsProvider(self, "AWS")
@@ -82,19 +85,13 @@ class AwsGrafana(TerraformStack):
             "api_key",
             secret_id="flight-controller/grafana-api-key",               # Secret name stored in AWS Secrets Manager
         )
-
-        workspace_id = data_aws_secretsmanager_secret_version.DataAwsSecretsmanagerSecretVersion(
-            self,
-            "workspace_id",
-            secret_id="flight-controller/grafana-workspace-id",               # Secret name stored in AWS Secrets Manager
-        )
         
         GrafanaProvider(
             self,
             "Grafana",
             auth=api_key.secret_string,
             url="https://"
-            + workspace_id.secret_string
+            + workspace_id
             + ".grafana-workspace.ap-southeast-2.amazonaws.com/",
         )
 
@@ -109,7 +106,7 @@ app = App()
 
 core_stack = AwsCore(app, "aws_core")
 
-grafana_dashboard_stack = AwsGrafana(app, "aws_grafana_dashboard")
+grafana_dashboard_stack = AwsGrafana(app, "aws_grafana_dashboard", core_stack.grafana_workspace_id)
 
 account_id = boto3.client("sts").get_caller_identity()["Account"]
 

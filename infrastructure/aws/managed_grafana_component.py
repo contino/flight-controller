@@ -6,6 +6,7 @@ from cdktf_cdktf_provider_aws import (
     iam_role_policy_attachment,
     secretsmanager_secret,
     secretsmanager_secret_version,
+    kms_key
 )
 from constructs import Construct
 
@@ -98,11 +99,20 @@ class GrafanaWithPermissionsComponent(Construct):
             )
         )
 
+        # KMS Key
+        key = kms_key.KmsKey(
+            self,
+            "flight_controller_core_grafana_api_key",
+            description="Flight Controller Core Grafana API KMS Key",
+            enable_key_rotation=True,
+        )
+
         # Create secret in AWS Secrets Manager
         self.grafana_key = secretsmanager_secret.SecretsmanagerSecret(
             self,
             "grafana_key",
             name="flight-controller/grafana-api-key",
+            kms_key_id = key.id
         )
 
         # Store secret in above created resource
@@ -112,22 +122,5 @@ class GrafanaWithPermissionsComponent(Construct):
                 "grafana_key_value",
                 secret_id=self.grafana_key.id,
                 secret_string=self.grafana_workspace_api_key.key,
-            )
-        )
-
-        # Store workspace ID in AWS Secrets Manager
-        self.workspace_id = secretsmanager_secret.SecretsmanagerSecret(
-            self,
-            "workspace_id",
-            name="flight-controller/grafana-workspace-id",
-        )
-
-        # Store workspace ID in above created resource
-        self.workspace_id_value = (
-            secretsmanager_secret_version.SecretsmanagerSecretVersion(
-                self,
-                "workspace_id_value",
-                secret_id=self.workspace_id.id,
-                secret_string=self.grafana_workspace.id,
             )
         )
