@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 name: gcp-cicd
-=======
-name: gcp
->>>>>>> b0b73b43 (Add SLSA3 provenance to FC builds)
 on:
   workflow_dispatch:
   workflow_call:
