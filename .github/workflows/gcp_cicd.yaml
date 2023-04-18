@@ -1,10 +1,11 @@
+<<<<<<< HEAD
 name: gcp-cicd
+=======
+name: gcp
+>>>>>>> b0b73b43 (Add SLSA3 provenance to FC builds)
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-  pull_request:
+  workflow_call:
 concurrency:
   group: "GCP"
   cancel-in-progress: true

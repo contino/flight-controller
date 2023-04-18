@@ -1,0 +1,25 @@
+on:
+  workflow_call:
+
+jobs:
+  build:
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate hashes
+        shell: bash
+        id: hash
+        run: |
+          make synth
+          echo "hashes=$(tar cf - infrastructure | sha256sum | base64 -w0)" >> "$GITHUB_OUTPUT"
+  provenance:
+    needs: [build]
+    permissions:
+        actions: read
+        id-token: write
+        contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.5.0
+    with:
+        base64-subjects: "${{ needs.build.outputs.hashes }}"
+        upload-assets: true
