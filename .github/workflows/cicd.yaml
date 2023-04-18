@@ -14,6 +14,7 @@ jobs:
 
   gcp:
     uses: ./.github/workflows/gcp_cicd.yaml
+    secrets: inherit
 
   slsa:
     uses: ./.github/workflows/provenance.yaml
