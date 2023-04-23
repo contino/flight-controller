@@ -257,6 +257,7 @@ Thumbs.db
 
 # CDKTF Specifics
 requirements.txt
+dev-requirements.txt
 controller_core/
 api_key_rotation/
 !api_key_rotation/main.py

@@ -3,7 +3,7 @@
 
 ## Architecture
 
-![Flight Controller Architecture](images/gcp_flight_controller.png)
+![Flight Controller Architecture](/images/gcp_flight_controller.png)
 
 ## Development
 
@@ -73,20 +73,20 @@ Create a GCP Service Account for a Project
 
 1. Navigate to the `APIs & Services Credentials` page.
 2. Click on `Create credentials` and choose `Service account key`.
-![Create Credentials](images/credentials.png)
+![Create Credentials](/images/credentials.png)
 
-3. On the Create service account key page, choose key type `JSON`. Then in the Service Account dropdown, choose the `New service account` option:
-![New Service Account](images/service_account_key.png)
+1. On the Create service account key page, choose key type `JSON`. Then in the Service Account dropdown, choose the `New service account` option:
+![New Service Account](/images/service_account_key.png)
 
-4. Some new fields will appear. Fill in a name for the service account in the `Service account name` field and then choose the `BigQuery Data Viewer` and `BigQuery Job User` roles from the Role dropdown:
-![Attach roles](images/service_account_role.png)
+1. Some new fields will appear. Fill in a name for the service account in the `Service account name` field and then choose the `BigQuery Data Viewer` and `BigQuery Job User` roles from the Role dropdown:
+![Attach roles](/images/service_account_role.png)
 
-5. Click the `Create` button. A JSON key file will be created and downloaded to your computer. Store this file in a secure place as it allows access to your BigQuery data.
+1. Click the `Create` button. A JSON key file will be created and downloaded to your computer. Store this file in a secure place as it allows access to your BigQuery data.
 
-6. Upload it to Grafana on the datasource Configuration page. You can either upload the file or paste in the contents of the file.
-![Grafana authentication](images/grafana_authentication.png)
+2. Upload it to Grafana on the datasource Configuration page. You can either upload the file or paste in the contents of the file.
+![Grafana authentication](/images/grafana_authentication.png)
 
-7. The file contents will be encrypted and saved in the Grafana database. Don't forget to save after uploading the file!
+1. The file contents will be encrypted and saved in the Grafana database. Don't forget to save after uploading the file!
 
 #### Creating Dashboards
 

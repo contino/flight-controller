@@ -51,7 +51,7 @@ API key is created by the terraform whilst core AWS infrastructure is being depl
 While writing this, Grafana API Keys are valid for maximum 30 days only. 
 Hopefully, Amazon will address this limitation in the future - but in the meantime, this simple pattern can be used to automatically rotate an API key every 29 days and store it for use in AWS Secrets Manager.
 
-![Grafana](images/manage_grafana_api_key.png)
+![Grafana](/images/manage_grafana_api_key.png)
 
 The solution is made up of two components:
 
