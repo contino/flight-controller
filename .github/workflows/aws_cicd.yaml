@@ -1,13 +1,10 @@
 name: aws-cicd
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-  pull_request:
+  workflow_call:
 concurrency:
   group: "AWS"
-  # cancel-in-progress: true
+  cancel-in-progress: true
 jobs:
   deploy:
     name: AWS

@@ -1,0 +1,26 @@
+name: cicd
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+  workflow_dispatch:
+  
+jobs:
+  pip-audit:
+    uses: ./.github/workflows/pip-audit.yaml
+
+  aws:
+    uses: ./.github/workflows/aws_cicd.yaml
+    needs: [pip-audit]
+
+  gcp:
+    uses: ./.github/workflows/gcp_cicd.yaml
+    secrets: inherit
+    needs: [pip-audit]
+
+  # slsa:
+  #   uses: ./.github/workflows/provenance.yaml
+  #   needs: [aws, gcp]
