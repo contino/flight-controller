@@ -1,0 +1,21 @@
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+  workflow_dispatch:
+  
+jobs:
+  aws:
+    uses: ./.github/workflows/aws_cicd.yaml
+
+  gcp:
+    uses: ./.github/workflows/gcp_cicd.yaml
+    secrets: inherit
+
+  slsa:
+    uses: ./.github/workflows/provenance.yaml
+    needs: [aws, gcp]
