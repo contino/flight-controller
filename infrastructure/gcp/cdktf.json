@@ -4,7 +4,7 @@
   "projectId": "ab6ba306-5f3e-4a6e-88ce-c23e56898e9d",
   "sendCrashReports": "false",
   "terraformProviders": [
-    "grafana/grafana@~> 1.37"
+    "grafana/grafana@~> 1.39"
   ],
   "terraformModules": [],
   "codeMakerOutput": "imports",
