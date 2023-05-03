@@ -1,4 +1,5 @@
 INFRA_ARGS = 
+COMMIT := $(shell git rev-parse --short HEAD)
 
 # Local Commands
 local: install-dependencies
@@ -30,11 +31,23 @@ integration-test:
 test:
 	pipenv run pytest --cov=src --cov=publisher --cov-fail-under=81 --cov-report term-missing tests/src tests/publisher
 
+aws-test:
+	pipenv run pytest -m 'not gcp' --cov=src --cov=publisher --cov-fail-under=75 --cov-report term-missing tests/src tests/publisher
+
+gcp-test:
+	pipenv run pytest -m 'not aws' --cov=src --cov=publisher --cov-fail-under=75 --cov-report term-missing tests/src tests/publisher
+
 watch:
 	ptw -- -m 'not integration' tests/src tests/publisher
 
 e2e:
 	cd tests/; pipenv run behave
+
+aws-e2e:
+	cd tests/; pipenv run behave --tags=aws
+
+gcp-e2e:
+	cd tests/; pipenv run behave --tags=gcp
 
 # Infrastructure Commands
 
@@ -116,7 +129,7 @@ gcp-build-image:
 	@echo "\n\n---GCP-BUILD-IMAGE---\n"
 	gcloud auth configure-docker australia-southeast1-docker.pkg.dev
 	pipenv requirements | tee requirements.txt
-	docker buildx build --platform=linux/amd64 --push . -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:latest
+	docker buildx build --platform=linux/amd64 --push . -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:${COMMIT}
 
 gcp-synth: gcp-build-dependencies
 	@echo "\n\n---GCP-SYNTH---\n"

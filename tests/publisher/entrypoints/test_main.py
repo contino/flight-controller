@@ -9,7 +9,7 @@ from publisher.drivers.source import OpenPolicyAgent
 
 ARGS = argparse.Namespace()
 
-
+@pytest.mark.aws
 @pytest.mark.integration
 def test_main_returns_no_exception():
     ARGS.source = "open_policy_agent"
@@ -79,7 +79,8 @@ def test_main_returns_exception_when_source_returns_exception(mock_get_events):
     mock_get_events.return_value = Exception()
     assert isinstance(main(ARGS), Exception)
 
-
+@pytest.mark.aws
+@pytest.mark.integration
 @patch.object(EventBridge, "send_events")
 def test_main_returns_exception_when_sink_returns_exception(mock_send_events):
     ARGS.source = "open_policy_agent"

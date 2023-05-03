@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import UUID
 
 import boto3
@@ -13,13 +13,13 @@ from src.drivers.event_source import EventSource
 from src.entities.events import Event, EVENT_CLASSES
 
 
-dynamo_db_resource = boto3.resource("dynamodb")
 logger = structlog.get_logger(__name__)
 
 
 class DynamoEventSink(EventSink):
     def __init__(self) -> None:
         TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
+        dynamo_db_resource = boto3.resource("dynamodb")
         self.dynamo_db_table = dynamo_db_resource.Table(TABLE_NAME)
 
     def store_events(self, events: List[Event]) -> Optional[Exception]:
@@ -47,12 +47,13 @@ class DynamoEventSink(EventSink):
 class DynamoEventSource(EventSource):
     def __init__(self) -> None:
         TABLE_NAME = os.environ.get("DYNAMO_TABLE_NAME")
+        dynamo_db_resource = boto3.resource("dynamodb")
         self.dynamo_db_table = dynamo_db_resource.Table(TABLE_NAME)
 
     def _sort_events(self, event: Event) -> int:
         return event.aggregate_version
 
-    def get_events_for_aggregate(self, aggregate_id: str) -> List[Event]:
+    def get_events_for_aggregate(self, aggregate_id: str) -> Union[Exception, List[Event]]:
         try:
             response = self.dynamo_db_table.query(
                 KeyConditionExpression=Key("aggregate_id").eq(aggregate_id)

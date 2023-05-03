@@ -1,5 +1,11 @@
 Feature: Capture useful metrics about patching
 
-    Scenario: Stores metric around patching compliance percentage
-        When patch run summary is complete
-        Then the compliance percentage is stored correctly
+    @aws
+    Scenario: Stores metric around patching compliance percentage for aws
+        When patch run summary is complete for aws
+        Then the compliance percentage is stored correctly for aws
+
+    @gcp
+    Scenario: Stores metric around patching compliance percentage for gcp
+        When patch run summary is complete for gcp
+        Then the compliance percentage is stored correctly for gcp

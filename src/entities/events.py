@@ -45,6 +45,8 @@ Event = Union[
     PatchRunSummary,
     GuardrailPassed,
     GuardrailActivated,
+    IdentityCreated,
+    IdentityRequested
 ]
 
 Event_Type = Union[

@@ -47,6 +47,8 @@ Subsequently, following components are built in stage `main_gcp_infra`:
 - `make gcp-destroy-core` cdktf destroy core stack
 - `make gcp-destroy-grafana` cdktf destroy grafana stack
 - `make gcp-destroy-all` cdktf destroy all stacks
+- `make gcp-test` gcp specific tests
+- `make gcp-e2e` gcp specific end to end tests
 
 ### Configure Grafana
 

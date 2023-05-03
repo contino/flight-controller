@@ -48,6 +48,7 @@ def set_table_name():
     os.environ["DYNAMO_TABLE_NAME"] = "event_sourcing_table"
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_returns_error_on_non_existent_table():
     os.environ["DYNAMO_TABLE_NAME"] = "does_not_exist"
@@ -65,6 +66,7 @@ def test_returns_error_on_non_existent_table():
     assert isinstance(sink.store_events([event]), Exception)
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_retrieves_project_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -94,6 +96,7 @@ def test_retrieves_project_events_from_dynamodb():
     assert got == [event, event_2]
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_retrieves_compliance_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -126,6 +129,7 @@ def test_retrieves_compliance_events_from_dynamodb():
     assert got == [event, event_2]
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_retrieves_patch_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -149,6 +153,7 @@ def test_retrieves_patch_events_from_dynamodb():
     assert got == [event]
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_retrieves_account_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -178,6 +183,7 @@ def test_retrieves_account_events_from_dynamodb():
     assert got == [event, event_2]
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_retrieves_guardrail_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -210,6 +216,7 @@ def test_retrieves_guardrail_events_from_dynamodb():
     assert got == [event, event_2]
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_retrieves_identity_events_from_dynamodb():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))

@@ -59,7 +59,7 @@ The approach to scaling a landing zone on AWS is [elaborated here](https://aws.a
 - `make destroy` destroys all cloud stacks with TF CDK.
 - `make clean` remove the cdktf.out folders for all clouds.
 
-Testing is split into four commands:
+Testing is split into several commands:
 
 - `make unittest` runs all the unit tests (i.e. tests that are not [marked as integration](https://docs.pytest.org/en/7.1.x/example/markers.html)).
 - `make integration-test` run all the integration tests.
