@@ -27,6 +27,7 @@ def set_env_vars():
     os.environ["TIMESTREAM_TABLE_NAME"] = "metrics_table"
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_returns_error_on_non_existent_database():
     os.environ["TIMESTREAM_DATABASE_NAME"] = "does_not_exist"
@@ -43,6 +44,7 @@ def test_returns_error_on_non_existent_database():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_metrics_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -58,6 +60,7 @@ def test_store_metrics_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_resource_compliance_lead_time_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -80,6 +83,7 @@ def test_store_resource_compliance_lead_time_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_patch_compliance_percentage_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -97,6 +101,7 @@ def test_store_patch_compliance_percentage_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_resource_account_lead_time_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -112,6 +117,7 @@ def test_store_resource_account_lead_time_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_guardrail_activation_count_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -134,6 +140,7 @@ def test_store_guardrail_activation_count_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_guardrail_max_activation_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -156,6 +163,7 @@ def test_store_guardrail_max_activation_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_guardrail_lead_time_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))
@@ -178,6 +186,7 @@ def test_store_guardrail_lead_time_does_not_return_error():
     )
 
 
+@pytest.mark.aws
 @pytest.mark.integration
 def test_store_identity_lead_time_does_not_return_error():
     aggregate_id = "".join(random.choices(string.ascii_letters, k=12))

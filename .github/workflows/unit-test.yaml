@@ -1,0 +1,25 @@
+name: unit-test
+on:
+  workflow_call:
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install pip packages
+        run: make install-dependencies
+
+      - name: Perform unittest
+        run: make unittest

@@ -1,7 +1,10 @@
+import subprocess
+
 from cdktf_cdktf_provider_google import (cloud_run_service, project_iam_member,
                                          service_account)
 from constructs import Construct
 
+COMMIT = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode("utf-8")
 
 class CloudRunComponent(Construct):
     def __init__(
@@ -22,11 +25,12 @@ class CloudRunComponent(Construct):
             location=location,
             project=project_id,
             metadata={"annotations": {"run.googleapis.com/ingress": "internal"}},
+            autogenerate_revision_name=True,
             template={
                 "spec": {
                     "containers": [
                         {
-                            "image": "australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:latest",
+                            "image": f"australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:{COMMIT}",
                             "ports": [{"container_port": 8080}],
                         },
                     ],

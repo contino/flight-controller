@@ -5,16 +5,12 @@ from typing import Any, Literal, Tuple, Union
 
 import structlog
 from flask import Flask, request
+
 from src.adapters.controller import handle_event
-from src.drivers.bigquery import (
-    BigQueryEventSink,
-    BigQueryEventSource,
-    BigQueryMetricSink,
-)
+from src.drivers.bigquery import (BigQueryEventSink, BigQueryEventSource,
+                                  BigQueryMetricSink)
 
 app = Flask(__name__)
-
-
 log = structlog.get_logger(__name__)
 
 

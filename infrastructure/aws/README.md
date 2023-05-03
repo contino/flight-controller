@@ -28,6 +28,8 @@
 - `make aws-destroy-core` cdktf destroy core stack
 - `make aws-destroy-grafana` cdktf destroy grafana deashboard stack
 - `make aws-destroy-all` cdktf destroy all stacks
+- `make aws-test` aws specific tests
+- `make aws-e2e` aws specific end to end tests
 
 ## Grafana
 

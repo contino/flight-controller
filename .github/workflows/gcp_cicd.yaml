@@ -64,8 +64,8 @@ jobs:
       - name: Deploy main infrastructure
         run: make gcp-deploy-core INFRA_ARGS=--auto-approve
 
-      # - name: Perform full test and check coverage
-      #   run: make test
+      - name: Perform full test and check coverage
+        run: make gcp-test
 
-      # - name: Conduct e2e testing
-      #   run: make e2e
+      - name: Conduct e2e testing
+        run: make gcp-e2e

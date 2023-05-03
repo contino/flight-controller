@@ -12,14 +12,18 @@ jobs:
   pip-audit:
     uses: ./.github/workflows/pip-audit.yaml
 
+  unit-test:
+    uses: ./.github/workflows/unit-test.yaml
+    secrets: inherit
+
   aws:
     uses: ./.github/workflows/aws_cicd.yaml
-    needs: [pip-audit]
+    needs: [pip-audit, unit-test]
 
   gcp:
     uses: ./.github/workflows/gcp_cicd.yaml
     secrets: inherit
-    needs: [pip-audit]
+    needs: [pip-audit, unit-test]
 
   # slsa:
   #   uses: ./.github/workflows/provenance.yaml

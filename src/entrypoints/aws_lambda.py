@@ -6,12 +6,9 @@ from src.drivers.timestream_metric_sink import TimeStreamMetricSink
 
 
 logger = structlog.get_logger(__name__)
-event_source = DynamoEventSource()
-event_sink = DynamoEventSink()
-metric_sink = TimeStreamMetricSink()
-
 
 def lambda_handler(event, _) -> None:
+    event_source, event_sink, metric_sink  = DynamoEventSource(), DynamoEventSink(), TimeStreamMetricSink()
     logger.msg("Incoming event", incoming_event=event)
     full_event = event["detail"]
     aggregate_events = event_source.get_events_for_aggregate(full_event["aggregate_id"])
