@@ -1,6 +1,6 @@
 Azure implementation of the Flight Controller infrastructure and code deployment.
 
-# Tasls
+# Tasks
 - [ ] Configure root CDKTF dependencies
 - [ ] Configure Azure provider
 - [ ] Define Terraform resources for Flight Controller application and database infrastructure
