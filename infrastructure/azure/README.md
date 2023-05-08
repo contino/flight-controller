@@ -1,22 +1,29 @@
 Azure implementation of the Flight Controller infrastructure and code deployment.
 
 # Setup
+In a new terminal session, run the followign commands while in the repository root:
 ```
 make local
-make make clean && azure-synth && make azure-plan-core
+make clean
+az login
+export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=1
+```
+
+Run the following following commands to synthesise, plan, apply and destroy the Azure resources:
+```
+make azure-synth && make azure-plan-core
 make azure-deploy-core
-
+make azure-destroy-core
 ```
 
-These targets will be changed to the following once Grafana is deployable:
+The `plan` and `deploy` targets will be changed to the following once Grafana is deployable:
 ```
-make local
-make make clean && azure-synth && make azure-plan-all
+make azure-synth && make azure-plan-all
 make azure-deploy-all
+make azure-destroy-all
 ```
 
 # Resources
-
 Following Azure resources are deployed:
 - Resource group
 - Storage account
