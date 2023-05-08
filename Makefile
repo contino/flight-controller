@@ -177,13 +177,13 @@ gcp-destroy-all:
 	cd infrastructure/gcp;cdktf destroy gcp_base gcp_core gcp_grafana 
 
 # Azure
+azure-build-dependencies:
+	@echo "\n\n---AZURE-BUILD-DEPENDENCIES---\n"
+	cd infrastructure/azure;cdktf provider add grafana/grafana
+
 azure-synth: azure-build-dependencies
 	@echo "\n\n---AZURE-SYNTH---\n"
 	cd infrastructure/azure;cdktf synth
-
-azure-build-dependencies:
-	@echo "\n\n---AZURE-BUILD-DEPENDENCIES---\n"
-	cd infrastructure/azure; cdktf provider add grafana/grafana
 
 azure-plan-core: 
 	@echo "\n\n---AZURE-PLAN-CORE---\n"
@@ -193,8 +193,6 @@ azure-plan-grafana:
 	@echo "\n\n---AZURE-PLAN-GRAFANA---\n"
 	cd infrastructure/azure;cdktf plan azure_grafana_dashboard
 
-azure-plan-all: azure-build-dependencies azure-plan-core azure-plan-grafana azure-plan-convert
-
 azure-plan-convert: 
 	@echo "\n\n---Converting AZURE plans file to json---\n"
 	cd infrastructure/azure/cdktf.out/stacks; \
@@ -203,6 +201,8 @@ azure-plan-convert:
 		terraform show -json plan > plan.json; \
 		cd -; \
 	done
+
+azure-plan-all: azure-build-dependencies azure-plan-core azure-plan-grafana azure-plan-convert
 
 azure-deploy-core:
 	@echo "\n\n---AZURE-DEPLOY-CORE---\n"
