@@ -1,9 +1,9 @@
 # Import the necessary modules
-from constructs import Construct
 import json
 
-from imports.grafana.folder import Folder
+from constructs import Construct
 from imports.grafana.dashboard import Dashboard
+from imports.grafana.folder import Folder
 
 # Load the dashboard configuration from a JSON file
 with open("dashboard.json", "r") as f:
@@ -23,7 +23,7 @@ class GrafanaDashboardComponent(Construct):
         super().__init__(scope, id)
 
         self.folder = Folder(self, "folder", title="AWS Flight Controller")
-        
+
         # Create a new Grafana dashboard
         self.dashboard = Dashboard(
             self,

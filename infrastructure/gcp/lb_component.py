@@ -1,12 +1,14 @@
+from cdktf_cdktf_provider_google import (compute_backend_service,
+                                         compute_global_address,
+                                         compute_global_forwarding_rule,
+                                         compute_health_check,
+                                         compute_region_network_endpoint_group,
+                                         compute_target_http_proxy,
+                                         compute_url_map,
+                                         compute_managed_ssl_certificate,
+                                         compute_target_https_proxy,
+                                         )
 from constructs import Construct
-from cdktf_cdktf_provider_google import (
-    compute_global_address,
-    compute_backend_service,
-    compute_url_map,
-    compute_target_http_proxy,
-    compute_global_forwarding_rule,
-    compute_region_network_endpoint_group,
-)
 
 
 class LBComponent(Construct):
@@ -16,8 +18,8 @@ class LBComponent(Construct):
         id: str,
         project_id: str,
         location: str,
-        name: str,
-        grafana_service_name: str,
+        name_prefix: str,
+        DOMAIN_NAME: str,
     ):
         super().__init__(scope, id)
 
@@ -26,12 +28,12 @@ class LBComponent(Construct):
             compute_region_network_endpoint_group.ComputeRegionNetworkEndpointGroup(
                 self,
                 "function_neg",
-                name=name + "-neg",
+                name=name_prefix+"-grafana-lb-neg",
                 project=project_id,
                 region=location,
                 network_endpoint_type="SERVERLESS",
                 cloud_run={
-                    "service": grafana_service_name,
+                    "service": f"{name_prefix}-grafana",
                 },
             )
         )
@@ -39,9 +41,10 @@ class LBComponent(Construct):
         # self.health_check = compute_health_check.ComputeHealthCheck(
         #     self,
         #     "health_check",
-        #     name=name,
-        #     http_health_check={
-        #     "port": 80
+        #     name=name_prefix+"-grafana-lb-health-check",
+        #     project=project_id,
+        #     ssl_health_check={
+        #     "port": 443
         #     },
         # )
 
@@ -49,12 +52,12 @@ class LBComponent(Construct):
         self.backend_service = compute_backend_service.ComputeBackendService(
             self,
             "backend_service",
-            name=name + "-backend",
+            name=name_prefix+"-grafana-lb-backend",
             project=project_id,
             timeout_sec=30,
             connection_draining_timeout_sec=300,
             load_balancing_scheme="EXTERNAL_MANAGED",
-            # health_checks=self.health_check.id,
+            # health_checks=[self.health_check.id],
             backend=[{"group": str(self.neg.id)}],
         )
 
@@ -62,76 +65,69 @@ class LBComponent(Construct):
         self.global_address = compute_global_address.ComputeGlobalAddress(
             self,
             "global_address",
-            name="flight-controller-grafana-ip",
+            name=name_prefix+"-grafana-ip",
             project=project_id,
         )
 
         # Create SSL certificate
-
-        # self.certificate = compute_managed_ssl_certificate.ComputeManagedSslCertificate(
-        #     self,
-        #     "ssl_certificate",
-        #     name=name+"-ssl-certificate",
-        #     project=project_id,
-        #     type="MANAGED",
-        #     managed={
-        #     "domains": ["grafana.thearmitagency.com"]
-        #     }
-        # )
+        self.certificate = compute_managed_ssl_certificate.ComputeManagedSslCertificate(
+            self,
+            "ssl_certificate",
+            name=name_prefix+"-ssl-certificate",
+            project=project_id,
+            type="MANAGED",
+            managed={
+            "domains": [str(DOMAIN_NAME),]
+            }
+        )
 
         # Create URL map
-        self.url_map = compute_url_map.ComputeUrlMap(
+        self.default = compute_url_map.ComputeUrlMap(
             self,
-            "urlmap",
-            name=name + "-urlmap",
-            default_service=self.backend_service.id,
+            "default-urlmap",
+            name=name_prefix+"-grafana-default-urlmap",
+            default_service=self.backend_service.self_link,
             project=project_id,
         )
 
-        # self.http_redirect = compute_url_map.ComputeUrlMap(
-        #     self,
-        #     "http_redirect",
-        #     name=name+"-http-redirect",
-        #     project=project_id,
-        #     default_url_redirect={
-        #     "https_redirect": True,
-        #     "strip_query": False,
-        #     }
-        # )
-
-        # # Create target proxy
-        # self.targetproxy = compute_target_https_proxy.ComputeTargetHttpsProxy(
-        #     self,
-        #     "target_proxy",
-        #     name=name+"-target",
-        #     url_map=self.url_map.id,
-        #     project=project_id,
-        #     ssl_certificates=[self.certificate.id],
-        # )
-
-        # self.redirectproxy = compute_target_http_proxy.ComputeTargetHttpProxy(
-        #     self,
-        #     "redirect_proxy",
-        #     name=name+"http-redirect",
-        #     url_map=self.http_redirect.id,
-        #     project=project_id,
-        # )
-
-        self.redirect_proxy = compute_target_http_proxy.ComputeTargetHttpProxy(
+        self.https_redirect = compute_url_map.ComputeUrlMap(
             self,
-            "redirect_proxy",
-            name=name + "http-redirect",
-            url_map=self.url_map.id,
+            "https_redirect",
+            name=name_prefix+"-https-redirect",
+            project=project_id,
+            default_url_redirect={
+            "https_redirect": True,
+            "strip_query": False,
+            "redirect_response_code": "MOVED_PERMANENTLY_DEFAULT"
+            }
+        )
+
+        # HTTPS proxy when ssl is true
+        self.https_proxy = compute_target_https_proxy.ComputeTargetHttpsProxy(
+            self,
+            "https_proxy",
+            name=name_prefix+"-grafana-https-proxy",
+            url_map=self.default.self_link,
+            project=project_id,
+            ssl_certificates=[self.certificate.id],
+        )
+
+        # HTTP Proxy when http forwarding is true
+        self.http_proxy = compute_target_http_proxy.ComputeTargetHttpProxy(
+            self,
+            "http_proxy",
+            name=name_prefix+"-grafana-http-proxy",
+            url_map=self.https_redirect.self_link,
             project=project_id,
         )
 
         # Create global forwarding rule
-        self.forwarding_rule = (
+        self.http_forwarding = (
             compute_global_forwarding_rule.ComputeGlobalForwardingRule(
                 self,
-                "forwarding_rule",
-                name=name,
-                target=self.redirect_proxy.id,
+                "http_forwarding",
+                name=name_prefix+"-grafana-http",
+                target=self.http_proxy.self_link,
                 port_range="80",
                 project=project_id,
                 load_balancing_scheme="EXTERNAL_MANAGED",
@@ -139,12 +135,13 @@ class LBComponent(Construct):
             )
         )
 
-        # self.redirect_rule = compute_global_forwarding_rule.ComputeGlobalForwardingRule(
-        #     self,
-        #     "redirect_rule",
-        #     name=name+"httpredirect",
-        #     target=self.redirectproxy.id,
-        #     port_range="80",
-        #     project=project_id,
-        #     ip_address=self.forwarding_rule.ip_address,
-        # )
+        self.https_forwarding = compute_global_forwarding_rule.ComputeGlobalForwardingRule(
+            self,
+            "https_forwarding",
+            name=name_prefix+"-grafana-https",
+            target=self.https_proxy.self_link,
+            port_range="443",
+            project=project_id,
+            ip_address=self.global_address.address,
+            load_balancing_scheme="EXTERNAL_MANAGED",
+        )

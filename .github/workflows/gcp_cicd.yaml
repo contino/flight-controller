@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 18
       - name: Install cdktf
-        run: npm install --global cdktf-cli@0.15.5
+        run: npm install --global cdktf-cli@latest
 
       - name: Install pip packages
         run: make install-dependencies
@@ -53,6 +53,7 @@ jobs:
         with:
           directory: infrastructure/gcp/cdktf.out/stacks/ 
           framework: terraform_plan
+          # skip_check: CKV_GCP_102
 
       - name: Deploy base infrastructure
         run: make gcp-deploy-base INFRA_ARGS=--auto-approve

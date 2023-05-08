@@ -1,9 +1,7 @@
+from cdktf_cdktf_provider_google import (cloud_run_service,
+                                         cloud_run_service_iam_member,
+                                         service_account)
 from constructs import Construct
-from cdktf_cdktf_provider_google import (
-    cloud_run_service,
-    cloud_run_service_iam_member,
-    service_account,
-)
 
 
 class GrafanaComponent(Construct):
@@ -13,22 +11,19 @@ class GrafanaComponent(Construct):
         id: str,
         project_id: str,
         location: str,
-        name: str,
-        cloudrun_account: service_account.ServiceAccount,
+        name_prefix: str,
     ):
         super().__init__(scope, id)
-
 
         self.service = cloud_run_service.CloudRunService(
             self,
             "grafana_service",
-            name=name,
+            name=f"{name_prefix}-grafana",
             location=location,
             project=project_id,
             metadata={
-                "annotations": 
-                {
-                    "run.googleapis.com/ingress" : "internal-and-cloud-load-balancing",
+                "annotations": {
+                    "run.googleapis.com/ingress": "internal-and-cloud-load-balancing",
                 }
             },
             template={
@@ -60,5 +55,5 @@ class GrafanaComponent(Construct):
             location=self.service.location,
             role="roles/run.invoker",
             project=project_id,
-            member="domain:contino.io"
+            member="domain:contino.io",
         )

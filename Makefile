@@ -117,7 +117,7 @@ gcp-build-image:
 	@echo "\n\n---GCP-BUILD-IMAGE---\n"
 	gcloud auth configure-docker australia-southeast1-docker.pkg.dev
 	pipenv requirements | tee requirements.txt
-	docker buildx build --platform=linux/amd64 --push . -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-contoller-event-receiver/event_receiver:latest
+	docker buildx build --platform=linux/amd64 --push . -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:latest
 
 gcp-synth: gcp-build-dependencies
 	@echo "\n\n---GCP-SYNTH---\n"
@@ -227,3 +227,8 @@ azure-destroy-grafana:
 azure-destroy-all: 
 	@echo "\n\n---AZURE-DESTROY-ALL---\n"
 	cd infrastructure/azure;cdktf destroy azure_core azure_grafana_dashboard
+
+# Local
+local-gcp-plan: gcp-plan-base gcp-plan-core
+
+local-gcp-deploy: gcp-deploy-base gcp-deploy-core
