@@ -140,9 +140,9 @@ class GcpCore(TerraformStack):
             NAME_PREFIX,
             DOMAIN_NAME
         )
-        # self.grafana_workspace_id = lb_component.global_address.address
 
-# GCP Grafana Stack
+
+## GCP Grafana Stack
 # class GcpGrafana(TerraformStack):
 #     def __init__(self, scope: Construct, id: str, workspace_id: str,):
 #         super().__init__(scope, id)
@@ -151,8 +151,7 @@ class GcpCore(TerraformStack):
 #             self,
 #             "Grafana",
 #             auth="",
-#             url=workspace_id
-#             + ":80",
+#             url="https://"+DOMAIN_NAME
 #         )
 
 #         # Create Grafana dashboard
