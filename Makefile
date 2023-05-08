@@ -174,3 +174,7 @@ gcp-destroy-grafana:
 gcp-destroy-all:
 	@echo "\n\n---GCP-DESTROY-ALL---\n"
 	cd infrastructure/gcp;cdktf destroy gcp_base gcp_core gcp_grafana 
+
+local-gcp-plan: gcp-plan-base gcp-plan-core
+
+local-gcp-deploy: gcp-deploy-base gcp-deploy-core
