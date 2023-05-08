@@ -22,6 +22,7 @@ LOCATION = "australia-southeast1"
 NAME_PREFIX = "flight-controller"
 EVENT_TABLE_NAME = "event_sourcing_table"
 METRIC_TABLE_NAME = "metric_sourcing_table"
+DOMAIN_NAME = "flightcontroller.apacsquadzero.io"
 
 # GCP Base Stack
 class GcpBase(TerraformStack):
@@ -137,6 +138,7 @@ class GcpCore(TerraformStack):
             PROJECT_ID,
             LOCATION,
             NAME_PREFIX,
+            DOMAIN_NAME
         )
         # self.grafana_workspace_id = lb_component.global_address.address
 
