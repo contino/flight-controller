@@ -5,6 +5,7 @@
     "grafana/grafana@~> 1.39"
   ],
   "terraformModules": [],
+  "codeMakerOutput": "imports",
   "context": {
     "excludeStackIdFromLogicalIds": "true",
     "allowSepCharsInLogicalIds": "true"
