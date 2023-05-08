@@ -19,5 +19,7 @@ class ServiceAccountComponent(Construct):
         )
 
         self.cloud_run = service_account.ServiceAccount(
-            self, "cloud-run", project=project_id, account_id="fc-cloud-run"
+            self, "cloud-run", 
+            project=project_id, 
+            account_id="fc-cloud-run"
         )

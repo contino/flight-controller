@@ -1,8 +1,13 @@
-from cdktf_cdktf_provider_google import (cloud_run_service, eventarc_trigger,
-                                         kms_crypto_key,
-                                         kms_crypto_key_iam_binding,
-                                         kms_key_ring, project_iam_binding,
-                                         pubsub_topic, service_account)
+from cdktf_cdktf_provider_google import (
+    cloud_run_service, 
+    eventarc_trigger,
+    kms_crypto_key,
+    kms_crypto_key_iam_binding,
+    kms_key_ring, 
+    project_iam_binding,
+    pubsub_topic, 
+    service_account,
+)
 from constructs import Construct
 
 
@@ -85,4 +90,12 @@ class EventarcWithPubsubComponent(Construct):
             project=project_id,
             role="roles/eventarc.eventReceiver",
             members=[f"serviceAccount:{cloudrun_account.email}"],
+        )
+
+        self.eventarc = project_iam_binding.ProjectIamBinding(
+            self,
+            "eventarc_binding",
+            project=project_id,
+            role="roles/run.invoker",
+            members=[f"serviceAccount:{service_account.email}"],
         )

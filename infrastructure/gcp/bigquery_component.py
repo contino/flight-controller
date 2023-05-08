@@ -1,9 +1,13 @@
 import json
 
 from cdktf_cdktf_provider_google import (
-    bigquery_dataset, bigquery_table,
-    data_google_bigquery_default_service_account, kms_crypto_key,
-    kms_crypto_key_iam_binding, kms_key_ring)
+    bigquery_dataset, 
+    bigquery_table,
+    data_google_bigquery_default_service_account, 
+    kms_crypto_key,
+    kms_crypto_key_iam_binding, 
+    kms_key_ring
+)
 from constructs import Construct
 
 

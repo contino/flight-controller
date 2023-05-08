@@ -26,7 +26,7 @@ class CloudRunComponent(Construct):
                 "spec": {
                     "containers": [
                         {
-                            "image": "australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-contoller-event-receiver/event_receiver:latest",
+                            "image": "australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:latest",
                             "ports": [{"container_port": 8080}],
                         },
                     ],
@@ -38,7 +38,7 @@ class CloudRunComponent(Construct):
         self.bigquery_job = project_iam_member.ProjectIamMember(
             self,
             "bigquery_job",
-            role="roles/bigquery.jobUser",
+            role="roles/bigquery.dataEditor",
             member=f"serviceAccount:{cloudrun_account.email}",
             project=project_id,
         )
