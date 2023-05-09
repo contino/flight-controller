@@ -25,6 +25,8 @@ constructs = "*"
 cdktf = "*"
 cdktf-cdktf-provider-aws = "*"
 cdktf-cdktf-provider-google = "*"
+cdktf-cdktf-provider-azurerm = "*"
+cdktf-cdktf-provider-external = "*"
 pytest-watch = "*"
 dirhash = "*"
 

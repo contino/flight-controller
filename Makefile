@@ -42,14 +42,15 @@ e2e:
 clean:
 	cd infrastructure/aws; rm -rf cdktf.out
 	cd infrastructure/gcp; rm -rf cdktf.out
+	cd infrastructure/azure; rm -rf cdktf.out
 
-synth: aws-synth gcp-synth
+synth: aws-synth gcp-synth azure-synth
 
-plan: aws-plan-all gcp-plan-all
+plan: aws-plan-all gcp-plan-all azure-plan-all
 
-deploy: aws-deploy-all gcp-deploy-all
+deploy: aws-deploy-all gcp-deploy-all azure-deploy-all
 
-destroy: aws-destroy-all gcp-destroy-all
+destroy: aws-destroy-all gcp-destroy-all azure-destroy-all
 
 # AWS
 aws-build-dependencies:
@@ -175,6 +176,59 @@ gcp-destroy-all:
 	@echo "\n\n---GCP-DESTROY-ALL---\n"
 	cd infrastructure/gcp;cdktf destroy gcp_base gcp_core gcp_grafana 
 
+# Azure
+azure-build-dependencies:
+	@echo "\n\n---AZURE-BUILD-DEPENDENCIES---\n"
+	cd infrastructure/azure;cdktf provider add grafana/grafana
+
+azure-synth: azure-build-dependencies
+	@echo "\n\n---AZURE-SYNTH---\n"
+	cd infrastructure/azure;cdktf synth
+
+azure-plan-core: 
+	@echo "\n\n---AZURE-PLAN-CORE---\n"
+	cd infrastructure/azure;cdktf plan azure_core
+
+azure-plan-grafana:
+	@echo "\n\n---AZURE-PLAN-GRAFANA---\n"
+	cd infrastructure/azure;cdktf plan azure_grafana_dashboard
+
+azure-plan-convert: 
+	@echo "\n\n---Converting AZURE plans file to json---\n"
+	cd infrastructure/azure/cdktf.out/stacks; \
+	find . -type f -name 'plan' -exec dirname {} \; | while read file; do \
+		cd "$$file"; \
+		terraform show -json plan > plan.json; \
+		cd -; \
+	done
+
+azure-plan-all: azure-build-dependencies azure-plan-core azure-plan-grafana azure-plan-convert
+
+azure-deploy-core:
+	@echo "\n\n---AZURE-DEPLOY-CORE---\n"
+	cd infrastructure/azure;cdktf deploy azure_core ${INFRA_ARGS}
+
+azure-deploy-grafana:
+	@echo "\n\n---AZURE-DEPLOY-GRAFANA---\n"
+	cd infrastructure/azure;cdktf deploy azure_grafana_dashboard ${INFRA_ARGS}
+
+azure-deploy-all:
+	@echo "\n\n---AZURE-DEPLOY-ALL---\n"
+	cd infrastructure/azure;cdktf deploy azure_core azure_grafana_dashboard ${INFRA_ARGS}
+
+azure-destroy-core:
+	@echo "\n\n---AZURE-DESTROY-CORE---\n"
+	cd infrastructure/azure;cdktf destroy azure_core
+
+azure-destroy-grafana:
+	@echo "\n\n---AZURE-DESTROY-GRAFANA---\n"
+	cd infrastructure/azure;cdktf destroy azure_grafana_dashboard
+
+azure-destroy-all: 
+	@echo "\n\n---AZURE-DESTROY-ALL---\n"
+	cd infrastructure/azure;cdktf destroy azure_core azure_grafana_dashboard
+
+# Local
 local-gcp-plan: gcp-plan-base gcp-plan-core
 
 local-gcp-deploy: gcp-deploy-base gcp-deploy-core
