@@ -1,4 +1,7 @@
-from cdktf_cdktf_provider_google import service_account
+from cdktf_cdktf_provider_google import (
+    service_account, 
+    service_account_iam_binding,
+)
 from constructs import Construct
 
 
@@ -22,4 +25,10 @@ class ServiceAccountComponent(Construct):
             self, "cloud-run", 
             project=project_id, 
             account_id="fc-cloud-run"
+        )
+        
+        self.grafana = service_account.ServiceAccount(
+            self, "grafana", 
+            project=project_id, 
+            account_id="fc-grafana"
         )

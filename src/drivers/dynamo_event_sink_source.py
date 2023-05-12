@@ -36,7 +36,7 @@ class DynamoEventSink(EventSink):
                         "aggregate_type": event.aggregate_type,
                         "aggregate_version": event.aggregate_version,
                         "event_version": event.event_version,
-                        "payload": event.payload.model_dump_json(by_alias=True),
+                        "payload": event.payload.json(by_alias=True),
                         "datetime": int(round(datetime.utcnow().timestamp())),
                     }
                     batch.put_item(Item=value)

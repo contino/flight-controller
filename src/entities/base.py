@@ -12,7 +12,7 @@ class BaseEvent(BaseModel):
 
     def __eq__(self, other):
         if other.__class__ is self.__class__:
-            return self.model_dump(by_alias=True) == other.model_dump(by_alias=True)
+            return self.dict(by_alias=True) == other.dict(by_alias=True)
         return NotImplemented
 
 
@@ -22,5 +22,5 @@ class BaseMetric(BaseModel):
 
     def __eq__(self, other):
         if other.__class__ is self.__class__:
-            return self.model_dump(by_alias=True) == other.model_dump(by_alias=True)
+            return self.dict(by_alias=True) == other.dict(by_alias=True)
         return NotImplemented

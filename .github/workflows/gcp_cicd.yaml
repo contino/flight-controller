@@ -53,16 +53,25 @@ jobs:
         with:
           directory: infrastructure/gcp/cdktf.out/stacks/ 
           framework: terraform_plan
-          # skip_check: CKV_GCP_102
 
       - name: Deploy base infrastructure
         run: make gcp-deploy-base INFRA_ARGS=--auto-approve
       
       - name: Build & push docker image
-        run: make gcp-build-image
+        run: make gcp-core-image
+
+      - name: Build & push Grafana image
+        run: make gcp-grafana-image
+        env:
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
       
       - name: Deploy main infrastructure
         run: make gcp-deploy-core INFRA_ARGS=--auto-approve
+
+      - name: Deploy grafana dashboard
+        run: make gcp-deploy-grafana INFRA_ARGS=--auto-approve
+        env:
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
 
       - name: Perform full test and check coverage
         run: make gcp-test

@@ -125,11 +125,17 @@ gcp-build-dependencies:
 	@echo "\n\n---GCP-BUILD-DEPENDENCIES---\n"
 	cd infrastructure/gcp; cdktf provider add grafana/grafana
 
-gcp-build-image:
+gcp-core-image:
 	@echo "\n\n---GCP-BUILD-IMAGE---\n"
 	gcloud auth configure-docker australia-southeast1-docker.pkg.dev
 	pipenv requirements | tee requirements.txt
-	docker buildx build --platform=linux/amd64 --push . -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:${COMMIT}
+	docker buildx build --platform=linux/amd64 -f infrastructure/gcp/Core.Dockerfile . --push  -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/event_receiver:${COMMIT}
+
+gcp-grafana-image:
+	@echo "\n\n---BUILD-GRAFANA-IMAGE---\n"
+	cd infrastructure/gcp
+	gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+	docker buildx build --platform=linux/amd64 --build-arg GRAFANA_PASSWORD=${GRAFANA_PASSWORD} -f infrastructure/gcp/Grafana.Dockerfile . --push  -t australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/grafana:${COMMIT}
 
 gcp-synth: gcp-build-dependencies
 	@echo "\n\n---GCP-SYNTH---\n"
@@ -170,7 +176,7 @@ gcp-deploy-grafana:
 	@echo "\n\n---GCP-DEPLOY-GRAFANA---\n"
 	cd infrastructure/gcp;cdktf deploy gcp_grafana ${INFRA_ARGS}
 
-gcp-deploy-all: gcp-deploy-base gcp-build-image gcp-deploy-core #gcp-deploy-grafana
+gcp-deploy-all: gcp-deploy-base gcp-core-image gcp-grafana-image gcp-deploy-core gcp-deploy-grafana
 
 gcp-destroy-base:
 	@echo "\n\n---GCP-DESTROY-BASE---\n"
@@ -187,7 +193,3 @@ gcp-destroy-grafana:
 gcp-destroy-all:
 	@echo "\n\n---GCP-DESTROY-ALL---\n"
 	cd infrastructure/gcp;cdktf destroy gcp_base gcp_core gcp_grafana 
-
-local-gcp-plan: gcp-plan-base gcp-plan-core
-
-local-gcp-deploy: gcp-deploy-base gcp-deploy-core

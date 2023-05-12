@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import os
+import json
 
 from artifact_registry_component import ArtifactRegistryComponent
 from bigquery_component import BigQueryComponent
@@ -142,23 +144,28 @@ class GcpCore(TerraformStack):
         )
 
 
-## GCP Grafana Stack
-# class GcpGrafana(TerraformStack):
-#     def __init__(self, scope: Construct, id: str, workspace_id: str,):
-#         super().__init__(scope, id)
+# GCP Grafana Stack
+class GcpGrafana(TerraformStack):
+    def __init__(self, scope: Construct, id: str,):
+        super().__init__(scope, id)
 
-#         GrafanaProvider(
-#             self,
-#             "Grafana",
-#             auth="",
-#             url="https://"+DOMAIN_NAME
-#         )
+        GrafanaProvider(
+            self,
+            "Grafana",
+            auth=f"admin:{os.getenv('GRAFANA_PASSWORD')}",
+            url="https://"+DOMAIN_NAME
+        )
 
-#         # Create Grafana dashboard
-#         GrafanaDashboardComponent(
-#             self,
-#             "grafana_dashboard",
-#         )
+        # Load the dashboard configuration from a JSON file
+        with open("dashboard.json", "r") as f:
+            data = json.load(f)
+
+        # Create Grafana dashboard
+        GrafanaDashboardComponent(
+            self,
+            "grafana_dashboard",
+            data
+        )
 
 app = App()
 
@@ -175,7 +182,7 @@ core_stack = GcpCore(
     base_stack.key_ring,
 )
 
-# grafana_stack = GcpGrafana(app, "gcp_grafana", gcp_stack.grafana_workspace_id)
+grafana_stack = GcpGrafana(app, "gcp_grafana",)
 
 GcsBackend(
     base_stack,
@@ -189,10 +196,10 @@ GcsBackend(
     prefix="main_gcp_infra/terraform.tfstate",
 )
 
-# GcsBackend(
-#     grafana_stack,
-#     bucket = "flight-controller-state",
-#     prefix="grafana_infra/terraform.tfstate",
-# )
+GcsBackend(
+    grafana_stack,
+    bucket = "flight-controller-state",
+    prefix="grafana_infra/terraform.tfstate",
+)
 
 app.synth()
