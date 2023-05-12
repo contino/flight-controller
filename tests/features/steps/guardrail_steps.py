@@ -106,7 +106,7 @@ def guardrail_passes(context, cloud):
 
 @then("the activation count is stored correctly for {cloud}")
 def metric_stored(context, cloud):
-    sleep(10)
+    sleep(15)
 
     if cloud == "aws":
         result = context.time_stream.query(
@@ -130,7 +130,7 @@ def metric_stored(context, cloud):
 
 @then("the guardrail lead time is stored correctly for {cloud}")
 def metric_stored(context, cloud):
-    sleep(10)
+    sleep(15)
 
     if cloud == "aws":
         result = context.time_stream.query(
@@ -154,7 +154,7 @@ def metric_stored(context, cloud):
 
 @then("the max activation count is stored correctly for {cloud}")
 def metric_stored(context, cloud):
-    sleep(10)
+    sleep(15)
 
     if cloud == "aws":
         result = context.time_stream.query(

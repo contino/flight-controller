@@ -11,24 +11,19 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [],
-          "type": "dashboard"
-        },
         "type": "dashboard"
       }
     ]
   },
+  "description": "",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [],
   "refresh": "",
-  "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -41,7 +36,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Flight Controller",
-  "version": 0,
+  "title": "Flight Controller Dashboard",
+  "uid": "d5c3a93e-f160-4ed5-b3b8-aefbc1532bf4",
+  "version": 2,
   "weekStart": ""
 }

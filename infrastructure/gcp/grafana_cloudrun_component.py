@@ -1,7 +1,12 @@
-from cdktf_cdktf_provider_google import (cloud_run_service,
-                                         cloud_run_service_iam_member,
-                                         service_account)
+import subprocess
+
+from cdktf_cdktf_provider_google import (
+    cloud_run_service,
+    cloud_run_service_iam_member,
+)
 from constructs import Construct
+
+COMMIT = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode("utf-8")
 
 
 class GrafanaComponent(Construct):
@@ -15,11 +20,14 @@ class GrafanaComponent(Construct):
     ):
         super().__init__(scope, id)
 
+
+        # Grafana service setup
         self.service = cloud_run_service.CloudRunService(
             self,
             "grafana_service",
             name=f"{name_prefix}-grafana",
             location=location,
+            autogenerate_revision_name=True,
             project=project_id,
             metadata={
                 "annotations": {
@@ -30,7 +38,7 @@ class GrafanaComponent(Construct):
                 "spec": {
                     "containers": [
                         {
-                            "image": "mirror.gcr.io/grafana/grafana:latest",
+                            "image": f"australia-southeast1-docker.pkg.dev/contino-squad0-fc/flight-controller-event-receiver/grafana:{COMMIT}",
                             "ports": [
                                 {
                                     "container_port": 8080,
@@ -40,12 +48,18 @@ class GrafanaComponent(Construct):
                                 {
                                     "name": "GF_SERVER_HTTP_PORT",
                                     "value": "8080",
-                                }
+                                },
                             ],
                         }
                     ]
                 }
             },
+            traffic=[
+                {
+                "percent": 100,
+                "latest_revision": True,      
+                }
+            ],
         )
 
         self.allowusers = cloud_run_service_iam_member.CloudRunServiceIamMember(
