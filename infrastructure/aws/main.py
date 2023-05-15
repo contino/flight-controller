@@ -66,7 +66,7 @@ class AwsCore(TerraformStack):
 
         # Create lambda function to rotate Grafana key 
         grafanaLambdaComponent = GrafanaLambdaComponent(
-            self, "grafana_function", self.grafana_lambda_name, grafanaWorkspace.grafana_workspace, dynamoDBcomponent.key.arn
+            self, "grafana_function", self.grafana_lambda_name, grafanaWorkspace.grafana_workspace, grafanaWorkspace.api_kms_key.arn, grafanaWorkspace.workspace_id_kms_key.arn
         )
 
         # Create rotation rules to trigger every 29 days

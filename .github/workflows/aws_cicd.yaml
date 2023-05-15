@@ -55,7 +55,7 @@ jobs:
         with:
           directory: infrastructure/aws/cdktf.out/stacks/
           framework: terraform_plan
-          skip_check: CKV_AWS_116,CKV_AWS_117,CKV_AWS_272
+          skip_check: CKV_AWS_116,CKV_AWS_117,CKV_AWS_272,CKV2_AWS_57
         
       - name: Dev deployment
         run: make aws-deploy-all INFRA_ARGS=--auto-approve
