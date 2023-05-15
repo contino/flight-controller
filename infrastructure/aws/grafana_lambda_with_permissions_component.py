@@ -27,7 +27,8 @@ class GrafanaLambdaComponent(Construct):
         id: str,
         name: str,
         grafanaWorkspace: grafana_workspace.GrafanaWorkspace,
-        dynamo_db_key: str
+        api_kms_key: str,
+        workspace_id_kms_key: str
     ):
         super().__init__(scope, id)
 
@@ -45,7 +46,10 @@ class GrafanaLambdaComponent(Construct):
             self,
             "flight_controller_grafana_rotation_lambda_key",
             description="Flight Controller Grafana Rotation Lambda KMS Key",
-            enable_key_rotation=True
+            enable_key_rotation=True,
+            lifecycle={
+                "prevent_destroy": True
+            }
         )
 
         # CREATE roles
@@ -95,8 +99,13 @@ class GrafanaLambdaComponent(Construct):
                                         "kms:Decrypt",
                                         "kms:Encrypt",
                                         "kms:CreateGrant",
+                                        "kms:ReEncrypt*",
+                                        "kms:GenerateDataKey*"
                                     ],
-                                    "Resource": dynamo_db_key,
+                                    "Resource": [
+                                        api_kms_key,
+                                        workspace_id_kms_key
+                                    ],
                                     "Effect": "Allow",
                                 },
                                 {

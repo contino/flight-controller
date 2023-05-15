@@ -92,7 +92,7 @@ class GrafanaWithPermissionsComponent(Construct):
             grafana_workspace_api_key.GrafanaWorkspaceApiKey(
                 self,
                 "grafana_workspace_api_key",
-                key_name="flight_controller_api_key",
+                key_name="flight-controller-grafana-api-key",
                 key_role="ADMIN",
                 workspace_id=self.grafana_workspace.id,
                 seconds_to_live=2525000,
@@ -100,11 +100,14 @@ class GrafanaWithPermissionsComponent(Construct):
         )
 
         # KMS Key
-        key = kms_key.KmsKey(
+        self.api_kms_key = kms_key.KmsKey(
             self,
             "flight_controller_core_grafana_api_key",
             description="Flight Controller Core Grafana API KMS Key",
             enable_key_rotation=True,
+            lifecycle={
+                "prevent_destroy": True
+            }
         )
 
         # Create secret in AWS Secrets Manager
@@ -112,7 +115,7 @@ class GrafanaWithPermissionsComponent(Construct):
             self,
             "grafana_key",
             name="flight-controller/grafana-api-key",
-            kms_key_id = key.id
+            kms_key_id = self.api_kms_key.id
         )
 
         # Store secret in above created resource
@@ -122,5 +125,33 @@ class GrafanaWithPermissionsComponent(Construct):
                 "grafana_key_value",
                 secret_id=self.grafana_key.id,
                 secret_string=self.grafana_workspace_api_key.key,
+            )
+        )
+
+        self.workspace_id_kms_key = kms_key.KmsKey(
+            self,
+            "flight_controller_core_grafana_workspace_key",
+            description="Flight Controller Core Grafana API KMS Key",
+            enable_key_rotation=True,
+            lifecycle={
+                "prevent_destroy": True
+            }
+        )
+
+        # Store workspace ID in AWS Secrets Manager
+        self.workspace_id = secretsmanager_secret.SecretsmanagerSecret(
+            self,
+            "workspace_id",
+            name="flight-controller/grafana-workspace-id",
+            kms_key_id= self.workspace_id_kms_key.id
+        )
+
+        # Store workspace ID in above created resource
+        self.workspace_id_value = (
+            secretsmanager_secret_version.SecretsmanagerSecretVersion(
+                self,
+                "workspace_id_value",
+                secret_id=self.workspace_id.id,
+                secret_string=self.grafana_workspace.id,
             )
         )

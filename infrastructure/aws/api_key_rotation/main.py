@@ -1,62 +1,53 @@
-import boto3
-import botocore
 import logging
+
+import boto3
+from botocore.exceptions import ClientError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 # secret's name and region
-grafana_api_key_name = "flight-controller/grafana-api-key"
-grafana_workspace_id = "flight-controller/grafana-workspace-id"
+grafana_api_key_name = "flight-controller-grafana-api-key"
+secrets_api_key_name = "flight-controller/grafana-api-key"
+secrets_workspace_id_name = "flight-controller/grafana-workspace-id"
 region_name = "ap-southeast-2"
-
-#Set up our Session and Client
-session = boto3.session.Session()
-client = session.client(
-    service_name='secretsmanager',
-    region_name=region_name
-)
 
 def lambda_handler(event, context):
     secretmanager_client = boto3.client('secretsmanager')
     grafana_client = boto3.client('grafana')
 
     # Calling SecretsManager
-    workspace_id = client.get_secret_value(
-        SecretId=grafana_workspace_id
+    workspace_id = secretmanager_client.get_secret_value(
+        SecretId=secrets_workspace_id_name
     )['SecretString']
     
     # Calling SecretsManager
-    current_api_key = client.get_secret_value(
-        SecretId=grafana_api_key_name
+    current_api_key = secretmanager_client.get_secret_value(
+        SecretId=secrets_api_key_name
     )['SecretString']
-    
-
-    #Raw Response
-    print(current_api_key)
     
     # Delete key if exists
     try:
-        print("Deleting old API Key")
+        logger.info("Deleting old API Key")
         grafana_client.delete_workspace_api_key(
             keyName=grafana_api_key_name,
             workspaceId=workspace_id
         )
-        print("Deleted old API key")
-    except grafana_client.exceptions.ResourceNotFoundException:
-        pass
+        logger.info("Deleted old API key")
+    except Exception as error:
+        logger.error(f"Deletion of old API key failed. Error: {error}")
 
     # Generate new API key
     try:
-        print("Creating new API key")
+        logger.info("Creating new API key")
         new_api_key = grafana_client.create_workspace_api_key(
             keyName=grafana_api_key_name,
             keyRole='ADMIN',
             secondsToLive=2592000,
             workspaceId=workspace_id
         )['key']
-        print("Created new API Key :{}".format(new_api_key))
-    except botocore.exceptions.ClientError as error:
+        logger.info("Created new API Key :{}".format(new_api_key))
+    except ClientError as error:
         logger.error(error)
         return {
             'statusCode': 500,
@@ -65,13 +56,13 @@ def lambda_handler(event, context):
 
     # Update the secret with the new API key
     try:
-        print("Storing new API key in Secrets Manager")
+        logger.info("Storing new API key in Secrets Manager")
         secretmanager_client.update_secret(
-            SecretId=grafana_api_key_name,
+            SecretId=secrets_api_key_name,
             SecretString=new_api_key
         )
-        print("Successfully stored new API key in Secrets Manager")
-    except botocore.exceptions.ClientError as error:
+        logger.info("Successfully stored new API key in Secrets Manager")
+    except ClientError as error:
         logger.error(error)
         return {
             'statusCode': 500,

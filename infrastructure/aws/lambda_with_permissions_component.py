@@ -52,6 +52,9 @@ class LambdaWithPermissionsComponent(Construct):
             "flight_controller_core_lambda_key",
             description="Flight Controller Core Lambda KMS Key",
             enable_key_rotation=True,
+            lifecycle={
+                "prevent_destroy": True
+            }
         )
 
         # CREATE roles

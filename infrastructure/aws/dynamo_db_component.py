@@ -18,6 +18,9 @@ class DynamoDBcomponent(Construct):
             "flight_controller_core_dynamodb_key",
             description="Flight Controller Core DynamoDB KMS Key",
             enable_key_rotation=True,
+            lifecycle={
+                "prevent_destroy": True
+            }
         )
 
         # create dynamoDB table
