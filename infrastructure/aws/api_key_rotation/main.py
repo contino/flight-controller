@@ -9,17 +9,18 @@ logger = logging.getLogger()
 # secret's name and region
 grafana_api_key_name = "flight-controller-grafana-api-key"
 secrets_api_key_name = "flight-controller/grafana-api-key"
-secrets_workspace_id_name = "flight-controller/grafana-workspace-id"
-region_name = "ap-southeast-2"
+parameter_workspace_id_name = "/flight-controller/grafana-workspace-id"
 
 def lambda_handler(event, context):
     secretmanager_client = boto3.client('secretsmanager')
+    ssm_client = boto3.client('ssm')
     grafana_client = boto3.client('grafana')
 
-    # Calling SecretsManager
-    workspace_id = secretmanager_client.get_secret_value(
-        SecretId=secrets_workspace_id_name
-    )['SecretString']
+    # Calling Parameter Sotre
+    workspace_id = ssm_client.get_parameter(
+        Name=parameter_workspace_id_name,
+        WithDecryption=True
+    )["Parameter"]["Value"]
     
     # Calling SecretsManager
     current_api_key = secretmanager_client.get_secret_value(

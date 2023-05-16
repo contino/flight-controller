@@ -1,6 +1,6 @@
+from cdktf_cdktf_provider_aws import (timestreamwrite_database,
+                                      timestreamwrite_table)
 from constructs import Construct
-
-from cdktf_cdktf_provider_aws import timestreamwrite_database, timestreamwrite_table
 
 
 class TimeStreamDBcomponent(Construct):
@@ -16,7 +16,7 @@ class TimeStreamDBcomponent(Construct):
             table_name="metrics_table",
             database_name=timestream_db.database_name,
             retention_properties={  # in-memory tier of a week and afterwards data will be moved to read-optimised tier for two years.
-                "magnetic_store_retention_period_in_days": 24 * 7,
-                "memory_store_retention_period_in_hours": 365 * 2,
+                "magnetic_store_retention_period_in_days": 365 * 2,
+                "memory_store_retention_period_in_hours": 24 * 2,
             },
         )

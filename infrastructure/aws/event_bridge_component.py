@@ -1,14 +1,10 @@
 import json
 
+from cdktf_cdktf_provider_aws import (cloudwatch_event_bus,
+                                      cloudwatch_event_rule,
+                                      cloudwatch_event_target, lambda_function,
+                                      lambda_permission)
 from constructs import Construct
-
-from cdktf_cdktf_provider_aws import (
-    cloudwatch_event_bus,
-    cloudwatch_event_rule,
-    cloudwatch_event_target,
-    lambda_function,
-    lambda_permission,
-)
 
 
 class EventBridgeComponent(Construct):
@@ -17,16 +13,16 @@ class EventBridgeComponent(Construct):
         scope: Construct,
         id: str,
         name: str,
-        lambdaTarget: lambda_function.LambdaFunction,
+        lambda_target: lambda_function.LambdaFunction,
     ):
         super().__init__(scope, id)
 
-        eventbus = cloudwatch_event_bus.CloudwatchEventBus(self, "eventbus", name=name)
-        eventrule = cloudwatch_event_rule.CloudwatchEventRule(
+        event_bus = cloudwatch_event_bus.CloudwatchEventBus(self, "eventbus", name=name)
+        event_rule = cloudwatch_event_rule.CloudwatchEventRule(
             self,
             "eventRule",
             name="eventrule_cdktf",
-            event_bus_name=eventbus.name,
+            event_bus_name=event_bus.name,
             event_pattern=json.dumps({"source": [{"prefix": "contino"}]}),
         )
 
@@ -34,9 +30,9 @@ class EventBridgeComponent(Construct):
             self,
             "event_target",
             target_id="target_id1",
-            event_bus_name=eventbus.name,
-            arn=lambdaTarget.arn,
-            rule=eventrule.name,
+            event_bus_name=event_bus.name,
+            arn=lambda_target.arn,
+            rule=event_rule.name,
         )
 
         lambda_permission.LambdaPermission(
@@ -44,7 +40,7 @@ class EventBridgeComponent(Construct):
             "lambda_resource_policy",
             statement_id="alloweventBridgetrigger",
             action="lambda:InvokeFunction",
-            function_name=lambdaTarget.function_name,
+            function_name=lambda_target.function_name,
             principal="events.amazonaws.com",
-            source_arn=eventrule.arn,
+            source_arn=event_rule.arn,
         )
