@@ -1,13 +1,11 @@
 import json
-from cdktf_cdktf_provider_aws import (
-    grafana_workspace,
-    grafana_workspace_api_key,
-    iam_role,
-    iam_role_policy_attachment,
-    secretsmanager_secret,
-    secretsmanager_secret_version,
-    kms_key
-)
+
+from cdktf_cdktf_provider_aws import (grafana_workspace,
+                                      grafana_workspace_api_key, iam_role,
+                                      iam_role_policy_attachment, kms_key,
+                                      secretsmanager_secret,
+                                      secretsmanager_secret_version,
+                                      ssm_parameter)
 from constructs import Construct
 
 
@@ -138,20 +136,13 @@ class GrafanaWithPermissionsComponent(Construct):
             }
         )
 
-        # Store workspace ID in AWS Secrets Manager
-        self.workspace_id = secretsmanager_secret.SecretsmanagerSecret(
+        # Store workspace ID in AWS Parameter Store
+        self.workspace_id = ssm_parameter.SsmParameter(
             self,
             "workspace_id",
-            name="flight-controller/grafana-workspace-id",
-            kms_key_id= self.workspace_id_kms_key.id
-        )
-
-        # Store workspace ID in above created resource
-        self.workspace_id_value = (
-            secretsmanager_secret_version.SecretsmanagerSecretVersion(
-                self,
-                "workspace_id_value",
-                secret_id=self.workspace_id.id,
-                secret_string=self.grafana_workspace.id,
-            )
+            name="/flight-controller/grafana-workspace-id",
+            type="SecureString",
+            value=self.grafana_workspace.id,
+            key_id=self.workspace_id_kms_key.id,
+            overwrite=True
         )

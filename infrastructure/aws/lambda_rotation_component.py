@@ -1,9 +1,7 @@
-from cdktf_cdktf_provider_aws import (
-    secretsmanager_secret_rotation,
-    lambda_function,
-    secretsmanager_secret,
-)
+from cdktf_cdktf_provider_aws import (lambda_function, secretsmanager_secret,
+                                      secretsmanager_secret_rotation)
 from constructs import Construct
+
 
 class RotationComponent(Construct):
     def __init__(self, scope: Construct, id: str, secretsManager: secretsmanager_secret.SecretsmanagerSecret, lambda_func: lambda_function.LambdaFunction):

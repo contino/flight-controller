@@ -1,23 +1,12 @@
+import json
 import os
 import os.path as Path
-import json
 
+from cdktf import AssetType, TerraformAsset
+from cdktf_cdktf_provider_aws import (dynamodb_table, iam_role,
+                                      iam_role_policy_attachment, kms_key,
+                                      lambda_function, timestreamwrite_table)
 from constructs import Construct
-
-from cdktf import (
-    TerraformAsset,
-    AssetType,
-)
-
-from cdktf_cdktf_provider_aws import (
-    iam_role,
-    iam_role_policy_attachment,
-    lambda_function,
-    dynamodb_table,
-    timestreamwrite_table,
-    kms_key
-)
-
 from dirhash import dirhash
 
 
@@ -27,8 +16,8 @@ class LambdaWithPermissionsComponent(Construct):
         scope: Construct,
         id: str,
         name: str,
-        dynamoDbTable: dynamodb_table.DynamodbTable,
-        timestream_table: timestreamwrite_table,
+        dynamo_db_table: dynamodb_table.DynamodbTable,
+        timestream_table: timestreamwrite_table.TimestreamwriteTable,
         dynamo_db_key: str
     ):
         super().__init__(scope, id)
@@ -91,7 +80,7 @@ class LambdaWithPermissionsComponent(Construct):
                                     "dynamodb:GetItem",
                                     "dynamodb:PutItem",
                                 ],
-                                "Resource": dynamoDbTable.arn,
+                                "Resource": dynamo_db_table.arn,
                                 "Effect": "Allow",
                             },
                         }
@@ -159,7 +148,7 @@ class LambdaWithPermissionsComponent(Construct):
             filename=asset.path,
             environment=lambda_function.LambdaFunctionEnvironment(
                 variables={
-                    "DYNAMO_TABLE_NAME": dynamoDbTable.name,
+                    "DYNAMO_TABLE_NAME": dynamo_db_table.name,
                     "TIMESTREAM_DATABASE_NAME": timestream_table.database_name,
                     "TIMESTREAM_TABLE_NAME": timestream_table.table_name,
                 }

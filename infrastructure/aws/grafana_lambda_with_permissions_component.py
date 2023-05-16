@@ -1,23 +1,13 @@
+import json
 import os
 import os.path as Path
-import json
-from dirhash import dirhash
 
+from cdktf import AssetType, TerraformAsset
+from cdktf_cdktf_provider_aws import (grafana_workspace, iam_role,
+                                      iam_role_policy_attachment, kms_key,
+                                      lambda_function, lambda_permission)
 from constructs import Construct
-
-from cdktf import (
-    TerraformAsset,
-    AssetType,
-)
-
-from cdktf_cdktf_provider_aws import (
-    iam_role,
-    iam_role_policy_attachment,
-    lambda_function,
-    grafana_workspace,
-    lambda_permission,
-    kms_key
-)
+from dirhash import dirhash
 
 
 class GrafanaLambdaComponent(Construct):
@@ -26,7 +16,7 @@ class GrafanaLambdaComponent(Construct):
         scope: Construct,
         id: str,
         name: str,
-        grafanaWorkspace: grafana_workspace.GrafanaWorkspace,
+        grafana_workspace: grafana_workspace.GrafanaWorkspace,
         api_kms_key: str,
         workspace_id_kms_key: str
     ):
@@ -82,7 +72,7 @@ class GrafanaLambdaComponent(Construct):
                                     "grafana:DeleteWorkspaceApiKey",
                                     "grafana:CreateWorkspaceApiKey",
                                 ],
-                                "Resource": grafanaWorkspace.arn,
+                                "Resource": grafana_workspace.arn,
                                 "Effect": "Allow",
                             },
                         }
@@ -110,6 +100,13 @@ class GrafanaLambdaComponent(Construct):
                                 },
                                 {
                                     "Action": "kms:ListAliases",
+                                    "Resource": "*",
+                                    "Effect": "Allow",
+                                },
+                                {
+                                    "Action": [
+                                        "ssm:GetParameter"
+                                    ],
                                     "Resource": "*",
                                     "Effect": "Allow",
                                 }

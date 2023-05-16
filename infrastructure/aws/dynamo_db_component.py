@@ -1,9 +1,5 @@
+from cdktf_cdktf_provider_aws import dynamodb_table, kms_key
 from constructs import Construct
-
-from cdktf_cdktf_provider_aws import (
-    dynamodb_table,
-    kms_key
-)
 
 
 class DynamoDBcomponent(Construct):
@@ -12,7 +8,7 @@ class DynamoDBcomponent(Construct):
         self.partition_key = "aggregate_id"
         self.sort_key = "event_id"
 
-        # KMS Key
+        # DynamoDB KMS Key
         self.key = kms_key.KmsKey(
             self,
             "flight_controller_core_dynamodb_key",
@@ -23,7 +19,7 @@ class DynamoDBcomponent(Construct):
             }
         )
 
-        # create dynamoDB table
+        # Create DynamoDB table
         self.table = dynamodb_table.DynamodbTable(
             self,
             "table",
