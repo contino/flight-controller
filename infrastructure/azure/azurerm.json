@@ -1,0 +1,42 @@
+{
+    "key": "apacfc",
+    "env": "dev",
+    "location": "australiaeast",
+    "resource_group": {
+        "key": "rg"
+    },
+    "storage_account": {
+        "key": "stac",
+        "tier": "Standard",
+        "replication": "LRS",
+        "public": false,
+        "public_nested": false,
+        "https_only": true
+    },
+    "storage_container": {
+        "key": "stco"
+    },
+    "mssql_server": {
+        "key": "sqsv",
+        "version": "12.0",
+        "administrator_login": "4dm1n157r470r",
+        "administrator_login_password": "4-v3ry-53cr37-p455w0rd"
+    },
+    "mssql_database": {
+        "key": "sqdb",
+        "sku_name": "GP_Gen5_2",
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "create_mode": "Default"
+    },
+    "service_plan": {
+        "key": "svcp",
+        "os_type": "Linux",
+        "sku_name": "Y1"
+    },
+    "linux_function_app": {
+        "key": "func"
+    },
+    "eventgrid_topic": {
+        "key": "evgt"
+    }
+}

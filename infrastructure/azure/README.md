@@ -1,6 +1,17 @@
 Azure implementation of the Flight Controller infrastructure and code deployment.
 
 # Setup
+Install the necessary tools:
+
+```
+brew update && brew upgrade
+brew install terraform
+brew install node
+brew install python3
+pip install --user pipenv
+```
+
+
 In a new terminal session, run the followign commands while in the repository root:
 ```
 make local
