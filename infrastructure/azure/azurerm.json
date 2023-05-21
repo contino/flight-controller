@@ -38,5 +38,8 @@
     },
     "eventgrid_topic": {
         "key": "evgt"
+    },
+    "dashboard_grafana": {
+        "key": "grad"
     }
 }
