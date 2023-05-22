@@ -4,9 +4,6 @@ import json
 from constructs import Construct
 from cdktf import App, TerraformStack
 from cdktf_cdktf_provider_azurerm.provider import AzurermProvider
-from imports.grafana.provider import GrafanaProvider
-from imports.grafana.folder import Folder
-from imports.grafana.dashboard import Dashboard
 from cdktf_cdktf_provider_azurerm import (
     resource_group,
     storage_account,
@@ -15,8 +12,11 @@ from cdktf_cdktf_provider_azurerm import (
     mssql_database,
     service_plan,
     linux_function_app,
-    eventgrid_topic
+    eventgrid_topic,
+    dashboard_grafana
 )
+from imports.grafana.provider import GrafanaProvider
+from imports.grafana.folder import Folder
 
 class AzureCore(TerraformStack):
     def __init__(
@@ -31,109 +31,98 @@ class AzureCore(TerraformStack):
             "Azure", 
             features = {}
         )
-    
-        az_prefix = "apacfc"
-        az_env = "dev"
-        az_location = "australiaeast"
 
-        az_storage_account = {
-            "tier": "Standard",
-            "replication": "LRS",
-            "public": False,
-            "public_nested": False,
-            "https_only": True
-        }
-        az_sql_server = { 
-            "version": "12.0",
-            "administrator_login": "4dm1n157r470r",
-            "administrator_login_password": "4-v3ry-53cr37-p455w0rd"
-        }
-        az_sql_db = { 
-            "sku_name": "GP_Gen5_2",
-            "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "create_mode": "Default"
-        }
-        az_svc_plan = { 
-            "os_type": "Linux",
-            "sku_name": "Y1"
-        }
+        with open("azurerm.json", "r") as f:
+            az = json.load(f)
 
-        resourceGroup = resource_group.ResourceGroup(
+        self.rg = resource_group.ResourceGroup(
             self, 
-            "rg",
-            name = f"{az_prefix}{az_env}rg",
-            location = az_location
+            az['resource_group']['key'],
+            name      = f"{az['key']}{az['env']}{az['resource_group']['key']}",
+            location  = az['location']
         )
 
-        storageAccount = storage_account.StorageAccount(
+        self.sa = storage_account.StorageAccount(
             self,
-            "sa",
-            location = az_location,
-            resource_group_name = resourceGroup.name,
-            name = f"{az_prefix}{az_env}sa",
-            account_tier = az_storage_account['tier'],
-            account_replication_type = az_storage_account['replication']
+            az['storage_account']['key'],
+            location                   = az['location'],
+            name                       = f"{az['key']}{az['env']}{az['storage_account']['key']}",
+            account_tier               = az['storage_account']['tier'],
+            account_replication_type   = az['storage_account']['replication'],
+            resource_group_name        = self.rg.name
         )
 
-        storageContainer = storage_container.StorageContainer(
-            self,
-            "sc",
-            name = f"{az_prefix}{az_env}sc",
-            storage_account_name = storageAccount.name
+        sc = storage_container.StorageContainer(
+            self, 
+            az['storage_container']['key'],
+            name = f"{az['key']}{az['env']}{az['storage_container']['key']}",
+            storage_account_name = self.sa.name
         )
 
-        sqlServer = mssql_server.MssqlServer(
-            self,
-            "sql",
-            location = az_location,
-            resource_group_name = resourceGroup.name,
-            name = f"{az_prefix}{az_env}sql",
-            version = az_sql_server["version"],
-            administrator_login = az_sql_server["administrator_login"],
-            administrator_login_password = az_sql_server["administrator_login_password"]
+        sql = mssql_server.Mssql(
+            self, 
+            az['mssql_server']['key'],
+            name = f"{az['key']}{az['env']}{az['mssql_server']['key']}",
+            location = az['location'],
+            version  = az['mssql_server']['version'],
+            administrator_login = az['mssql_server']['administrator_login'],
+            administrator_login_password = az['mssql_server']['administrator_login_password'],
+            resource_group_name = self.rg.name
         )
 
-        sqlDatabase = mssql_database.MssqlDatabase(
-            self,
-            "db",
-            server_id = sqlServer.id,
-            name = f"{az_prefix}{az_env}db",
-            sku_name = az_sql_db["sku_name"],
-            collation = az_sql_db["collation"],
-            create_mode = az_sql_db["create_mode"],
+        db = mssql_database.MssqlDatabase(
+            self, 
+            az['mssql_database']['key'],
+            name = f"{az['key']}{az['env']}{az['mssql_database']['key']}",
+            sku_name = az['mssql_database']['sku_name'],
+            collation = az['mssql_database']['collation'],
+            create_mode = az['mssql_database']['create_mode'],
+            server_id = sql.id
         )
 
-        servicePlan = service_plan.ServicePlan(
-            self,
-            "asp",
-            location = az_location,
-            resource_group_name = resourceGroup.name,
-            name = f"{az_prefix}{az_env}asp",
-            sku_name = az_svc_plan["sku_name"],
-            os_type = az_svc_plan["os_type"]
+        self.svc = service_plan.ServicePlan(
+            self, 
+            az['service_plan']['key'],
+            location = az['location'],
+            name = f"{az['key']}{az['env']}{az['service_plan']['key']}",
+            sku_name = az['service_plan']['sku_name'],
+            os_type = az['service_plan']['os_type'],
+            resource_group_name = self.rg.name
         )
 
-        appFnc = linux_function_app.LinuxFunctionApp(
+        self.fnc = linux_function_app.LinuxFunctionApp(
             self,
-            "fnc",
-            location = az_location,
-            resource_group_name = resourceGroup.name,
-            service_plan_id = servicePlan.id,
-            storage_account_name = storageAccount.name,
-            storage_account_access_key = storageAccount.primary_access_key,
-            name = f"{az_prefix}{az_env}fnc",
+            az['linux_function_app']['key'],
+            name = f"{az['key']}{az['env']}{az['linux_function_app']['key']}",
+            location = az['location'],
+            resource_group_name = self.rg.name,
+            service_plan_id = svc.id,
+            storage_account_name = self.sa.name,
+            storage_account_access_key = self.sa.primary_access_key,
             site_config = { },
             identity = { "type": "SystemAssigned" }
         )
 
-        eventgridtopic = eventgrid_topic.EventgridTopic(
+        self.eventgridtopic = eventgrid_topic.EventgridTopic(
             self,
-            "egt",
-            location = az_location,
-            resource_group_name = resourceGroup.name,
-            name = f"{az_prefix}{az_env}egt"
+            az['eventgrid_topic']['key'],
+            location = az['location'],
+            resource_group_name = self.rg.name,
+            name = f"{az['key']}{az['env']}{az['eventgrid_topic']['key']}"
         )
 
+        self.dashboard = dashboard_grafana.DashboardGrafana(
+            self,
+            az['dashboard_grafana']['key'],
+            location = az['location'],
+            resource_group_name = self.rg.name,
+            name = f"{az['key']}{az['env']}{az['dashboard_grafana']['key']}",
+            api_key_enabled = True
+            deterministic_outbound_ip_enabled = True
+            public_network_access_enabled = False
+            identity = { "type": "SystemAssigned" }
+        )
+       
 class AzureGrafana(TerraformStack):
     def __init__(self, scope: Construct, id: str, workspace_id: str):
         super().__init__(scope, id)
@@ -147,6 +136,7 @@ class AzureGrafana(TerraformStack):
         self.grafana = {
             'auth': 'supersecretkeygoeshere',
             'url': 'https://apacfcdevgrafana.azurewebsites.net'
+            'url': 'https://apacfcdevgrad.azurewebsites.net'
         }
 
         GrafanaProvider(
@@ -176,5 +166,5 @@ class AzureGrafana(TerraformStack):
 
 app = App()
 core_stack = AzureCore(app, "azure_core")
-#grafana_dashboard_stack = AzureGrafana(app, "azure_grafana_dashboard", core_stack.grafana_workspace_id)
+grafana_dashboard_stack = AzureGrafana(app, "azure_grafana_dashboard", core_stack.dashboard.)
 app.synth()

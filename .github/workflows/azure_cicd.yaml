@@ -1,0 +1,65 @@
+name: azure-cicd
+on:
+  workflow_dispatch:
+  workflow_call:
+concurrency:
+  group: "Azure"
+  cancel-in-progress: true
+jobs:
+  deploy:
+    name: Azure
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+     - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install cdktf
+        run: npm install --global cdktf-cli@latest
+
+      - name: Install pip packages
+        run: make install-dependencies
+
+      - name: Perform unittest
+        run: make unittest
+
+      - name: Plan terraform configuration
+        run: make azure-plan-all
+
+      - name: Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/azure/cdktf.out/stacks/
+          framework: terraform_plan
+        
+      - name: Development deployment
+        run: make azure-deploy-all INFRA_ARGS=--auto-approve
+
+      - name: Perform full test and check coverage
+        run: make test
+
+      - name: Conduct e2e testing
+        run: make e2e
